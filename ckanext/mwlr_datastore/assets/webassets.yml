@@ -1,0 +1,14 @@
+# mwlr_datastore-js:
+#   filter: rjsmin
+#   output: ckanext-mwlr_datastore/%(version)s-mwlr_datastore.js
+#   contents:
+#     - js/mwlr_datastore.js
+#   extra:
+#     preload:
+#       - base/main
+
+# mwlr_datastore-css:
+#   filter: cssrewrite
+#   output: ckanext-mwlr_datastore/%(version)s-mwlr_datastore.css
+#   contents:
+#     - css/mwlr_datastore.css

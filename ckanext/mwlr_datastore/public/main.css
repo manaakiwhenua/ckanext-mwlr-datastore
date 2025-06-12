@@ -1,0 +1,232 @@
+/* CKAN-440 Add to allow word breaking of descriptions of organizaions
+   (collections) and groups in the sidebar information of datasets
+   etc. THIS WILL CHANGE SIDEBAR CONTEXT INFO BEHAVIOUR IN MANY
+   PLACES. */
+.context-info .description {
+    word-break: normal;
+}
+
+/* CKAN-440 Add to allow word breaking of descriptions in organizations
+   (collections) and groups tile mosaics */
+.media-description {
+    word-break: normal;
+}
+
+/* ?? */
+.form-horizontal .help-block {
+  margin-left: 130px;
+  margin-bottom: 1em;
+  margin-top: -15px;
+  padding-top: 0;
+}
+@media (max-width: 767px) {
+  .form-horizontal .help-block {
+    margin-left: 180px;
+  }
+}
+@media (max-width: 480px) {
+  .form-horizontal .help-block {
+    margin-left: 0;
+  }
+}
+
+/* lcrnz repeating */
+
+.control-repeating .checkbox.btn {
+  display: inline-block;
+  position: relative;
+  top: 0;
+  left: 5px;
+  height: 20px;
+  width: 20px;
+  padding: 3px 8px;
+
+  -webkit-border-radius: 15px;
+          border-radius: 15px;
+  line-height: 21px;
+}
+
+.control-repeating .checkbox.btn input {
+  display: none;
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .form-horizontal .control-repeating:first-child .controls input {
+    width: 87%;
+  }
+}
+
+/* For the registration page */
+.noteBoxes {
+	border: 1px solid;
+  	border-radius: 5px;
+	padding: 10px;
+	margin: 10px 0;
+	width: 100%;
+}
+
+.warningBox {
+	border-color: #E76F51;
+	background-color: rgba(231, 111, 81, 0.1); 
+}
+
+.notePicture
+{
+	width: 15px; 
+	padding-right: 10px;
+}
+
+img {
+  max-width: 100%;
+}
+
+
+
+/* form inline */
+
+/* =====================================================
+   The "account masthead" bar across the top of the site
+   ===================================================== */
+.account-masthead {
+    background-color: rgb(40, 40, 40);
+}
+/* The "bubble" containing the number of new notifications. */
+.account-masthead .account .notifications a span {
+  background-color: black;
+}
+
+/* The text and icons in the user account info. */
+.account-masthead .account ul li a {
+  color: rgba(255, 255, 255);
+}
+/* The user account info text and icons, when the user's pointer is hovering
+   over them. */
+.account-masthead .account ul li a:hover {
+  color: rgba(255, 255, 255, 1);
+  background-color: black;
+}
+
+/* ===========================================================
+   The main masthead bar that contains the site logo, nav links, and search
+   ===========================================================*/
+.masthead {
+  background-color: #3d3d3d;
+}
+
+/* search box */
+.masthead .site-search input {
+  padding: 4px 10px;
+  width: 175px;
+}
+
+
+/* The "navigation pills" in the masthead (the links to Datasets,
+   Organizations, etc) when the user's pointer hovers over them. */
+.masthead .navbar .navbar-nav  li a:hover {
+  background-color: rgb(96, 96, 96);
+  color: white;
+}
+
+/* The "active" navigation pill (for example, when you're on the /dataset page
+   the "Datasets" link is active). */
+.masthead .navbar .navbar-nav > li.active a{
+  background-color: rgb(74, 74, 74);
+}
+
+
+/* ====================================
+   The footer at the bottom of the site
+   ==================================== */
+.site-footer,
+body {
+  background-color: rgb(40, 40, 40);
+}
+/* The text in the footer. */
+.site-footer,
+.site-footer label,
+.site-footer small {
+  color: rgba(255, 255, 255, 0.6);
+}
+/* The link texts in the footer. */
+.site-footer a {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+.hero a:link {color: #009F77; text-decoration: none; } .hero a:active {color: #009F77; text-decoration: none; } .hero a:visited {color: #055F7B; text-decoration: none; } .hero a:hover {color: #ff0000; text-decoration: underline; }
+
+
+/* Remove the feature image */
+div.hero section.featured.media-overlay {
+display: none;
+}
+
+/* Style up front page */
+div.hero header {
+background-image: url(https://datastore.landcareresearch.co.nz/dataset/e2eb77d4-2b29-4733-8e2f-3ec6285bf76d/resource/232868d4-6cea-4195-8a82-61404fcff240/download/6-measuring-biodiversity264.jpg);
+background-size: cover;
+background-repeat: no-repeat;
+background-position: center;
+height: 264px; /* 185 = works in both IE and Firefox, 250=good, 264=height of main background image */
+padding-top: 15px; /* 15 originally was 42, but 24 works better in IE at height 185 */
+padding-bottom: 75px; /*75 */
+border-radius: 3px;
+font-size: 1.8em;
+font-weight: normal;
+color: white;
+text-shadow: 2px 2px 2px black;
+text-align: center;
+line-height:120%;
+}
+
+/* homepage background image */
+.homepage .hero {
+    background: lightsteelblue;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(/homepage-background.jpg);
+  padding: 20px 0;
+}
+
+/* Customise colours - e.g. NZBH theme */
+/*  .account-masthead {
+    background-color: rgb(40, 40, 40);
+}
+.masthead {
+    background-color: rgb(138, 137, 91);
+}  */
+
+
+.search-form .search-input input {
+    color: black;
+}
+
+/* Alternative images */
+/* url(http://www.landcareresearch.co.nz/__data/assets/image/0010/13204/45_data.jpg); */
+
+/* url(http://www.landcareresearch.co.nz/__data/assets/image/0006/28095/PAN_banner.jpg); */
+
+/* url(http://www.landcareresearch.co.nz/__data/assets/image/0014/13190/8_e_science.jpg); */
+/* url(http://www.landcareresearch.co.nz/__data/assets/image/0015/15504/6-Measuring-Biodiversity.jpg); */
+
+/* http://openumea-storage.s3-website-eu-west-1.amazonaws.com/birches-scaled.jpg */
+      
+
+/* homepage promoted box */
+.module-promotion.card.box {
+    background-image: url(6-measuring-biodiversity264.jpg);
+    /* background-size: cover; */
+    background-repeat: no-repeat;
+    /* background-position: center; */
+    height: 250px;
+    padding-top: 15px; /* originally was 42, but 24 works better in IE at height 185 */
+    padding-bottom: 75px;
+    border-radius: 3px;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 2px black;
+    text-align: center;
+    line-height:120%;
+}

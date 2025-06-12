@@ -1,0 +1,9 @@
+{% ckan_extends %} 
+
+{# remove the dialogue to change password on the user/Manage page  (CKAN-447)#}
+
+{% block change_password %} 
+    <div style="display: none;">
+    {{ super() }}
+    </div>
+{% endblock %} 

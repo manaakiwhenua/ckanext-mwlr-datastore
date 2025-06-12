@@ -1,0 +1,29 @@
+{% ckan_extends %}
+
+{# load css #}
+{% block custom_styles %}
+  {{ super() }}
+
+  <link rel="stylesheet" href="/main.css" />
+{% endblock %}
+
+{# install favicon #}
+{% block links %}
+  <link rel="shortcut icon" href="/favicon-32x32.png" />
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+  {# CKAN-367 Add google analytics tag to every page. This is a novel
+    block, not in the built in CKAN templates.  Including a block is not
+    strictly necessary but adds nice structure I think, and permits child
+    templates to change or remove the tag.  The code is ineffective if it
+    occurs after ckan_extends. The block or snippet could be referenced
+    elsewhere.  This location was chosen because the template already
+    existed in the extension and it is highly likely to be sourced on
+    every CKAN page.#}
+  {% block google_tag %}  
+    {% snippet 'snippets/google_analytics_tag.html' %}  
+  {% endblock %}  
+{% endblock %}

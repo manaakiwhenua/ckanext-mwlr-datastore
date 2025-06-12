@@ -1,0 +1,9 @@
+{% ckan_extends %}
+{% block secondary_content %}
+
+{% snippet "spatial/snippets/spatial_query.html", default_extent="[[-49.43,160.74], [-32.43,185.91]]" %}  
+
+{{ super() }}
+
+{% endblock %}
+

@@ -1,0 +1,70 @@
+{% ckan_extends %}
+
+{% block package_metadata_fields %}
+
+  {{ form.input('publisher',
+    label=_('Publisher'),
+    id='field-publisher',
+    value=data.publisher or _('Landcare Research NZ Ltd'),
+    error=errors.publisher,
+    classes=['control-medium']) }}
+
+  {{ form.input('publication_year',
+    label=_('Publication Year'),
+    id='field-publication_year',
+    placeholder=_('YYYY'),
+    value=data.publication_year,
+    error=errors.publication_year,
+    classes=['control-medium']) }}
+    <p class="help-block">The year the data will be made public (if it will be).</p>
+
+  {% block package_metadata_fields_maintainer %}
+    {{ form.input('maintainer', label=_('Maintainer'), id='field-maintainer', placeholder=_('Jo Bloggs'), value=data.maintainer, error=errors.maintainer, classes=['control-medium']) }}
+
+    {{ form.input('maintainer_email', label=_('Maintainer Email'), id='field-maintainer-email', placeholder=_('jo@example.com'), value=data.maintainer_email, error=errors.maintainer_email, classes=['control-medium']) }}
+  {% endblock %}
+
+  {{ form.input('start_date',
+    label=_('Start Date'),
+    id='field-start_date',
+    placeholder=_('YYYY, YYYY-MM, or YYYY-MM-DD'),
+    value=data.start_date,
+    error=errors.start_date,
+    classes=['control-medium']) }}
+    <p class="help-block">The start date the data was collected/created.</p>
+
+  {{ form.input('end_date',
+    label=_('End Date'),
+    id='field-end_date',
+    placeholder=_('YYYY, YYYY-MM, or YYYY-MM-DD'),
+    value=data.end_date,
+    error=errors.end_date,
+    classes=['control-medium']) }}
+    <p class="help-block">The end date the data was collected/created.</p>
+
+  {% block package_metadata_fields_url %}
+    {{ form.input('url', label=_('Source'), id='field-url', placeholder=_('http://example.com/dataset.json'), value=data.url, error=errors.url, classes=['control-medium']) }}
+  {% endblock %}
+
+  {% block package_metadata_fields_version %}
+    {{ form.input('version', label=_('Version'), id='field-version', placeholder=_('1.0'), value=data.version, error=errors.version, classes=['control-medium']) }}
+  {% endblock %}
+
+  {{ form.input('doi',
+    label=_('DOI'),
+    id='field-doi',
+    placeholder=_('e.g. doi: 10.7931/J2PK0D34'),
+    value=data.doi,
+    error=errors.doi,
+    classes=['control-medium']) }}
+
+  {% block package_metadata_fields_custom %}
+    {% block custom_fields %}
+      {% snippet 'snippets/custom_form_fields.html', extras=data.extras, errors=errors, limit=3 %}
+    {% endblock %}
+  {% endblock %}
+
+  {% block dataset_fields %}
+  {% endblock %}
+
+{% endblock %}

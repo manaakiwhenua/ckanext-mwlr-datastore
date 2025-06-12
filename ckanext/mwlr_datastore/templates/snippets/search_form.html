@@ -1,0 +1,20 @@
+{% ckan_extends %}
+
+{# Set the value for 'placeholder' to change the default text used in search
+fields. To set a blank value, set 'placeholder' to a single space: ' '. #}
+
+{# Organization search field #}
+{% if type == 'organization' %}
+  {% set placeholder = ' ' %}
+
+{# Group search field #}
+{% elif type == 'group' %}
+  {% set placeholder = ' ' %}
+
+{# Dataset search field #}
+{% elif type == 'dataset' %}
+  {% set placeholder = ' ' %}
+
+{% else %}
+  {% set placeholder = ' ' %}
+{% endif %}

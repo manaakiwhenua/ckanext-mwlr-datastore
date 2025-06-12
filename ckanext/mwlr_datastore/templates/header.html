@@ -1,0 +1,16 @@
+{% ckan_extends %}
+
+{% block header_site_navigation_tabs %}     
+  {{ h.build_nav_main(     
+  ('dataset.search', _('Data')) ,
+  ('organization.index', _('Collections')), 
+  ('group.index', _('Groups')),     
+  ('lcrnz.terms_of_use', _('Terms Of Use')),     
+  ) }}
+{% endblock %}     
+
+{% block header_logo %}
+    <a class="logo" href="{{ h.url_for('home.index') }}">
+      <img src="/logo.png" alt="{{ g.site_title }}" title="{{ g.site_title }}" />   
+    </a>
+{% endblock %}
