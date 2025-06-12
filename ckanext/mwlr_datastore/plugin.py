@@ -27,7 +27,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     def get_blueprint(self):
         """Provides Flask blueprint which sets up a custom
         `terms_of_use` URL. Uses IBlueprint interface."""
-        blueprint = Blueprint('lcrnz', self.__module__)
+        blueprint = Blueprint('mwlr_datastore', self.__module__)
         rules = [('/terms_of_use','terms_of_use',terms_of_use),]
         for rule in rules:
             blueprint.add_url_rule(*rule)

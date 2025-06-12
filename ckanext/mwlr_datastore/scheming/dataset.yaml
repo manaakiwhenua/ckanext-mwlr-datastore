@@ -67,14 +67,14 @@ dataset_fields:
   label            : 'Start Date'
   help_text        : 'The start date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
-  validators       : ignore_empty ckanext_lcrnz_is_date convert_to_extras
+  validators       : ignore_empty ckanext_mwlr_datastore_is_date convert_to_extras
   form_snippet     : text_no_autocomplete.html
 
 - field_name       : end_date
   label            : 'End Date'
   help_text        : 'The end date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
-  validators       : ignore_empty ckanext_lcrnz_is_date convert_to_extras
+  validators       : ignore_empty ckanext_mwlr_datastore_is_date convert_to_extras
   form_snippet     : text_no_autocomplete.html
 
 - field_name       : url
@@ -95,35 +95,35 @@ dataset_fields:
 
 - field_name       : latitude
   label            : 'Latitude'
-  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
 
 - field_name       : longitude
   label            : 'Longitude'
-  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., 166.166667'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
 
 - field_name       : area_height
   label            : 'Area Height'
-  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Extent height (km). Default is 0.05.'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
 
 - field_name       : area_width
   label            : 'Area Width'
-  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Extent width (km). Default is 0.05.'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
 
 - field_name       : spatial
   label            : 'Spatial extent polygon'
-  validators       : ignore_empty ckanext_lcrnz_convert_spatial
+  validators       : ignore_empty ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'JSON-formatted polygon. Computed from latitude etc if entered above above.'
   form_snippet     : text_no_autocomplete.html
   help_text        : 'For example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}'
@@ -131,13 +131,13 @@ dataset_fields:
 
 - field_name          : custom
   label               : Custom Field
-  ## validators          : ckanext_lcrnz_convert_custom_fields  # Does not seem to act if validator is here.   Instead I have placed it in one of the repeating subfields. even though it is not subfield specific. Alan Heays 2023-12-18
+  ## validators          : ckanext_mwlr_datastore_convert_custom_fields  # Does not seem to act if validator is here.   Instead I have placed it in one of the repeating subfields. even though it is not subfield specific. Alan Heays 2023-12-18
   repeating_label     : Custom Field
   repeating_subfields :
     - field_name      : custom_key
       label           : key
       form_snippet    : text_no_autocomplete.html
-      validators      : ckanext_lcrnz_convert_custom_fields
+      validators      : ckanext_mwlr_datastore_convert_custom_fields
     - field_name      : custom_value
       label           : Value
       form_snippet    : text_no_autocomplete.html
