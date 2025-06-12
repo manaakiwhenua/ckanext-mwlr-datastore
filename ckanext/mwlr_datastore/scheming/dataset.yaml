@@ -1,0 +1,168 @@
+scheming_version: 2
+dataset_type: dataset
+about_url: http://example.com/the-camel-photos-schema
+
+
+dataset_fields:
+
+- field_name: title
+  label: Title
+  preset: title
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : name
+  label            : URL
+  preset           : dataset_slug
+  form_placeholder : autofills, leave blank
+  validators       : unicode_safe
+
+
+- field_name       : notes
+  label            : Description
+  preset           : markdown
+
+- field_name       : tag_string
+  label            : Tags
+  preset           : tag_string_autocomplete
+  help_text        : 'eg. vegetation, soil carbon, possums'
+
+- field_name       : license_id
+  label            : License
+  form_snippet     : license.html
+  help_text        : 'License definitions and additional information can be found at http://creativecommons.org/licenses'
+
+- field_name       : owner_org
+  label            : Collection
+  preset           : dataset_organization
+
+- field_name       : publisher
+  label            : Publisher
+  validators       : ignore_empty
+
+- field_name       : publication_year
+  label            : Publication Year
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : author
+  label            : Authors
+  help_text        : 'eg. Surname, First Name'
+  preset           : multiple_text
+  validators       : ignore_missing scheming_multiple_text
+
+- field_name: maintainer
+  label: Maintainer
+  form_placeholder: Maintainer Name
+  display_property: dc:contributor
+  display_snippet : maintainer_display.html
+  display_email_field : maintainer_email
+
+- field_name: maintainer_email
+  label: Maintainer Email
+  form_placeholder: user@example.com
+  display_property: dc:contributor
+  display_snippet: null
+  display_email_name_field: maintainer
+
+- field_name       : start_date
+  label            : 'Start Date'
+  help_text        : 'The start date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  validators       : ignore_empty ckanext_lcrnz_is_date convert_to_extras
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : end_date
+  label            : 'End Date'
+  help_text        : 'The end date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  validators       : ignore_empty ckanext_lcrnz_is_date convert_to_extras
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : url
+  label            : 'Source'
+  form_placeholder : 'http://example.com/dataset.json'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : link.html
+
+- field_name       : version
+  label            : 'Version'
+  form_placeholder : '1.0'
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : doi
+  label            : 'DOI'
+  form_placeholder : 'e.g. https://doi.org/10.7931/J2PK0D34'
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : latitude
+  label            : 'Latitude'
+  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+
+- field_name       : longitude
+  label            : 'Longitude'
+  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., 166.166667'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+
+- field_name       : area_height
+  label            : 'Area Height'
+  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  form_placeholder : 'Extent height (km). Default is 0.05.'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+
+- field_name       : area_width
+  label            : 'Area Width'
+  validators       : ignore_empty ckanext_lcrnz_is_number ckanext_lcrnz_convert_spatial
+  form_placeholder : 'Extent width (km). Default is 0.05.'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+
+- field_name       : spatial
+  label            : 'Spatial extent polygon'
+  validators       : ignore_empty ckanext_lcrnz_convert_spatial
+  form_placeholder : 'JSON-formatted polygon. Computed from latitude etc if entered above above.'
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'For example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}'
+  display_snippet  : null
+
+- field_name          : custom
+  label               : Custom Field
+  ## validators          : ckanext_lcrnz_convert_custom_fields  # Does not seem to act if validator is here.   Instead I have placed it in one of the repeating subfields. even though it is not subfield specific. Alan Heays 2023-12-18
+  repeating_label     : Custom Field
+  repeating_subfields :
+    - field_name      : custom_key
+      label           : key
+      form_snippet    : text_no_autocomplete.html
+      validators      : ckanext_lcrnz_convert_custom_fields
+    - field_name      : custom_value
+      label           : Value
+      form_snippet    : text_no_autocomplete.html
+
+resource_fields:
+
+- field_name: url
+  label: URL
+  preset: resource_url_upload
+
+- field_name: name
+  label: Name
+  form_placeholder: eg. January 2011 Gold Prices
+
+- field_name: description
+  label: Description
+  form_snippet: markdown.html
+  form_placeholder: Some useful notes about the data
+
+- field_name       : version
+  label            : Version
+  form_placeholder : 1.0
+  form_snippet     : text_no_autocomplete.html
+
+- field_name: format
+  label: Format
+  preset: resource_format_autocomplete
+
