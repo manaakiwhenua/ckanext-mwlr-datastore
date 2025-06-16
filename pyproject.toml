@@ -36,3 +36,9 @@ filterwarnings = [
         "ignore::DeprecationWarning",
 ]
 addopts = "--ckan-ini test.ini"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"ckanext.mwlr_datastore" = ["scheming/*.yaml"]
