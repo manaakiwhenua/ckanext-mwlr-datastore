@@ -1,7 +1,5 @@
 scheming_version: 2
 dataset_type: dataset
-about_url: http://example.com/the-camel-photos-schema
-
 
 dataset_fields:
 
@@ -9,52 +7,57 @@ dataset_fields:
   label: Title
   preset: title
   form_snippet     : text_no_autocomplete.html
+  validators       : if_empty_same_as("name") unicode_safe strip_value
 
 - field_name       : name
   label            : URL
   preset           : dataset_slug
   form_placeholder : autofills, leave blank
-  validators       : unicode_safe
-
+  validators       : not_empty unicode_safe name_validator package_name_validator strip_value
 
 - field_name       : notes
   label            : Description
-  preset           : markdown
+  validators       : ignore_empty unicode_safe strip_value
 
 - field_name       : tag_string
   label            : Tags
   preset           : tag_string_autocomplete
   help_text        : 'eg. vegetation, soil carbon, possums'
+  validators       : ignore_empty tag_string_convert
 
 - field_name       : license_id
   label            : License
   form_snippet     : license.html
   help_text        : 'License definitions and additional information can be found at http://creativecommons.org/licenses'
+  validators       : ignore_empty unicode_safe
 
 - field_name       : owner_org
   label            : Collection
   preset           : dataset_organization
+  validators       : owner_org_validator unicode_safe
 
 - field_name       : publisher
   label            : Publisher
-  validators       : ignore_empty
+  validators       : ignore_empty unicode_safe strip_value
 
 - field_name       : publication_year
   label            : Publication Year
   form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_year
 
 - field_name       : author
   label            : Authors
   help_text        : 'eg. Surname, First Name'
   preset           : multiple_text
-  validators       : ignore_missing scheming_multiple_text
+  validators       : ignore_empty ckanext_mwlr_datastore_strip_values_in_list scheming_multiple_text 
 
 - field_name: maintainer
   label: Maintainer
-  form_placeholder: Maintainer Name
-  display_property: dc:contributor
-  display_snippet : maintainer_display.html
+  form_placeholder : Maintainer Name
+  display_property : dc:contributor
+  display_snippet  : maintainer_display.html
   display_email_field : maintainer_email
+  validators       : ignore_empty unicode_safe strip_value
 
 - field_name: maintainer_email
   label: Maintainer Email
@@ -62,19 +65,20 @@ dataset_fields:
   display_property: dc:contributor
   display_snippet: null
   display_email_name_field: maintainer
+  validators       : ignore_empty unicode_safe strip_value email_validator
 
 - field_name       : start_date
   label            : 'Start Date'
   help_text        : 'The start date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_date convert_to_extras
   form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_date convert_to_extras
 
 - field_name       : end_date
   label            : 'End Date'
   help_text        : 'The end date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_date convert_to_extras
+  validators       : ignore_empty strip_value ckanext_mwlr_datastore_is_date convert_to_extras
   form_snippet     : text_no_autocomplete.html
 
 - field_name       : url
@@ -82,52 +86,55 @@ dataset_fields:
   form_placeholder : 'http://example.com/dataset.json'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : link.html
+  validators       : ignore_empty strip_value unicode_safe
 
 - field_name       : version
   label            : 'Version'
   form_placeholder : '1.0'
   form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty strip_value unicode_safe package_version_validator
 
 - field_name       : doi
   label            : 'DOI'
   form_placeholder : 'e.g. https://doi.org/10.7931/J2PK0D34'
   form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty unicode_safe strip_value unicode_safe
 
 - field_name       : latitude
   label            : 'Latitude'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
 
 - field_name       : longitude
   label            : 'Longitude'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., 166.166667'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
 
 - field_name       : area_height
   label            : 'Area Height'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Extent height (km). Default is 0.05.'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
+  validators       : ignore_empty strip_value unicode_safe ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
 
 - field_name       : area_width
   label            : 'Area Width'
-  validators       : ignore_empty ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'Extent width (km). Default is 0.05.'
   form_snippet     : text_no_autocomplete.html
   display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
 
 - field_name       : spatial
   label            : 'Spatial extent polygon'
-  validators       : ignore_empty ckanext_mwlr_datastore_convert_spatial
   form_placeholder : 'JSON-formatted polygon. Computed from latitude etc if entered above above.'
   form_snippet     : text_no_autocomplete.html
   help_text        : 'For example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}'
   display_snippet  : null
+  validators       : ignore_empty strip_value ckanext_mwlr_datastore_convert_spatial
 
 - field_name          : custom
   label               : Custom Field
@@ -137,32 +144,40 @@ dataset_fields:
     - field_name      : custom_key
       label           : key
       form_snippet    : text_no_autocomplete.html
-      validators      : ckanext_mwlr_datastore_convert_custom_fields
+      ### validators      : remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
+      validators      : ignore_empty remove_whitespace unicode_safe
+      validators      : ckanext_mwlr_datastore_convert_custom_fields 
     - field_name      : custom_value
       label           : Value
       form_snippet    : text_no_autocomplete.html
+      validators      : ignore_empty remove_whitespace unicode_safe
 
 resource_fields:
 
 - field_name: url
   label: URL
   preset: resource_url_upload
+  validators: ignore_empty unicode_safe strip_value
 
 - field_name: name
   label: Name
   form_placeholder: eg. January 2011 Gold Prices
+  validators: ignore_empty unicode_safe strip_value
 
 - field_name: description
   label: Description
   form_snippet: markdown.html
   form_placeholder: Some useful notes about the data
+  validators: ignore_empty unicode_safe strip_value
 
 - field_name       : version
   label            : Version
   form_placeholder : 1.0
   form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty strip_value unicode_safe
 
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
+  validators: if_empty_guess_format ignore_empty strip_value clean_format unicode_safe
 
