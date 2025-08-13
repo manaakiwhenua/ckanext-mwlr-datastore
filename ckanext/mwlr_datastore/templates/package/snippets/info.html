@@ -1,0 +1,16 @@
+{# Add Recent and Total views to a packages sidebar #}
+
+{% ckan_extends %} 
+{% block nums %} 
+  {% set num_followers = h.follow_count('dataset', pkg.id) %} 
+  <div class="nums"> 
+    <dl> 
+      <dt>{{ _('Followers') }}</dt> 
+      <dd data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}">{{ h.SI_number_span(num_followers) }}</dd> 
+      <dt>{{ _('Recent views') }}</dt> 
+      <dd> {{ pkg.tracking_summary['recent'] }} </dd> 
+      <dt>{{ _('Total views') }}</dt> 
+      <dd> {{ pkg.tracking_summary['total'] }} </dd> 
+    </dl> 
+  </div> 
+{% endblock %} 
