@@ -6,11 +6,17 @@
   <div class="nums"> 
     <dl> 
       <dt>{{ _('Followers') }}</dt> 
-      <dd data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}">{{ h.SI_number_span(num_followers) }}</dd> 
-      <dt>{{ _('Recent views') }}</dt> 
-      <dd> {{ pkg.tracking_summary['recent'] }} </dd> 
-      <dt>{{ _('Total views') }}</dt> 
-      <dd> {{ pkg.tracking_summary['total'] }} </dd> 
+      <dd data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}">{{ h.SI_number_span(num_followers) }}</dd>
+      {# The tracking summary is not available in the package data on
+      some pages (e.g., the edit package page). Perhaps this is
+      because the package data is collected in a parent template with
+      include_tracking=False? #}
+      {% if 'tracking_summary' in pkg %} 
+        <dt>{{ _('Recent views') }}</dt>    
+          <dd> {{ pkg.tracking_summary['recent'] }} </dd>    
+          <dt>{{ _('Total views') }}</dt>    
+          <dd> {{ pkg.tracking_summary['total'] }} </dd> 
+        {% endif %} 
     </dl> 
   </div> 
 {% endblock %} 
