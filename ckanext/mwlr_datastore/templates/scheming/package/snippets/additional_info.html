@@ -1,4 +1,10 @@
-{% extends "package/snippets/additional_info.html" %}
+{% ckan_extends %}
+
+{# 2025-08-15: Replace this same snippet provided by the scheming
+plugin the only change is the line "and pkg_dict[field.field_name]"
+which excludes listing empty package metadata in the Additional Info
+list box#}
+
 
 {%- set exclude_fields = [
     'id',
@@ -13,8 +19,9 @@
 {% block package_additional_info %}
   {%- for field in schema.dataset_fields -%}
     {%- if field.field_name not in exclude_fields
-        and field.display_snippet is not none 
-        and pkg_dict[field.field_name] -%}
+        and field.display_snippet is not none
+        and pkg_dict[field.field_name]
+      -%}
       <tr>
         <th scope="row" class="dataset-label">{{
           h.scheming_language_text(field.label) }}</th>
@@ -25,5 +32,10 @@
       </tr>
     {%- endif -%}
   {%- endfor -%}
-  {{ super() }}
+  {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("State") }}</th>
+      <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
+    </tr>
+  {% endif %}
 {% endblock %}
