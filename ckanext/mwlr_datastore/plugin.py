@@ -5,6 +5,7 @@ import ckan.plugins.toolkit as toolkit
 from flask import Blueprint
 
 from ckanext.mwlr_datastore.logic import validators
+from ckanext.mwlr_datastore.template_helper_functions import *
 
 
 def terms_of_use():
@@ -16,7 +17,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
-    
+    plugins.implements(plugins.ITemplateHelpers)    
 
     def is_fallback(self):
         return True
@@ -79,6 +80,13 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         _update_facets(facets_dict)
         return facets_dict
 
+    ## ITemplateHelpers
+    def get_helpers(self):
+        '''Register custom template helper functions.'''
+        return {
+            'datastore_get_package_tracking_total': get_package_tracking_total,
+            'datastore_get_package_tracking_recent': get_package_tracking_recent,
+        }
 
 def _update_facets(facets_dict):
 

@@ -1,22 +1,22 @@
 {# Add Recent and Total views to a packages sidebar #}
 
 {% ckan_extends %} 
-{% block nums %} 
+{% block nums %}
   {% set num_followers = h.follow_count('dataset', pkg.id) %} 
   <div class="nums"> 
     <dl> 
       <dt>{{ _('Followers') }}</dt> 
       <dd data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}">{{ h.SI_number_span(num_followers) }}</dd>
       {# The tracking summary is not available in the package data on
-      some pages (e.g., the edit package page). Perhaps this is
+      some pages as pkg.tracking_summary (e.g., the edit package page). Perhaps this is
       because the package data is collected in a parent template with
-      include_tracking=False? #}
-      {% if 'tracking_summary' in pkg %} 
-        <dt>{{ _('Recent views') }}</dt>    
-          <dd> {{ pkg.tracking_summary['recent'] }} </dd>    
-          <dt>{{ _('Total views') }}</dt>    
-          <dd> {{ pkg.tracking_summary['total'] }} </dd> 
-        {% endif %} 
+      include_tracking=False? For that reason I created the helper
+      functions datastore_get_package_tracking_recent to retrieve this
+      information.#}
+      <dt>{{ _('Recent views') }}</dt>    
+      <dd> {{ h.datastore_get_package_tracking_recent(pkg.id) }} </dd>    
+      <dt>{{ _('Total views') }}</dt>    
+      <dd> {{ h.datastore_get_package_tracking_total(pkg.id) }} </dd>    
     </dl> 
   </div> 
 {% endblock %} 
