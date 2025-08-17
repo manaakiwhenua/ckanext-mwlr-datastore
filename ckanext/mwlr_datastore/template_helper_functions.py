@@ -8,7 +8,7 @@ def get_package_tracking_total(package_id):
     data.'''
     data = toolkit.get_action('package_show')(
         data_dict={
-            'name_or_id':"package_id",
+            'name_or_id':package_id,
             'include_tracking':True,}
     )
     return data['tracking_summary']['total']
@@ -18,7 +18,10 @@ def get_package_tracking_recent(package_id):
     data.'''
     data = toolkit.get_action('package_show')(
         data_dict={
-            'name_or_id':"package_id",
+            'name_or_id':package_id,
             'include_tracking':True,}
     )
     return data['tracking_summary']['recent']
+
+
+
