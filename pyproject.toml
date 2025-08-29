@@ -23,6 +23,7 @@ Homepage = "https://github.com//ckanext-mwlr-datastore"
 
 [project.entry-points."ckan.plugins"]
 mwlr_datastore = "ckanext.mwlr_datastore.plugin:MwlrDatastorePlugin"
+mwlr_tracking = "ckanext.mwlr_tracking.plugin:MwlrTrackingPlugin"
 
 
 [build-system]
