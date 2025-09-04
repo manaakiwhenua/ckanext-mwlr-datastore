@@ -1,20 +1,24 @@
 {% ckan_extends %}
 
-{# This extension extends a scheming plugin template and adds tracking
-data to the resources Additional Information box.  This is done by
-piggy-backing on the resource creation field that has a named block
-"resource_created". Otherwise more of the template would have to be
-copied here to add the new fields. #}
-
+{# Alan Heays 2025-09-04: This extension extends a scheming plugin
+template and adds tracking data to the resources "Additional
+Information" box.  This is done by piggy-backing on the resource
+creation field that has a named block "resource_created". Otherwise
+more of the template would have to be copied here to add the new
+fields. It uses custom template helpers get_resource_tracking_total
+and get_resource_tracking_recent because the res data_dicts provided
+in the template are apparently generated with include_tracking=False.
+It would be nice to remove these helpers if a future version of CKAN
+sets this to True.#}
 
 {% block resource_created %}
   {{ super() }} {# prepend the original block#}
   <tr>  
-    <th scope="row">{{ _('Recent views') }}</th>  
-    <td>{{ h.datastore_get_package_tracking_recent(pkg.id) }}</td>  
+    <th scope="row">{{ _('Recent downloads') }}</th>  
+    <td>{{ h.datastore_get_resource_tracking_recent(res.id) }}</td>   
   </tr>  
   <tr>  
-    <th scope="row">{{ _('Total views') }}</th>  
-    <td>{{ h.datastore_get_package_tracking_total(pkg.id) }}</td>  
+    <th scope="row">{{ _('Total downloads') }}</th>  
+    <td>{{ h.datastore_get_resource_tracking_total(res.id) }}</td>  
   </tr>  
 {% endblock %} 
