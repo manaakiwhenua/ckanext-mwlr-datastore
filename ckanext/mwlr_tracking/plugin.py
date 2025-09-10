@@ -30,7 +30,6 @@ class MwlrTrackingPlugin(plugins.SingletonPlugin):
 
     def update_config(self, config_):
         """Point to overriding jinja2 templates."""
-        logging.debug('XXXXXXXXXXXXXXXXXXXXX mwlr_tracking update_config running..') #  DEBUG
         toolkit.add_template_directory(config_, "templates")
 
     def get_helpers(self):
@@ -46,6 +45,7 @@ class MwlrTrackingPlugin(plugins.SingletonPlugin):
     def make_middleware(self, app, config):
         """Activate custom tracking middleware to get resource
         downloads tracked."""
+        logging.info('mwlr_tracking_middleware added')
         return MwlrTrackingMiddleware(app, config)
 
 def get_package_tracking_total(package_id):
