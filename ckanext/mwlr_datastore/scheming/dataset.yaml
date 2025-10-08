@@ -39,6 +39,7 @@ dataset_fields:
 - field_name       : publisher
   label            : Publisher
   validators       : ignore_empty unicode_safe strip_value
+  default          : Landcare Research NZ Ltd
 
 - field_name       : publication_year
   label            : Publication Year
