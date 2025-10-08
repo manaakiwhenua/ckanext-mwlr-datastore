@@ -1,6 +1,7 @@
 import ckan.plugins.toolkit as tk
 from ckan.plugins.toolkit import Invalid
 from ckan.lib.navl.dictization_functions import Missing
+from typing import List
 import sys
 import datetime
 import math
@@ -183,7 +184,19 @@ def convert_custom_fields(key, data, errors, context):
     for key in keys_to_pop:
         data.pop(key)
 
-def  strip_values_in_list(key, data, errors, context):
+def encapsulate_string_in_list_if_necessary(key, data, errors, context):
+    """If a given metadata value is list do nothing, if it is a string convert to a list-encapsulate string.  Otherwise raise an error."""
+    value = data[key]
+    if isinstance(value,List):
+        for item in value:
+            if not isinstance(item,str):
+                raise Invalid(f'Input must be a string or list of strings: {repr(value)}')
+    elif isinstance(value,str):
+        data[key] = [value]
+    else:
+        raise Invalid(f'Input must be a string or list of strings: {repr(value)}')
+
+def strip_values_in_list(key, data, errors, context):
     """Strip leading and trailing whitespace from each element of a
     list of strings."""
     values = data[key]
@@ -199,4 +212,5 @@ def get_validators():
         'ckanext_mwlr_datastore_convert_spatial'       : convert_spatial,
         'ckanext_mwlr_datastore_convert_custom_fields' : convert_custom_fields,
         'ckanext_mwlr_datastore_strip_values_in_list'  : strip_values_in_list,
+        'ckanext_mwlr_datastore_encapsulate_string_in_list_if_necessary'  : encapsulate_string_in_list_if_necessary,
     }
