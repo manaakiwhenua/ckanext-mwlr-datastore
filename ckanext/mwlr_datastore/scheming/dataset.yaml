@@ -180,5 +180,5 @@ resource_fields:
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
-  validators: if_empty_guess_format ignore_empty strip_value clean_format unicode_safe
+  validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_remove_leading_dot_if_present clean_format unicode_safe
 
