@@ -1,7 +1,6 @@
 import ckan.plugins.toolkit as tk
 from ckan.plugins.toolkit import Invalid
 from ckan.lib.navl.dictization_functions import Missing
-from typing import List
 import sys
 import datetime
 import math
