@@ -105,6 +105,7 @@ dataset_fields:
   label            : 'Latitude'
   form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
   form_snippet     : text_no_autocomplete.html
+  help_text        : 'Optionally provide a spatial bounding-box by setting a latitude, longitude, area height and area width.'
   display_snippet  : null
   validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
 
@@ -131,9 +132,9 @@ dataset_fields:
 
 - field_name       : spatial
   label            : 'Spatial extent polygon'
-  form_placeholder : 'JSON-formatted polygon. Computed from latitude etc if entered above above.'
+  form_placeholder : 'JSON-formatted polygon.'
   form_snippet     : text_no_autocomplete.html
-  help_text        : 'For example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}'
+  help_text        : 'Optionally provide a spatial bounding-polygon. An example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}. This will be automatically generated if the above parameters defining a spatial bounding-box have been set.'
   display_snippet  : null
   validators       : ignore_empty strip_value ckanext_mwlr_datastore_convert_spatial
 
