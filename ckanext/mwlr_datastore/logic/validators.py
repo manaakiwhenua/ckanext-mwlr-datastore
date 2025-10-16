@@ -183,12 +183,12 @@ def convert_custom_fields(key, data, errors, context):
     for key in keys_to_pop:
         data.pop(key)
 
-def  strip_values_in_list(key, data, errors, context):
-    """Strip leading and trailing whitespace from each element of a
-    list of strings."""
-    values = data[key]
-    stripped_values = [value.strip() for value in values]
-    data[key] = stripped_values
+def remove_leading_dot_if_present(key, data, errors, context):
+    """Remove a leading '.' from the value of data[key] if it is a
+    string."""
+    value = data[key]
+    if isinstance(value,str) and len(value) > 1 and value[0] == '.':
+        data[key] = value[1:]
 
 def get_validators():
     return {
@@ -198,5 +198,5 @@ def get_validators():
         'ckanext_mwlr_datastore_is_elevation_range'    : is_elevation_range,
         'ckanext_mwlr_datastore_convert_spatial'       : convert_spatial,
         'ckanext_mwlr_datastore_convert_custom_fields' : convert_custom_fields,
-        'ckanext_mwlr_datastore_strip_values_in_list'  : strip_values_in_list,
+        'ckanext_mwlr_datastore_remove_leading_dot_if_present'  : remove_leading_dot_if_present,
     }
