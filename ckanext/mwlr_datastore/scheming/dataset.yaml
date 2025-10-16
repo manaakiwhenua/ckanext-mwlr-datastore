@@ -144,12 +144,11 @@ dataset_fields:
   repeating_label     : Custom Field
   repeating_subfields :
     - field_name      : custom_key
-      label           : Key
+      label           : key
       form_snippet    : text_no_autocomplete.html
       ### validators      : remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
-      ### ignore      : validators_empty remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
-      validators      : ignore_empty remove_whitespace unicode_safe 
-      ### validators      : ckanext_mwlr_datastore_convert_custom_fields 
+      validators      : ignore_empty remove_whitespace unicode_safe
+      validators      : ckanext_mwlr_datastore_convert_custom_fields 
     - field_name      : custom_value
       label           : Value
       form_snippet    : text_no_autocomplete.html
