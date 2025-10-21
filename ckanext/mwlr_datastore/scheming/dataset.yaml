@@ -50,6 +50,7 @@ dataset_fields:
   label            : Authors
   help_text        : 'eg. Surname, First Name'
   preset           : multiple_text
+  display_snippet  : author_display.html
   validators       : ignore_empty scheming_multiple_text 
 
 - field_name: maintainer

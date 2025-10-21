@@ -1,0 +1,66 @@
+{#
+Custom display snippet for author field that handles the case where
+multiple authors get corrupted from JSON array to character-by-character display.
+
+This happens when JSON string like ["John Doe", "Jane Smith"] gets treated
+as an iterable string instead of being parsed as JSON.
+#}
+
+{% set authors = data[field.field_name] %}
+{% if authors %}
+  {% if authors is string %}
+    {# If it's a JSON string, try to parse it #}
+    {% if authors.startswith('[') and authors.endswith(']') %}
+      {# This looks like a JSON array string #}
+      {% set author_list = authors|from_json %}
+      {% if author_list and author_list is iterable and not (author_list is string) %}
+        {# Successfully parsed JSON array #}
+        {% for author in author_list %}
+          {% if author and author|trim %}
+            {{ author|trim }}{% if not loop.last %}, {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {# JSON parsing failed, display as-is #}
+        {{ authors }}
+      {% endif %}
+    {% else %}
+      {# Regular string, not JSON #}
+      {{ authors }}
+    {% endif %}
+  {% elif authors is iterable and not (authors is string) %}
+    {# It's a list/array #}
+    {% if authors|length > 10 and authors[0]|length == 1 %}
+      {# This looks like character-by-character corruption #}
+      {# Try to reconstruct the original JSON string #}
+      {% set reconstructed = authors|join('') %}
+      {% if reconstructed.startswith('[') and reconstructed.endswith(']') %}
+        {% set author_list = reconstructed|from_json %}
+        {% if author_list and author_list is iterable and not (author_list is string) %}
+          {# Successfully reconstructed and parsed #}
+          {% for author in author_list %}
+            {% if author and author|trim %}
+              {{ author|trim }}{% if not loop.last %}, {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {# Reconstruction failed, display the original corrupted data #}
+          {{ authors|join('') }}
+        {% endif %}
+      {% else %}
+        {# Doesn't look like JSON, display the original corrupted data #}
+        {{ authors|join('') }}
+      {% endif %}
+    {% else %}
+      {# Normal list of authors #}
+      {% for author in authors %}
+        {% if author and author|trim %}
+          {{ author|trim }}{% if not loop.last %}, {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    {# Fallback: convert to string #}
+    {{ authors }}
+  {% endif %}
+{% endif %}
