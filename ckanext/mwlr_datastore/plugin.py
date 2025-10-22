@@ -83,9 +83,13 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         return {'mwlr_datastore_listify_author': listify_author}
 
 def listify_author(author_value):
-    """Convert authos, whatever it is, into a list of strings."""
+    """Convert authos, whatever it is, into a list of strings. If
+    input is a list, listify and join elements, i.e., for the cast ["['abc def','ghi jkl']"] """
     if isinstance(author_value, list):
-        return author_value
+        retval = []
+        for element in author_value:
+            retval.extend(listify_author(element))
+        return retval
     if author_value is None:
         return []
     try:
