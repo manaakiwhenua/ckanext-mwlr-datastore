@@ -4,11 +4,9 @@ function is added to the existing snippet here and expands these back
 into lists if necessary. It would be better to find the root of this
 problem that institute this fix. #}
 
-{# {%- set values = h.mwlr_datastore_listify_author(data[field.field_name]) -%}  #}
-<ol>
-{%- for key,values in data.items() -%} 
-{# {%- for element in values -%}  #}
-  <li> {{key}} {{ values }}</li> 
-{# {%- endfor -%}   #}
-{%- endfor -%}  
+{%- set values = h.mwlr_datastore_listify_author(data[field.field_name]) -%}
+<ol> 
+{%- for element in values -%}
+  <li> {{ element }}</li>
+{%- endfor -%} 
 </ol> 
