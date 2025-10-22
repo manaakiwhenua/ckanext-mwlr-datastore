@@ -16,7 +16,8 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
-
+    plugins.implements(plugins.ITemplateHelpers)
+   
     def is_fallback(self):
         return True
     
@@ -77,6 +78,20 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     def organization_facets(self, facets_dict, organization_type, package_type):
         _update_facets(facets_dict)
         return facets_dict
+
+    def get_helpers(self):
+        return {'mwlr_datastore_listify_author': listify_author}
+
+def listify_author(author_value):
+    """Convert authos, whatever it is, into a list of strings."""
+    if isinstance(author_value, list):
+        return author_value
+    if author_value is None:
+        return []
+    try:
+        return json.loads(author_value)
+    except ValueError:
+        return [author_value]
 
 def _update_facets(facets_dict):
 
