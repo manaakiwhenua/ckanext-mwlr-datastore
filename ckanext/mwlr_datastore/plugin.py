@@ -61,6 +61,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
         if dataset_dict.get('author'):
             dataset_dict['vocab_author'] = author_value
+            dataset_dict['author'] = author_value
 
         return dataset_dict
 
