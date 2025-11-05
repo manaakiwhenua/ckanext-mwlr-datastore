@@ -111,20 +111,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'publishing_status_validator': validation.publishing_status_validator,
         }
 
-    # IPackageController
-    def create(self, entity):
-        # if editor published the dataset it will be awalys private
-        if editor_publishing_dataset(entity.owner_org, toolkit.c.userobj):
-            entity.private = True
-        return entity
-
-    def edit(self, entity):
-        # if editor published the dataset it will be awalys private
-        if editor_publishing_dataset(entity.owner_org, toolkit.c.userobj):
-            entity.private = True
-        return entity
-
-
     def before_search(self, search_params):
         include_in_review = search_params.get('include_in_review', False)
 

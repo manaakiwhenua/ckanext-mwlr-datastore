@@ -114,11 +114,15 @@ def _make_action(package_id, action='reject'):
         'reject': 'rejected',
         'approve': 'approved'
     }
+    set_private = action == 'reject'
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
+    update_dict = {'id': package_id, 'publishing_status': states[action]}
+    if set_private:
+        update_dict['private'] = True
     toolkit.get_action('package_patch')(
         {'model': model, 'user': toolkit.c.user},
-        {'id': package_id, 'publishing_status': states[action], 'private': False}
+        update_dict
     )
     # Notify editors via email that dataset has been approved/rejected.
     try:
