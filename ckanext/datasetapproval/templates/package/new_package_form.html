@@ -6,8 +6,8 @@
     <div class="alert alert-warning" role="alert">
         <p><strong>{{ _('Note:') }}</strong></p>
         {% if form_style != 'edit' %}
-          <p>This dataset will be submited for approval by an Office Administrator.</p>
-          <p>While being reviewed members of other offices or the general public won't be able to access it.</p>
+          <p>This dataset will be submitted for approval by an Office Administrator.</p>
+          <p>While being reviewed, members of other offices or the general public won't be able to access it.</p>
         {% else %}
           <p>Changes made now won't be public until the dataset is approved.</p>
         {% endif %}
@@ -24,7 +24,7 @@
   {% if form_style != 'edit' %}
     {{ super() }}
   {% else %}
-    {{ _('Finish Update') }}
+    {{ _('Submit for review') }}
   {% endif %}
 {% endblock %}
 
