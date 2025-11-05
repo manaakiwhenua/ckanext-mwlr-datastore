@@ -1,7 +1,5 @@
 {% extends 'package/snippets/package_form.html' %}
 
-{% set form_style = c.form_style or c.action %}
-
 {% block stages %}
   {% if not h.is_admin(c.user) %}
 
