@@ -155,6 +155,12 @@ dataset_fields:
       form_snippet    : text_no_autocomplete.html
       validators      : ignore_empty remove_whitespace unicode_safe
 
+- field_name       : publishing_status
+  label            : 'Publishing Status'
+  form_snippet     : null
+  display_snippet  : null
+  validators       : ignore_missing publishing_status_validator
+
 resource_fields:
 
 - field_name: url
