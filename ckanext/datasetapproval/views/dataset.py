@@ -294,7 +294,10 @@ class EditView(BaseEditView):
                 tk.h.flash_success(tk._("Dataset saved as draft"))
                 return self.get(package_type, id, data=pkg_dict)
             else:
-                return tk.redirect_to("approval_dataset.dataset_review", id=id)
+                return h.redirect_to(
+                        u'{}.read'.format(package_type),
+                        id=pkg_dict["id"]
+                    )
         except tk.NotAuthorized:
             return tk.abort(403, tk._("Unauthorized to read package %s") % id)
         except tk.ObjectNotFound:
@@ -303,27 +306,6 @@ class EditView(BaseEditView):
             errors = e.error_dict
             error_summary = e.error_summary
             return self.get(package_type, id, data_dict, errors, error_summary)
-
-
-def dataset_review(package_type, id):
-    # Retrieve the context for CKAN's logic functions
-    context = {
-        "model": model,
-        "session": model.Session,
-        "user": tk.c.user or tk.c.author,
-    }
-    try:
-        package_dict = tk.get_action("package_show")(context, {"id": id})
-    except tk.ObjectNotFound:
-        tk.abort(404, tk._("Dataset not found"))
-    except tk.NotAuthorized:
-        tk.abort(401, tk._("Unauthorized to read dataset"))
-
-    return tk.render(
-        "package/snippets/review.html",
-        extra_vars={"pkg_dict": package_dict, "data": package_dict},
-    )
-
 
 def dataset_publish(package_type, id):
     context = {
@@ -345,7 +327,6 @@ def dataset_publish(package_type, id):
 
 dataset.add_url_rule("/new", view_func=CreateView.as_view(str("new")))
 dataset.add_url_rule("/edit/<id>", view_func=EditView.as_view(str("edit")))
-dataset.add_url_rule("/<id>/review", view_func=dataset_review)
 dataset.add_url_rule("/<id>/publish", view_func=dataset_publish, methods=["POST"])
 
 

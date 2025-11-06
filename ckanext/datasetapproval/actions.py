@@ -36,14 +36,14 @@ def publishing_check(context, data_dict):
     )
     org_id = data_dict.get("owner_org")
     log.debug(f"checking key publishing status {data_dict.get('publishing_status')}")
-    is_active = data_dict.get('publishing_status') in [None, "in_review", "published", "", False]
+    is_active = data_dict.get('state') in [None, "active", "published", False]
     log.debug(f"is active {is_active}")
 
     is_user_editor = is_user_editor_of_org(org_id, user_id)
     is_user_admin = is_user_admin_of_org(org_id, user_id)
     is_sysadmin = hasattr(toolkit.current_user, "sysadmin") and toolkit.current_user.sysadmin
 
-    if (is_user_editor or is_unowned_dataset(org_id)) and is_active:
+    if (is_user_editor or is_unowned_dataset(org_id)):
         #mail_package_review_request_to_admins(context, data_dict)
         data_dict['publishing_status'] = "in_review"
 
@@ -73,6 +73,7 @@ def package_create(up_func, context, data_dict):
     publishing_check(context, data_dict)
     result = up_func(context, data_dict)
     log.debug(f"data_dict after publishing_check: {data_dict}")
+    log.debug(f"result after package_create: {result}")
     return result
 
 
@@ -81,7 +82,6 @@ def package_create(up_func, context, data_dict):
 def package_update(up_func, context, data_dict):
     log.debug("package_update called")
     log.debug(f"package_update data_dict before publishing_check: {data_dict}")
-    publishing_check(context, data_dict)
     result = up_func(context, data_dict)
     log.debug(f"package_update data_dict after publishing_check: {data_dict}")
     return result
@@ -95,30 +95,4 @@ def package_patch(up_func, context, data_dict):
     publishing_check(context, data_dict)
     result = up_func(context, data_dict)
     log.debug(f"package_patch data_dict after publishing_check: {data_dict}")
-    return result
-
-
-@toolkit.chained_action   
-def resource_create(up_func,context, data_dict):
-    result = up_func(context, data_dict)
-     # little hack here, update dataset publishing status 
-    if data_dict.get('pkg_publishing_status', False):
-        toolkit.get_action('package_patch')(context, {
-            'id': data_dict.get('package_id', ''), 
-            'publishing_status': data_dict.get('pkg_publishing_status')
-            })
-        data_dict.pop('pkg_publishing_status', None)
-    return result
-
-
-@toolkit.chained_action   
-def resource_update(up_func,context, data_dict):
-    result = up_func(context, data_dict)
-    # little hack here, update dataset publishing status 
-    if data_dict.get('pkg_publishing_status', False):
-        toolkit.get_action('package_patch')(context, {
-            'id': data_dict.get('package_id', ''), 
-            'publishing_status': data_dict.get('pkg_publishing_status')
-            })
-        data_dict.pop('pkg_publishing_status', None)
     return result

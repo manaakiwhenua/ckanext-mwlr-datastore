@@ -4,7 +4,7 @@
 	{% if stage %}
 		{% if stage != 1 %}
 			{% if 'complete' in stage %} {# When new resource added on newly created dataset. #}
-				<input id="field-pkg_publishing_status" type="hidden" name="pkg_publishing_status" value="published" />
+				<input id="field-pkg_publishing_status" type="hidden" name="pkg_publishing_status" value="in_review" />
 			{% endif %}
 		{% else %}  {# When existing resource is edited. #}
 			<input id="field-pkg_publishing_status" type="hidden" name="pkg_publishing_status" value="draft" />

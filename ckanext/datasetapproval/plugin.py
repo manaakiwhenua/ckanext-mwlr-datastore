@@ -59,8 +59,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'package_create': actions.package_create,
             'package_show': actions.package_show,
             'package_update': actions.package_update,
-            'resource_create': actions.resource_create,
-            'resource_update': actions.resource_update,
         }
         
     # IAuthFunctions
@@ -124,7 +122,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
 
     # IBlueprint
     def get_blueprint(self):
-        blueprints = [views.dataset.registered_views()]
-        return blueprints
+        full_blueprints = [views.dataset.registered_views(), blueprints.approveBlueprint]
+        return full_blueprints
 
 

@@ -3,7 +3,7 @@
 {% block content_primary_nav %}
   {{ h.build_nav_icon('user.read', _('Datasets'), id=user.name, icon='sitemap') }}
   {% if is_myself %}
-    {{ h.build_nav_icon('approval_dataset.dataset_review', _('Review Requested'), id=user.name, icon='check') }}
+    {{ h.build_nav_icon('approval.dataset_review', _('Review Requested'), id=user.name, icon='check') }}
   {% endif %}
   {{ h.build_nav_icon('activity.user_activity', _('Activity Stream'), id=user.name, icon='clock') }}
   {% if h.check_access('api_token_list', {'user': user['name']}) %}
