@@ -3,7 +3,7 @@ import logging
 from ckan.plugins import toolkit
 
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def _get_action(action, context_dict, data_dict):

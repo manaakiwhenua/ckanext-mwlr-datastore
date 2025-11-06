@@ -14,7 +14,7 @@ from ckan.lib.mailer import MailerException
 from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
 from ckan.views.dataset import url_with_params
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 approveBlueprint = Blueprint('approval', __name__,)
@@ -125,11 +125,11 @@ def _make_action(package_id, action='reject'):
         update_dict
     )
     # Notify editors via email that dataset has been approved/rejected.
-    try:
-        mail_package_approve_reject_notification_to_editors(package_id, states[action])
-    except MailerException:
-        message = '[email] Failed to sent notification to the editor: {}'
-        log.critical(message.format(package_id))
+    # try:
+    #     mail_package_approve_reject_notification_to_editors(package_id, states[action])
+    # except MailerException:
+    #     message = '[email] Failed to sent notification to the editor: {}'
+    #     log.critical(message.format(package_id))
     
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 

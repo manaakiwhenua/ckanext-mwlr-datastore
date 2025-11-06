@@ -8,43 +8,97 @@ import ckan.logic as logic
 
 from ckanext.datasetapproval.mailer import mail_package_review_request_to_admins
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
+
+def is_unowned_dataset(owner_org):
+    return (
+        not owner_org
+        and authz.check_config_permission("create_dataset_if_not_in_organization")
+        and authz.check_config_permission("create_unowned_dataset")
+    )
 
 
-@p.toolkit.chained_action
+def is_user_editor_of_org(org_id, user_id):
+    capacity = authz.users_role_for_group_or_org(org_id, user_id)
+    return capacity == "editor"
+
+
+def is_user_admin_of_org(org_id, user_id):
+    capacity = authz.users_role_for_group_or_org(org_id, user_id)
+    return capacity == "admin"
+
+def publishing_check(context, data_dict):
+    log.debug("publishing_check called")
+    user_id = (
+        toolkit.current_user.id
+        if toolkit.current_user and not toolkit.current_user.is_anonymous
+        else None
+    )
+    org_id = data_dict.get("owner_org")
+    log.debug(f"checking key publishing status {data_dict.get('publishing_status')}")
+    is_active = data_dict.get('publishing_status') in [None, "in_review", "published", "", False]
+    log.debug(f"is active {is_active}")
+
+    is_user_editor = is_user_editor_of_org(org_id, user_id)
+    is_user_admin = is_user_admin_of_org(org_id, user_id)
+    is_sysadmin = hasattr(toolkit.current_user, "sysadmin") and toolkit.current_user.sysadmin
+
+    if (is_user_editor or is_unowned_dataset(org_id)) and is_active:
+        #mail_package_review_request_to_admins(context, data_dict)
+        data_dict['publishing_status'] = "in_review"
+
+    # if sysadmin is updating the dataset and it's already in review state
+    # then it should remain in review state
+    _action_review = context.get("_action_review", False)
+    if not _action_review and data_dict.get("id"):
+        old_data_dict = toolkit.get_action("package_show")(
+            context, {"id": data_dict.get("id")}
+        )
+        if (is_user_admin or is_sysadmin) and old_data_dict.get("publishing_status") == "in_review":
+            data_dict["publishing_status"] = old_data_dict.get("publishing_status")
+    return data_dict
+
+
+@toolkit.chained_action
 @logic.side_effect_free
 def package_show(up_func, context, data_dict):
     toolkit.check_access('package_show_with_approval', context, data_dict)
     return up_func(context, data_dict)
 
-@p.toolkit.chained_action
+@toolkit.chained_action
+@logic.side_effect_free
 def package_create(up_func, context, data_dict):
-    dataset_dict = up_func(context, data_dict)
-    # Sent email to admins to review the dataset
-    if dataset_dict.get('publishing_status') == 'in_review':
-        try:
-            mail_package_review_request_to_admins(context, dataset_dict, 'new')
-        except MailerException:
-            message = '[email] Package review request is not sent: {0}'
-            log.critical(message.format(data_dict.get('title')))
-    return dataset_dict
+    log.debug("package_create called")
+    log.debug(f"data_dict before publishing_check: {data_dict}")
+    publishing_check(context, data_dict)
+    result = up_func(context, data_dict)
+    log.debug(f"data_dict after publishing_check: {data_dict}")
+    return result
 
 
-@p.toolkit.chained_action
+@toolkit.chained_action
+@logic.side_effect_free
 def package_update(up_func, context, data_dict):
-    dataset_dict = up_func(context, data_dict)
-    
-    # Sent email to admins to review the dataset
-    if dataset_dict.get('publishing_status') == 'in_review':
-        try:
-            mail_package_review_request_to_admins(context, dataset_dict, 'updated')
-        except MailerException:
-            message = '[email] Package review request is not sent: {0}'
-            log.critical(message.format(data_dict.get('title')))
-    return dataset_dict
+    log.debug("package_update called")
+    log.debug(f"package_update data_dict before publishing_check: {data_dict}")
+    publishing_check(context, data_dict)
+    result = up_func(context, data_dict)
+    log.debug(f"package_update data_dict after publishing_check: {data_dict}")
+    return result
 
 
-@p.toolkit.chained_action   
+@toolkit.chained_action
+@logic.side_effect_free
+def package_patch(up_func, context, data_dict):
+    log.debug("package_patch called")
+    log.debug(f"package_patch data_dict before publishing_check: {data_dict}")
+    publishing_check(context, data_dict)
+    result = up_func(context, data_dict)
+    log.debug(f"package_patch data_dict after publishing_check: {data_dict}")
+    return result
+
+
+@toolkit.chained_action   
 def resource_create(up_func,context, data_dict):
     result = up_func(context, data_dict)
      # little hack here, update dataset publishing status 
@@ -57,7 +111,7 @@ def resource_create(up_func,context, data_dict):
     return result
 
 
-@p.toolkit.chained_action   
+@toolkit.chained_action   
 def resource_update(up_func,context, data_dict):
     result = up_func(context, data_dict)
     # little hack here, update dataset publishing status 
