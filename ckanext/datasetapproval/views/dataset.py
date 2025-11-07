@@ -194,10 +194,10 @@ class EditView(BaseEditView):
     def get(self, package_type, id, data=None, errors=None, error_summary=None):
         context = self._prepare()
         package_type = _get_package_type(id) or package_type
-
         try:
             view_context = context.copy()
             view_context["for_view"] = True
+            log.debug(f"view context: {view_context}")
             pkg_dict = tk.get_action("package_show")(view_context, {"id": id})
             context["for_edit"] = True
             old_data = tk.get_action("package_show")(context, {"id": id})
@@ -213,7 +213,6 @@ class EditView(BaseEditView):
         pkg = context.get("package")
         resources_json = tk.h.dump_json(data.get("resources", []))
         user = current_user.name
-
         try:
             tk.check_access("package_update", context)
         except tk.NotAuthorized:
@@ -268,7 +267,6 @@ class EditView(BaseEditView):
         package_type = _get_package_type(id) or package_type
         log.debug("Package save request name: %s POST: %r", id, tk.request.form)
         save_draft = tk.request.form.get("save") == "save-draft"
-
         try:
             data_dict = logic.clean_dict(
                 dict_fns.unflatten(
@@ -277,7 +275,10 @@ class EditView(BaseEditView):
             )
         except dict_fns.DataError:
             return tk.abort(400, tk._("Integrity Error"))
-
+        is_admin = h.is_admin(current_user.name, data_dict.get("owner_org"))
+        log.debug(f"in EditView post : is admin {is_admin}")
+        context['admin_editing'] = is_admin
+        log.debug(f"context in EditView post: {context}")
         try:
             if "_ckan_phase" in data_dict:
                 # we allow partial updates to not destroy existing resources

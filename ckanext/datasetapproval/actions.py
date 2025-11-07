@@ -29,6 +29,7 @@ def is_user_admin_of_org(org_id, user_id):
 
 def publishing_check(context, data_dict):
     log.debug("publishing_check called")
+    log.debug(f"checking context {context}")
     user_id = (
         toolkit.current_user.id
         if toolkit.current_user and not toolkit.current_user.is_anonymous
@@ -43,19 +44,14 @@ def publishing_check(context, data_dict):
     is_user_admin = is_user_admin_of_org(org_id, user_id)
     is_sysadmin = hasattr(toolkit.current_user, "sysadmin") and toolkit.current_user.sysadmin
 
-    if (is_user_editor or is_unowned_dataset(org_id)):
+    admin_editing = context.get("admin_editing", False)
+    log.debug(f"admin editing {admin_editing}")
+    if admin_editing and data_dict.get('publishing_status') in ["rejected", "approved"]:
+        #if it is an admin and the dataset is being updated (not created)
+        data_dict['publishing_status'] = "published"
+    elif (is_user_editor or is_unowned_dataset(org_id)):
         #mail_package_review_request_to_admins(context, data_dict)
         data_dict['publishing_status'] = "in_review"
-
-    # if sysadmin is updating the dataset and it's already in review state
-    # then it should remain in review state
-    _action_review = context.get("_action_review", False)
-    if not _action_review and data_dict.get("id"):
-        old_data_dict = toolkit.get_action("package_show")(
-            context, {"id": data_dict.get("id")}
-        )
-        if (is_user_admin or is_sysadmin) and old_data_dict.get("publishing_status") == "in_review":
-            data_dict["publishing_status"] = old_data_dict.get("publishing_status")
     return data_dict
 
 
@@ -73,7 +69,6 @@ def package_create(up_func, context, data_dict):
     publishing_check(context, data_dict)
     result = up_func(context, data_dict)
     log.debug(f"data_dict after publishing_check: {data_dict}")
-    log.debug(f"result after package_create: {result}")
     return result
 
 
@@ -82,6 +77,7 @@ def package_create(up_func, context, data_dict):
 def package_update(up_func, context, data_dict):
     log.debug("package_update called")
     log.debug(f"package_update data_dict before publishing_check: {data_dict}")
+    publishing_check(context, data_dict)
     result = up_func(context, data_dict)
     log.debug(f"package_update data_dict after publishing_check: {data_dict}")
     return result
