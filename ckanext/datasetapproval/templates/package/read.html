@@ -9,6 +9,7 @@
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
       {# TODO: remove style #}
       <div style="margin-top: 10px">
+        <h3>{{ c.pkg_dict.id }}</h3>
         <a href="/dataset-publish/{{ c.pkg_dict.id }}/approve" class="btn btn-primary">
           {% trans %}Approve Dataset{% endtrans %}
         </a>
@@ -34,15 +35,15 @@
     {% block package_description %}
     <div class="dataset-status-label">
       {% if pkg.private %}
-      <span class="dataset-private label label-inverse pull-right">
+      <span class="dataset-private label label-inverse pull-right px-2">
         <i class="fa fa-lock"></i>
         {{ _('Private') }}
       </span>
     {% endif %}
-      {% if pkg.get('state', '').startswith('draft') %}
-      <span class="badge badge bg-info">{{ _('Draft') }}</span>
-    {% elif pkg.get('publishing_status', '').startswith('draft') %}
-      <span class="badge badge bg-info">{{ _('Draft') }}</span>
+      {% if pkg.get('state', '').startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
+      <span class="badge badge bg-secondary">{{ _('Draft') }}</span>
+    {% elif pkg.get('publishing_status', '').startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
+      <span class="badge badge bg-secondary">{{ _('Draft') }}</span>
     {% elif pkg.get('state', '').startswith('deleted') %}
       <span class="badge badge bg-danger">{{ _('Deleted') }}</span>
     {% endif %}
@@ -50,7 +51,7 @@
       <h1>
         {% block page_heading %}
           {{ h.dataset_display_name(pkg) }}
-          {% if pkg.state.startswith('draft') %}
+          {% if pkg.state.startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
             [{{ _('Draft') }}]
           {% endif %}
           {% if pkg.state == 'deleted' %}

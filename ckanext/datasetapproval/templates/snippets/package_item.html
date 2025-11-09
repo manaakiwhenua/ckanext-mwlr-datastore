@@ -1,18 +1,25 @@
 {% ckan_extends %}
 
 {% block heading_meta %}
-    {% if package.get('state', '').startswith('draft') %}
-        <span class="badge badge bg-info">{{ _('Draft') }}</span>
-    {% elif package.get('publishing_status', '').startswith('draft') %}
-        <span class="badge badge bg-info">{{ _('Draft') }}</span>
-    {% elif package.get('publishing_status', '').startswith('in_review') and in_review %}
-        <span class="badge badge bg-warning">{{ _('Review requested')  }}</span>
-    {% elif package.get('publishing_status', '').startswith('in_review') %}
-        <span class="badge badge bg-warning">{{ _('Review Pending')  }}</span>
-    {% elif package.get('publishing_status', '').startswith('rejected') %}
-    <span class="badge badge bg-danger">{{ _('Rejected')  }}</span>
-    {% elif package.get('state', '').startswith('deleted') %}
-        <span class="badge badge bg-danger">{{ _('Deleted') }}</span>
+    {% if package.get('state', '').startswith('draft') and not package.get('publishing_status','').startswith('in_review') %}
+        <span class="badge bg-secondary">{{ _('Draft') }}</span>
     {% endif %}
-    {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
+
+    {% if package.get('publishing_status', '').startswith('in_review') and in_review %}
+        <span class="badge bg-warning">{{ _('Review requested') }}</span>
+    {% elif package.get('publishing_status', '').startswith('in_review') %}
+        <span class="badge bg-warning">{{ _('Review Pending') }}</span>
+    {% endif %}
+
+    {% if package.get('publishing_status', '').startswith('rejected') %}
+        <span class="badge bg-danger">{{ _('Rejected') }}</span>
+    {% endif %}
+
+    {% if package.get('state', '').startswith('deleted') %}
+        <span class="badge bg-danger">{{ _('Deleted') }}</span>
+    {% endif %}
+
+    {% if package.tracking_summary %}
+        {{ h.popular('recent views', package.tracking_summary.recent, min=10) }}
+    {% endif %}
 {% endblock %}

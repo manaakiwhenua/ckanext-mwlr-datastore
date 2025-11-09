@@ -37,8 +37,6 @@ def publishing_check(context, data_dict):
     )
     org_id = data_dict.get("owner_org")
     log.debug(f"checking key publishing status {data_dict.get('publishing_status')}")
-    is_active = data_dict.get('state') in [None, "active", "published", False]
-    log.debug(f"is active {is_active}")
 
     is_user_editor = is_user_editor_of_org(org_id, user_id)
     is_user_admin = is_user_admin_of_org(org_id, user_id)
@@ -46,12 +44,25 @@ def publishing_check(context, data_dict):
 
     admin_editing = context.get("admin_editing", False)
     log.debug(f"admin editing {admin_editing}")
-    if admin_editing and data_dict.get('publishing_status') in ["rejected", "approved"]:
+    if data_dict.get("currently_reviewing"):
+        log.debug("removing currently_reviewing flag from data_dict")
+        data_dict.pop("currently_reviewing")
+        if data_dict.get("publishing_status") == "approved":
+            data_dict["state"] = "active"
+    elif admin_editing:
         #if it is an admin and the dataset is being updated (not created)
-        data_dict['publishing_status'] = "published"
+        old_data_dict = toolkit.get_action("package_show")(
+            context, {"id": data_dict.get("id")}
+        )
+        if (is_user_admin or is_sysadmin) and old_data_dict.get("publishing_status") == "in_review":
+            data_dict["publishing_status"] = old_data_dict.get("publishing_status")
+        else:
+            data_dict['publishing_status'] = "approved"
+            data_dict["state"] = "active"
     elif (is_user_editor or is_unowned_dataset(org_id)):
         #mail_package_review_request_to_admins(context, data_dict)
         data_dict['publishing_status'] = "in_review"
+        data_dict["state"] = "draft"
     return data_dict
 
 

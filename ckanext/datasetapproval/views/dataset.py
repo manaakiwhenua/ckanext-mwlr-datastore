@@ -224,34 +224,29 @@ class EditView(BaseEditView):
             data["tag_string"] = ", ".join(
                 tk.h.dict_list_reduce(pkg_dict.get("tags", {}), "name")
             )
-
+        stage = [u'active']
         errors = errors or {}
         form_snippet = _get_pkg_template("package_form", package_type=package_type)
-        form_vars = {
-            "data": data,
-            "errors": errors,
-            "error_summary": error_summary,
-            "action": "edit",
-            "dataset_type": package_type,
-            "form_style": "edit",
-        }
         errors_json = tk.h.dump_json(errors)
 
         tk.g.pkg = pkg
         tk.g.resources_json = resources_json
         tk.g.errors_json = errors_json
 
-        _setup_template_variables(context, {"id": id}, package_type=package_type)
-
-        form_vars["stage"] = ["active"]
-        if data.get("state", "").startswith("draft"):
-            form_vars["stage"] = ["active", "complete"]
-
+        _form_vars: dict[str, Any] = {
+            u'data': data,
+            u'errors': errors,
+            u'error_summary': error_summary,
+            u'action': u'edit',
+            u'stage': stage,
+            u'dataset_type': package_type,
+            u'form_style': u'edit'
+        }
         edit_template = _get_pkg_template("edit_template", package_type)
         return tk.base.render(
             edit_template,
             extra_vars={
-                "form_vars": form_vars,
+                "form_vars": _form_vars,
                 "form_snippet": form_snippet,
                 "dataset_type": package_type,
                 "pkg_dict": pkg_dict,
@@ -282,7 +277,6 @@ class EditView(BaseEditView):
         try:
             if "_ckan_phase" in data_dict:
                 # we allow partial updates to not destroy existing resources
-                context["allow_partial_update"] = True
                 if "tag_string" in data_dict:
                     data_dict["tags"] = _tag_string_to_list(data_dict["tag_string"])
                 del data_dict["_ckan_phase"]

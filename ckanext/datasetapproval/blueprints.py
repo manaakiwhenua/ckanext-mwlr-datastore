@@ -32,9 +32,11 @@ def search_url(params, package_type=None):
 
 
 def approve(id):
+    log.debug(f"IN APPROVE {id}")
     return _make_action(id, 'approve')
 
 def reject(id):
+    log.debug(f"IN REJECT {id}")
     return _make_action(id, 'reject')
 
 def dataset_review(id):
@@ -76,7 +78,8 @@ def dataset_review(id):
         'rows': limit,
         'start': limit * (page - 1),
         'fq': 'publishing_status:in_review',
-        'include_private': True
+        'include_private': True,
+        'include_drafts': True
         }
 
     in_review_datasets = toolkit.get_action('package_search')(context,
@@ -114,10 +117,13 @@ def _make_action(package_id, action='reject'):
         'reject': 'rejected',
         'approve': 'approved'
     }
+    # grab the old dict
+    old_dict = toolkit.get_action('package_show')({'model': model, 'user': toolkit.c.user}, {'id': package_id})
+    log.debug(f"-MAKE_ACTION: old dict: {old_dict}")
     set_private = action == 'reject'
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
-    update_dict = {'id': package_id, 'publishing_status': states[action]}
+    update_dict = {'id': package_id, 'publishing_status': states[action], 'currently_reviewing': True}
     if set_private:
         update_dict['private'] = True
     toolkit.get_action('package_patch')(
