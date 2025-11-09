@@ -62,6 +62,16 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         if dataset_dict.get('author'):
             dataset_dict['vocab_author'] = author_value
 
+        ## Any 'repeating subfields' schema item must be converted to
+        ## JSON strings before being indexed by Solr (currently only
+        ## the 'custom' field).  This implementation is less general
+        ## than the extension 'scheming_nerf_index but, is used here
+        ## because it repeatedly states in the scheming documentation
+        ## that this scheming_nerf_index is for testing only.
+        if 'custom' in dataset_dict:
+            dataset_dict['custom'] = json.dumps(dataset_dict['custom'])
+
+
         return dataset_dict
 
     ## IFacets
