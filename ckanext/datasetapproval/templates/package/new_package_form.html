@@ -20,13 +20,22 @@
   {% endif %}
 {% endblock %}
 
-{% block save_button_text %}
-  {% if form_style != 'edit' %}
-    {{ super() }}
-  {% else %}
-    {{ _('Submit for review') }}
-  {% endif %}
-{% endblock %}
+{% block save_button %}
+    <button class="btn btn-secondary" type="submit" name="save" value="save-draft" >{{ _('Save as Draft') }}</button>
+    <button class="btn btn-primary" type="submit" name="save">
+      {%- block save_button_text -%}
+        {%- if form_style == 'edit' -%}
+          {% if h.is_admin(c.user) %}
+            {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
+          {% else %}
+            {{ _('Submit for Review') }}
+          {% endif %}
+        {%- else -%}
+          {{ _('Next: Add Data') }}
+        {%- endif -%}
+      {%- endblock -%}
+    </button>
+  {% endblock %}
 
 {% block cancel_button %}
   {% if form_style != 'edit' %}

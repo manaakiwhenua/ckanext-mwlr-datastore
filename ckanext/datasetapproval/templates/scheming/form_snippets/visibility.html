@@ -1,0 +1,12 @@
+{% if not h.is_admin(c.user) %}
+    <div class="control-group form-group control-medium">
+        <label for="field-chosen_visibility" class="control-label">{{ _('Visibility') }}</label>
+        <div class="controls">
+        <select id="field-chosen_visibility" name="chosen_visibility" class="form-control form-select">
+            {% for option in [('true', _('Private')), ('false', _('Public'))] %}
+            <option value="{{ option[0] }}" {% if option[0] == data.chosen_visibility|trim %}selected="selected"{% endif %}>{{ option[1] }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+{% endif %}
