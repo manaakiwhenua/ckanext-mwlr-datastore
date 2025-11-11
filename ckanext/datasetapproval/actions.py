@@ -2,7 +2,7 @@ import logging
 import ckan.authz as authz
 
 from ckan.lib.mailer import MailerException
-from ckan.plugins import toolkit
+import ckan.plugins.toolkit as tk
 import ckan.plugins as p
 import ckan.logic as logic
 
@@ -18,8 +18,8 @@ def publishing_check(context, data_dict):
     admin_editing = context.get("admin_editing", False)
     save_as_draft = context.get("save_as_draft", False)
     user_id = (
-        toolkit.current_user.id
-        if toolkit.current_user and not toolkit.current_user.is_anonymous
+        tk.current_user.id
+        if tk.current_user and not tk.current_user.is_anonymous
         else None
     )
     org_id = data_dict.get("owner_org")
@@ -32,7 +32,7 @@ def publishing_check(context, data_dict):
             data_dict["private"] = "true"
         mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"))
     elif admin_editing and data_dict.get("id"):
-        old_data_dict = toolkit.get_action("package_show")(
+        old_data_dict = tk.get_action("package_show")(
             context, {"id": data_dict.get("id")}
         )
         if old_data_dict.get("publishing_status") == "in_review":
@@ -47,13 +47,13 @@ def publishing_check(context, data_dict):
     return data_dict
 
 
-@toolkit.chained_action
+@tk.chained_action
 @logic.side_effect_free
 def package_show(up_func, context, data_dict):
-    toolkit.check_access('package_show_with_approval', context, data_dict)
+    tk.check_access('package_show_with_approval', context, data_dict)
     return up_func(context, data_dict)
 
-@toolkit.chained_action
+@tk.chained_action
 @logic.side_effect_free
 def package_create(up_func, context, data_dict):
     publishing_check(context, data_dict)
@@ -61,7 +61,7 @@ def package_create(up_func, context, data_dict):
     return result
 
 
-@toolkit.chained_action
+@tk.chained_action
 @logic.side_effect_free
 def package_update(up_func, context, data_dict):
     publishing_check(context, data_dict)
@@ -69,7 +69,7 @@ def package_update(up_func, context, data_dict):
     return result
 
 
-@toolkit.chained_action
+@tk.chained_action
 @logic.side_effect_free
 def package_patch(up_func, context, data_dict):
     publishing_check(context, data_dict)
