@@ -39,9 +39,9 @@
         {{ _('Private') }}
       </span>
     {% endif %}
-      {% if pkg.get('state', '').startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
+      {% if pkg.get('state', '').startswith('draft') %}
       <span class="badge badge bg-secondary">{{ _('Draft') }}</span>
-    {% elif pkg.get('publishing_status', '').startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
+    {% elif pkg.get('publishing_status', '').startswith('draft') %}
       <span class="badge badge bg-secondary">{{ _('Draft') }}</span>
     {% elif pkg.get('state', '').startswith('deleted') %}
       <span class="badge badge bg-danger">{{ _('Deleted') }}</span>
@@ -50,7 +50,7 @@
       <h1>
         {% block page_heading %}
           {{ h.dataset_display_name(pkg) }}
-          {% if pkg.state.startswith('draft') and not pkg.get('publishing_status','').startswith('in_review') %}
+          {% if pkg.state.startswith('draft') %}
             [{{ _('Draft') }}]
           {% endif %}
           {% if pkg.state == 'deleted' %}

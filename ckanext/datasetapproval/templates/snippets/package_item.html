@@ -1,7 +1,7 @@
 {% ckan_extends %}
 
 {% block heading_meta %}
-    {% if package.get('state', '').startswith('draft') and not package.get('publishing_status','').startswith('in_review') %}
+    {% if package.get('state', '').startswith('draft') %}
         <span class="badge bg-secondary">{{ _('Draft') }}</span>
     {% endif %}
 

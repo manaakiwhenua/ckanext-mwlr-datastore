@@ -114,7 +114,6 @@ def _make_action(package_id, action='reject'):
         'approve': 'approved'
     }
     # grab the old dict
-    old_dict = toolkit.get_action('package_show')({'model': model, 'user': toolkit.c.user}, {'id': package_id})
     set_private = action == 'reject'
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
