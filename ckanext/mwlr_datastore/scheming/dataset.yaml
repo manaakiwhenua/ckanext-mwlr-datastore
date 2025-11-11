@@ -36,6 +36,14 @@ dataset_fields:
   preset           : dataset_organization
   validators       : owner_org_validator unicode_safe
 
+- field_name       : chosen_visibility
+  label            : Visibility
+  form_snippet     : visibility.html
+  display_snippet  : null
+  validators       : ignore_empty unicode_safe
+  default          : true
+
+
 - field_name       : publisher
   label            : Publisher
   validators       : ignore_empty unicode_safe strip_value
@@ -159,7 +167,7 @@ dataset_fields:
   label            : 'Publishing Status'
   form_snippet     : null
   display_snippet  : null
-  validators       : ignore_missing publishing_status_validator
+  validators       : ignore_missing
 
 resource_fields:
 
