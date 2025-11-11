@@ -35,9 +35,12 @@ dataset_fields:
   label: Organization
   preset: dataset_organization
 
-- field_name: approval_state
-  label: Approved
-  validators: state_validator
+- field_name       : chosen_visibility
+  label            : Visibility
+  form_snippet     : visibility.html
+  display_snippet  : null
+  validators       : ignore_empty unicode_safe
+  default          : true
 
 - field_name: url
   label: Source

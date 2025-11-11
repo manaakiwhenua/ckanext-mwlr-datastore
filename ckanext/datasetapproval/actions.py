@@ -15,8 +15,6 @@ def is_user_editor_of_org(org_id, user_id):
     return capacity == "editor"
 
 def publishing_check(context, data_dict):
-    log.debug(f"CONTEXT {context}")
-    log.debug(f"DATA_DICT {data_dict}")
     admin_editing = context.get("admin_editing", False)
     save_as_draft = context.get("save_as_draft", False)
     user_id = (

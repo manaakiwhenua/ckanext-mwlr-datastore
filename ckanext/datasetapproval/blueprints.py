@@ -75,7 +75,7 @@ def dataset_review(id):
         'rows': limit,
         'start': limit * (page - 1),
         'fq': 'publishing_status:in_review',
-        'include_private': True,
+        'include_private': True
         }
 
     in_review_datasets = toolkit.get_action('package_search')(context,
