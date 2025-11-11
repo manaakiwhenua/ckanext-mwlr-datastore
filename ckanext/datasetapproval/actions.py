@@ -24,20 +24,26 @@ def publishing_check(context, data_dict):
     )
     org_id = data_dict.get("owner_org")
 
+    ## if the dataset being created/updated is currently under review the status will be either "approved" or "rejected"
     if data_dict.get("currently_reviewing"):
         data_dict.pop("currently_reviewing")
+        ## if approved, then the visibility is set to whatever the creator (editor) of the dataset chose
         if data_dict.get("publishing_status") == "approved":
             data_dict["private"] = data_dict.get("chosen_visibility", "true") == "true"
+        ## if rejected, the visibility should be private
         elif data_dict.get("publishing_status") == "rejected":
             data_dict["private"] = "true"
         #mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"))
+    ## if the dataset is being updated by an admin then should bypass the approval state
     elif admin_editing and data_dict.get("id"):
         old_data_dict = tk.get_action("package_show")(
             context, {"id": data_dict.get("id")}
         )
+        ## if the dataset is currently in review, should remain in review and visibility should be whatever the admin has set it to
         if old_data_dict.get("publishing_status") == "in_review":
             data_dict["publishing_status"] = old_data_dict.get("publishing_status")
         data_dict["chosen_visibility"] = data_dict.get("private", "true")
+    ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft
     elif is_user_editor_of_org(org_id, user_id):
         if save_as_draft:
             data_dict['publishing_status'] = "draft"
