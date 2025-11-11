@@ -1,4 +1,5 @@
 import json
+import os
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
@@ -16,6 +17,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.ITemplateHelpers)
 
     def is_fallback(self):
         return True
@@ -41,6 +43,24 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
     def get_validators(self):
         return validators.get_validators()
+
+    def get_helpers(self):
+        """Register template helper functions."""
+        return {
+            'get_env_var': self.get_env_var,
+        }
+
+    def get_env_var(self, var_name, default=None):
+        """Get environment variable value with optional default.
+        
+        Args:
+            var_name (str): Name of the environment variable
+            default (str, optional): Default value if variable not found
+            
+        Returns:
+            str: Environment variable value or default
+        """
+        return os.environ.get(var_name, default)
 
     def before_dataset_index(self, dataset_dict):
         '''
