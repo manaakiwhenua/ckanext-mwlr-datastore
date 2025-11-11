@@ -30,7 +30,7 @@ def publishing_check(context, data_dict):
             data_dict["private"] = data_dict.get("chosen_visibility", "true") == "true"
         elif data_dict.get("publishing_status") == "rejected":
             data_dict["private"] = "true"
-        mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"))
+        #mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"))
     elif admin_editing and data_dict.get("id"):
         old_data_dict = tk.get_action("package_show")(
             context, {"id": data_dict.get("id")}
@@ -42,7 +42,7 @@ def publishing_check(context, data_dict):
         if save_as_draft:
             data_dict['publishing_status'] = "draft"
         else:
-            mail_package_review_request_to_admins(context, data_dict)
+            #mail_package_review_request_to_admins(context, data_dict)
             data_dict['publishing_status'] = "in_review"
     return data_dict
 
