@@ -4,7 +4,7 @@ from ckan.lib.plugins import DefaultPermissionLabels
 from ckan.authz import users_role_for_group_or_org
 from ckanext.datasetapproval import views
 
-from ckanext.datasetapproval import auth, actions, blueprints, helpers, validation
+from ckanext.datasetapproval import auth, actions, blueprints, helpers
 
 import json
 import logging as log
