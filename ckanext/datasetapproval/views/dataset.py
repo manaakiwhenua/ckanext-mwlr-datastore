@@ -18,9 +18,12 @@ from ckan.views.dataset import (
 from ckan.types import Context, Response
 
 import ckan.lib.navl.dictization_functions as dict_fns
+from ckan.lib.search import (
+    SearchError, SearchQueryError, SearchIndexError
+)
 import ckan.logic as logic
 from typing import Any, Iterable, Optional, Union, cast
-from ckan.common import _
+from ckan.common import _, config, g, request
 
 log = logging.getLogger(__name__)
 
@@ -54,18 +57,36 @@ class CreateView(BaseCreateView):
             return tk.base.abort(403, _(u'Unauthorized to create a package'))
         return context
 
-    def get(
-        self,
-        package_type,
-        term_agree=False,
-        data=None,
-        errors=None,
-        error_summary=None,
-    ):
+    def post(self, package_type: str) -> Union[Response, str]:
+        # The staged add dataset used the new functionality when the dataset is
+        # partially created so we need to know if we actually are updating or
+        # this is a real new.
+        context = self._prepare()
+        log.debug("In createview post with context : %r", context)
+        is_an_update = False
+        ckan_phase = tk.request.form.get(u'_ckan_phase')
+        log.debug("ckan_phase: %r", ckan_phase)
+        try:
+            data_dict = logic.clean_dict(
+                dict_fns.unflatten(logic.tuplize_dict(logic.parse_params(tk.request.form)))
+            )
+        except dict_fns.DataError:
+            return tk.base.abort(400, _(u'Integrity Error'))
+        log.debug("DATA DICT IN CREATE POST: %r", data_dict)
+        if context.get(u'save_as_draft') == True:
+            log.debug("Saving as draft : %r", context.get("save_as_draft"))
+            pkg_dict = tk.get_action(u'package_create')(context, data_dict)
+            data_dict[u'pkg_name'] = pkg_dict[u'name']
+            data_dict[u'state'] = u'active'
+            log.debug("DATA DICT AFTER DRAFT CREATE: %r", data_dict)
+        try:
+            log.debug("attempting to redirect to read view")
+            return h.redirect_to(u'{}.read'.format(package_type),
+                             id=pkg_dict['name'])
+        except Exception as e:
+            log.error("Error redirecting to read view after draft save: %r", e)
 
-        if error_summary or errors or data:
-            return super().get(package_type, data, errors, error_summary)
-        return super().get(package_type)
+        return super().post(package_type)
 
 class EditView(BaseEditView):
     def __init__(self):
