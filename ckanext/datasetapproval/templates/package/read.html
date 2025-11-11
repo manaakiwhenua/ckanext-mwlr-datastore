@@ -9,7 +9,6 @@
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
       {# TODO: remove style #}
       <div style="margin-top: 10px">
-        <h3>{{ c.pkg_dict.id }}</h3>
         <a href="/dataset-publish/{{ c.pkg_dict.id }}/approve" class="btn btn-primary">
           {% trans %}Approve Dataset{% endtrans %}
         </a>

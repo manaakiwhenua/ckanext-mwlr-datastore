@@ -11,7 +11,6 @@ from ckan.views.user import _extra_template_variables
 import ckan.lib.helpers as h
 from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
-from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
 from ckan.views.dataset import url_with_params
 
 log = logging.getLogger(__name__)
@@ -32,11 +31,9 @@ def search_url(params, package_type=None):
 
 
 def approve(id):
-    log.debug(f"IN APPROVE {id}")
     return _make_action(id, 'approve')
 
 def reject(id):
-    log.debug(f"IN REJECT {id}")
     return _make_action(id, 'reject')
 
 def dataset_review(id):
@@ -79,7 +76,6 @@ def dataset_review(id):
         'start': limit * (page - 1),
         'fq': 'publishing_status:in_review',
         'include_private': True,
-        'include_drafts': True
         }
 
     in_review_datasets = toolkit.get_action('package_search')(context,
@@ -119,7 +115,6 @@ def _make_action(package_id, action='reject'):
     }
     # grab the old dict
     old_dict = toolkit.get_action('package_show')({'model': model, 'user': toolkit.c.user}, {'id': package_id})
-    log.debug(f"-MAKE_ACTION: old dict: {old_dict}")
     set_private = action == 'reject'
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
@@ -129,14 +124,7 @@ def _make_action(package_id, action='reject'):
     toolkit.get_action('package_patch')(
         {'model': model, 'user': toolkit.c.user},
         update_dict
-    )
-    # Notify editors via email that dataset has been approved/rejected.
-    # try:
-    #     mail_package_approve_reject_notification_to_editors(package_id, states[action])
-    # except MailerException:
-    #     message = '[email] Failed to sent notification to the editor: {}'
-    #     log.critical(message.format(package_id))
-    
+    ) 
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 
 approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve)
