@@ -1,4 +1,5 @@
 import json
+import os
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
@@ -16,6 +17,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.ITemplateHelpers)
 
     def is_fallback(self):
         return True
@@ -42,6 +44,24 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     def get_validators(self):
         return validators.get_validators()
 
+    def get_helpers(self):
+        """Register template helper functions."""
+        return {
+            'get_env_var': self.get_env_var,
+        }
+
+    def get_env_var(self, var_name, default=None):
+        """Get environment variable value with optional default.
+        
+        Args:
+            var_name (str): Name of the environment variable
+            default (str, optional): Default value if variable not found
+            
+        Returns:
+            str: Environment variable value or default
+        """
+        return os.environ.get(var_name, default)
+
     def before_dataset_index(self, dataset_dict):
         '''
         Insert `vocab_author` into solr index with list of authors derived
@@ -61,6 +81,16 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
         if dataset_dict.get('author'):
             dataset_dict['vocab_author'] = author_value
+
+        ## Any 'repeating subfields' schema item must be converted to
+        ## JSON strings before being indexed by Solr (currently only
+        ## the 'custom' field).  This implementation is less general
+        ## than the extension 'scheming_nerf_index but, is used here
+        ## because it repeatedly states in the scheming documentation
+        ## that this scheming_nerf_index is for testing only.
+        if 'custom' in dataset_dict:
+            dataset_dict['custom'] = json.dumps(dataset_dict['custom'])
+
 
         return dataset_dict
 
