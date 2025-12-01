@@ -106,10 +106,51 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             })
         return search_params
 
-    # IPermissionLabels
+    @staticmethod
+    def _publishing_status(package):
+        # `package` is a model.Package object
+        # with extras as model.PackageExtra rows
+        log.debug("Getting publishing_status for package: %r", package.extras)
+        for extra in package.extras:
+            log.debug("Checking extra: %r", extra)
+            if extra == 'publishing_status':
+                log.debug("publishing_status extra found: %r",package.extras.get(extra))
+                return package.extras.get(extra)
+        return None
+
+    def get_dataset_labels(self, dataset_obj):
+        labels = super(DatasetapprovalPlugin, self) \
+            .get_dataset_labels(dataset_obj)
+
+        status = self._publishing_status(dataset_obj)
+
+        if status == 'draft':
+            # Remove ALL generic visibility labels
+            cleaned = []
+            for l in labels:
+                # Drop public and all organisation membership labels
+                if l == 'public':
+                    continue
+                if l.startswith('member-'):
+                    continue
+                cleaned.append(l)
+            labels = cleaned
+
+            # Add a label that only the creator user will have
+            if dataset_obj.creator_user_id:
+                labels.append(u'draft-owner-{0}'.format(
+                    dataset_obj.creator_user_id))
+
+        return labels
+
+    # --- user labels (what labels a user is allowed to see) ---
     def get_user_dataset_labels(self, user_obj):
-        labels = super(DatasetapprovalPlugin, self
-                       ).get_user_dataset_labels(user_obj)
+        # Start with the normal labels a user already has
+        labels = super(DatasetapprovalPlugin, self) \
+            .get_user_dataset_labels(user_obj)
+
+        # Give each user a label matching “their” drafts
+        labels.append(u'draft-owner-{0}'.format(user_obj.id))
 
         if user_obj and hasattr(user_obj, 'plugin_extras') and user_obj.plugin_extras:
             if user_obj.plugin_extras.get('has_approval_permission', False):
@@ -118,7 +159,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
                     {u'user': user_obj.id}, {u'permission': u'admin'})
                 labels.extend(u'member-%s' % o['id'] for o in orgs)
         return labels
-
 
     # IBlueprint
     def get_blueprint(self):
