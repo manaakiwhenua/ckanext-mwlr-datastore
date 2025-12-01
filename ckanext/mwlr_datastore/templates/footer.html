@@ -2,9 +2,7 @@
 
 {% block footer_links_ckan %}
     {{ super() }}
-    <li>Origin: {{ h.get_env_var('VERSION_ORIGIN', 'unknown') }}</li>
-    <li>Commit: {{ h.get_env_var('VERSION_GIT_COMMIT', 'unknown') }}</li>
-    <li>Build: {{ h.get_env_var('VERSION_BUILD_NUMBER', 'unknown') }}</li>
+    <p><strong>Build</strong>: {{ h.get_env_var('VERSION_BUILD_NUMBER', 'unknown') }}</p>
 {% endblock %}
 
 {% block footer_content%}
