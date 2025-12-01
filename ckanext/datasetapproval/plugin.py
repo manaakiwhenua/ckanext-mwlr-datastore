@@ -108,39 +108,52 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
 
     @staticmethod
     def _publishing_status(package):
-        # `package` is a model.Package object
-        # with extras as model.PackageExtra rows
-        log.debug("Getting publishing_status for package: %r", package.extras)
-        for extra in package.extras:
-            log.debug("Checking extra: %r", extra)
-            if extra == 'publishing_status':
-                log.debug("publishing_status extra found: %r",package.extras.get(extra))
-                return package.extras.get(extra)
+        log.debug("package in _publishing_status: {0}".format(package))
+        extras = getattr(package, 'extras', None)
+        if not extras:
+            return None
+
+        # Case 1: dict-like extras
+        if hasattr(extras, 'get'):
+            return extras.get('publishing_status')
+
+        # Case 2: list of PackageExtra
+        for extra in extras:
+            if getattr(extra, 'key', None) == 'publishing_status':
+                return getattr(extra, 'value', None)
+
         return None
 
     def get_dataset_labels(self, dataset_obj):
+        # Start with CKAN’s defaults (public/private/org labels, etc)
         labels = super(DatasetapprovalPlugin, self) \
             .get_dataset_labels(dataset_obj)
 
         status = self._publishing_status(dataset_obj)
 
         if status == 'draft':
-            # Remove ALL generic visibility labels
+            # Strip public + membership-based labels so drafts do NOT
+            # show up for regular org members or general users.
             cleaned = []
             for l in labels:
-                # Drop public and all organisation membership labels
                 if l == 'public':
                     continue
                 if l.startswith('member-'):
                     continue
+                # Optional: you may also want to drop 'logged_in' etc,
+                # but keeping them is harmless if no dataset has only that.
                 cleaned.append(l)
             labels = cleaned
 
-            # Add a label that only the creator user will have
+            # Allow the creator to see their own draft
             if dataset_obj.creator_user_id:
                 labels.append(u'draft-owner-{0}'.format(
                     dataset_obj.creator_user_id))
 
+            # Allow org admins (for the owner_org) to see via special label
+            if dataset_obj.owner_org:
+                labels.append(u'draft-org-{0}'.format(dataset_obj.owner_org))
+        log.debug("final labels in get_dataset_labels: {0}".format(labels))
         return labels
 
     # --- user labels (what labels a user is allowed to see) ---
@@ -148,16 +161,24 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
         # Start with the normal labels a user already has
         labels = super(DatasetapprovalPlugin, self) \
             .get_user_dataset_labels(user_obj)
-
-        # Give each user a label matching “their” drafts
-        labels.append(u'draft-owner-{0}'.format(user_obj.id))
+        log.debug("user object in get_user_dataset_labels: {0}".format(user_obj))
+        log.debug("initial labels in get_user_dataset_labels: {0}".format(labels))
+        if user_obj and hasattr(user_obj, 'id'):
+            # Give each user a label matching “their” drafts
+            labels.append(u'draft-owner-{0}'.format(user_obj.id))
 
         if user_obj and hasattr(user_obj, 'plugin_extras') and user_obj.plugin_extras:
             if user_obj.plugin_extras.get('has_approval_permission', False):
                 labels = [x for x in labels if not x.startswith('member')]
                 orgs = toolkit.get_action(u'organization_list_for_user')(
                     {u'user': user_obj.id}, {u'permission': u'admin'})
-                labels.extend(u'member-%s' % o['id'] for o in orgs)
+                for o in orgs:
+                    org_id = o['id']
+                    # Normal membership for those orgs
+                    labels.append(u'member-{0}'.format(org_id))
+                    # NEW: admin draft visibility labels
+                    labels.append(u'draft-org-{0}'.format(org_id))
+        log.debug("final labels in get_user_dataset_labels: {0}".format(labels))
         return labels
 
     # IBlueprint
