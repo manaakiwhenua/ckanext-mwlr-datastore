@@ -37,12 +37,12 @@ def mail_package_review_request_to_admins(context, data_dict, _type='new'):
 
 
 
-def mail_package_approve_reject_notification_to_editors(package_id, publishing_status):
+def mail_package_approve_reject_notification_to_editors(package_id, publishing_status, rejection_reason=None):
     package_dict = toolkit.get_action('package_show' )({'ignore_auth': True}, {'id':package_id })
     editor = model.User.get(package_dict.get('creator_user_id'))
     if editor.email:
         subj = _compose_email_subj_for_editors(publishing_status)
-        body = _compose_email_body_for_editors(editor, package_dict, publishing_status )
+        body = _compose_email_body_for_editors(editor, package_dict, publishing_status, rejection_reason)
         try:
             mail_user(editor, subj, body)
         except Exception as e:
@@ -80,55 +80,47 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     publisher_name = _get_publisher_name(context, data_dict.get('creator_user_id'))
 
     email_body = f'''
-        Dear {admin_name},
+    Dear {admin_name},
 
-        {'An'if _type == 'updated' else 'A'} {_type} dataset has been requested for review by {publisher_name}:
+    {'An' if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by {publisher_name}:
 
-            {package_title}
+    {package_title}
 
-            {package_description}
+    {package_description}
 
-        To approve or reject the request, please visit the following page (logged in as an admin):
+    To approve or reject the request, please visit the following page (while logged in as an admin):
 
-            {package_url}
+    {package_url}
 
-        Have a nice day.
-
-
-        --
-        Message sent by {site_title} ({site_url})
-        This is an automated message, please don't respond to this address.
-        '''
+    --
+    Message sent by {site_title} ({site_url})
+    This is an automated message. Please do not reply to this email.
+    '''
     return email_body
 
 
-def _compose_email_body_for_editors(user, package_dict, state):
+def _compose_email_body_for_editors(user, package_dict, state, rejection_reason=None):
     pkg_link = toolkit.url_for('dataset.read', id=package_dict['name'], qualified=True)
     editor_name = user.fullname or user.name
     site_title = config.get('ckan.site_title')
     site_url = config.get('ckan.site_url')
     package_title = package_dict.get('title')
-    package_description = package_dict.get('notes', '')
     package_url = pkg_link
 
+    approval_paragraph = f"Your dataset {package_title} has been approved and published."
+    rejection_paragraph = f"Your dataset {package_title} has been reviewed and rejected by the reviewer. Please see the following feedback. You can update the dataset and resubmit it for further review. \n\n Feedback:\n {rejection_reason}" 
+
     email_body = f'''
-        Dear {editor_name},
+    Dear {editor_name.title()},
 
-        {'Your dataset has been approved and published by the administrator.' 
-        if state == 'approved' else 'Your dataset request has been reviewed and rejected by the administrator.'} 
+    {approval_paragraph if state == 'approved' else rejection_paragraph} 
 
-            {package_title}
+    To view your dataset, please visit the following page:
 
-            {package_description}
+    {package_url}
 
-       To view the dataset, please visit following page:
-
-            {package_url}
-
-        Have a nice day.
-
-        --
-        Message sent by {site_title} ({site_url})
-        This is an automated message, please don't respond to this address.
-        '''
+    --
+    Message sent by {site_title} ({site_url})
+    This is an automated message. Please do not reply to this email. If you have any questions, please contact the administrator.
+    '''
     return email_body

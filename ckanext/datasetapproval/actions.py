@@ -17,6 +17,7 @@ def is_user_editor_of_org(org_id, user_id):
 def publishing_check(context, data_dict):
     admin_editing = context.get("admin_editing", False)
     save_as_draft = context.get("save_as_draft", False)
+    
     user_id = (
         tk.current_user.id
         if tk.current_user and not tk.current_user.is_anonymous
@@ -27,13 +28,9 @@ def publishing_check(context, data_dict):
     ## if the dataset being created/updated is currently under review the status will be either "approved" or "rejected"
     if data_dict.get("currently_reviewing"):
         data_dict.pop("currently_reviewing")
-        ## if approved, then the visibility is set to whatever the creator (editor) of the dataset chose
-        if data_dict.get("publishing_status") == "approved":
-            data_dict["private"] = data_dict.get("chosen_visibility", "true") == "true"
-        ## if rejected, the visibility should be private
-        elif data_dict.get("publishing_status") == "rejected":
-            data_dict["private"] = "true"
-        #mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"))
+        rejection_reason = context.get("rejection_reason", None)
+        data_dict = set_visibility_on_approval_or_rejection(data_dict)      
+        mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"), rejection_reason)
     ## if the dataset is being updated by an admin then should bypass the approval state
     elif admin_editing and data_dict.get("id"):
         old_data_dict = tk.get_action("package_show")(
@@ -52,6 +49,15 @@ def publishing_check(context, data_dict):
             data_dict['publishing_status'] = "in_review"
     return data_dict
 
+def set_visibility_on_approval_or_rejection(data_dict):
+    ## if approved, then the visibility is set to whatever the creator (editor) of the dataset chose
+    if data_dict.get("publishing_status") == "approved":
+        data_dict["private"] = data_dict.get("chosen_visibility", "true") == "true"
+    ## if rejected, the visibility should be private
+    elif data_dict.get("publishing_status") == "rejected":
+        data_dict["private"] = "true"
+
+    return data_dict
 
 @tk.chained_action
 @logic.side_effect_free

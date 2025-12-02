@@ -5,28 +5,61 @@
 
   {% if c.pkg_dict.publishing_status  == 'in_review' %}
     <div class="alert alert-warning" role="alert">
-      <p>{% trans %}This dataset is waiting for an administrator approval.{% endtrans %}</p>
+      <p>{% trans %}This dataset is waiting for reviewer approval.{% endtrans %}</p>
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
       {# TODO: remove style #}
       <div style="margin-top: 10px">
         <a href="/dataset-publish/{{ c.pkg_dict.id }}/approve" class="btn btn-primary">
           {% trans %}Approve Dataset{% endtrans %}
         </a>
-        <a href="/dataset-publish/{{ c.pkg_dict.id }}/reject" class="btn btn-danger">
+        <a class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="collapse" href="#rejectReason" role="button">
           {% trans %}Reject Dataset{% endtrans %}
         </a>
+        <div class="collapse mt-3" id="rejectReason">
+          <div class="card" style="border: 1.5px solid #B64623; border-radius: 12px;">
+            <div class="card-header" style="background-color: #C5432F; color: white; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+              <span>{% trans %}Rejection Reason{% endtrans %}</span>
+              <button type="button" class="btn-close btn-close-white float-end" data-bs-toggle="collapse" data-bs-target="#rejectReason" aria-label="Close" onclick="document.getElementById('rejection_reason').value = '';">
+              </button>
+            </div>
+            <div class="card-body" style="background-color: #ffe5d0; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+              <form action="/dataset-publish/{{ c.pkg_dict.id }}/reject" method="post">
+                <div class="mb-3">
+                  <label for="rejection_reason" class="form-label" style="color:#984C0C;">
+                   {% trans %}Please let the editor know what modifications are needed for dataset publication (max 1000 characters){% endtrans %}
+                  </label>
+                  <textarea 
+                    id="rejection_reason" 
+                    name="rejection_reason" 
+                    class="form-control"
+                    style="border-radius:8px; border:1px solid #C5432F;"
+                    rows="4" 
+                    maxlength="1000" 
+                    required
+                    ondrop="return false;"
+                    oninput="this.value = this.value.replace(/[\uFFFC-\uFFFF]/g, '');"
+                    placeholder="{% trans %}Explain the required modifications here...{% endtrans %}"></textarea>
+                </div>
+                <button type="submit" class="btn float-end" style="background-color:#C5432F;color:white;">
+                  {% trans %}Send Rejection{% endtrans %}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        </div>
       </div>
       {% endif %}
     </div>
   {% elif c.pkg_dict.publishing_status  == 'rejected' %}
     {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
     <div class="alert alert-danger" role="alert">
-      <p>{% trans %}Dataset was rejected.{% endtrans %}</p>
+      <p>{% trans %}Dataset was rejected. The editor of the dataset has been notified by email.{% endtrans %}</p>
     </div>
     {% endif %}
     {% if not h.is_admin(c.user, c.pkg_dict.owner_org)%}
     <div class="alert alert-danger" role="alert">
-      <p>{% trans %}Dataset was rejected by administrator.{% endtrans %}</p>
+      <p>{% trans %}Dataset was rejected by the reviewer. Please update the dataset according to the feedback you received by email and resubmit for review.{% endtrans %}</p>
     </div>
     {% endif %}
   {% endif %}
