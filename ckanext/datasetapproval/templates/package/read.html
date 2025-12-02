@@ -12,41 +12,48 @@
         <a href="/dataset-publish/{{ c.pkg_dict.id }}/approve" class="btn btn-primary">
           {% trans %}Approve Dataset{% endtrans %}
         </a>
-        <a class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="collapse" href="#rejectReason" role="button">
+        <!-- Rejection reason trigger button -->
+        <button class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="modal" data-bs-target="#rejectReasonModal">
           {% trans %}Reject Dataset{% endtrans %}
-        </a>
-        <div class="collapse mt-3" id="rejectReason">
-          <div class="card" style="border: 1.5px solid #B64623; border-radius: 12px;">
-            <div class="card-header" style="background-color: #C5432F; color: white; border-top-left-radius: 12px; border-top-right-radius: 12px;">
-              <span>{% trans %}Rejection Reason{% endtrans %}</span>
-              <button type="button" class="btn-close btn-close-white float-end" data-bs-toggle="collapse" data-bs-target="#rejectReason" aria-label="Close" onclick="document.getElementById('rejection_reason').value = '';">
-              </button>
-            </div>
-            <div class="card-body" style="background-color: #ffe5d0; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-              <form action="/dataset-publish/{{ c.pkg_dict.id }}/reject" method="post">
-                <div class="mb-3">
-                  <label for="rejection_reason" class="form-label" style="color:#984C0C;">
-                   {% trans %}Please let the editor know what modifications are needed for dataset publication (max 1000 characters){% endtrans %}
-                  </label>
-                  <textarea 
-                    id="rejection_reason" 
-                    name="rejection_reason" 
-                    class="form-control"
-                    style="border-radius:8px; border:1px solid #C5432F;"
-                    rows="4" 
-                    maxlength="1000" 
-                    required
-                    ondrop="return false;"
-                    oninput="this.value = this.value.replace(/[\uFFFC-\uFFFF]/g, '');"
-                    placeholder="{% trans %}Explain the required modifications here...{% endtrans %}"></textarea>
+        </button>
+        <!-- Rejection reasons pop-up modal -->
+          <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content">
+                <div class="modal-header p-4" style="background-color: #206b82; color: white">
+                  <h4 class="modal-title">{% trans %}Rejection Reason{% endtrans %}</h4>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <button type="submit" class="btn float-end" style="background-color:#C5432F;color:white;">
-                  {% trans %}Send Rejection{% endtrans %}
-                </button>
-              </form>
+                <div class="modal-body">
+                  <form action="/dataset-publish/{{ c.pkg_dict.id }}/reject" method="post">
+                    <div class="m-3">
+                      <label for="rejection_reason" class="form-label" style="color: black; font-weight: normal;">
+                        {% trans %}Please let the dataset editor know what modifications are needed for dataset publication (max 1000 characters){% endtrans %}
+                      </label>
+                      <textarea 
+                        id="rejection_reason" 
+                        name="rejection_reason" 
+                        class="form-control"
+                        style="border-radius:8px; border:1px solid #206b82;"
+                        rows="4" 
+                        maxlength="1000" 
+                        required
+                        ondrop="return false;"
+                        oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
+                        placeholder="{% trans %}Explain the required modifications here...{% endtrans %}">
+                      </textarea>
+                    </div>
+                    <div class="modal-footer" style="border: none">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                      <button type="submit" class="btn" style="background-color:#C5432F;color:white;">
+                        {% trans %}Send Rejection{% endtrans %}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
       {% endif %}

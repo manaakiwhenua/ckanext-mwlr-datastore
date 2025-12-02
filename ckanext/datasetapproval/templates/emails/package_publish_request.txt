@@ -1,17 +1,14 @@
 Dear {{ admin_name }},
 
-A new package has been requested for publishing by {{ publisher_name }}:
+A new dataset has been submitted for review by {{ publisher_name }}:
 
     {{ package_title }}
 
     {{ package_description}}
 
-To approve or reject the request, please visit the following page (logged in as a office administrator):
+To approve or reject the dataset, please visit the following page:
 
     {{ package_url }}
-
-Have a nice day.
-
 
 --
 Message sent by {{ site_title }} ({{ site_url }})
