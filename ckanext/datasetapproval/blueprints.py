@@ -29,10 +29,6 @@ def search_url(params, package_type=None):
     url = h.url_for('approval.dataset_review', id=toolkit.c.user)
     return url_with_params(url, params)
 
-def save_as_draft():
-    log.debug("In save as draft view")
-    return toolkit.base.abort(404, "Saving as a draft test")
-
 def approve(id):
     return _make_action(id, 'approve')
 
@@ -134,5 +130,4 @@ def _make_action(package_id, action='reject', rejection_reason=None):
 approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve)
 approveBlueprint.add_url_rule('/dataset-publish/<id>/reject', view_func=reject, methods=['POST'])
 approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=dataset_review)
-approveBlueprint.add_url_rule(u'/dataset-publish/save_as_draft', view_func=save_as_draft)
 

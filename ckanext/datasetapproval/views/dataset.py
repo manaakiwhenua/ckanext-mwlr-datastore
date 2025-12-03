@@ -5,25 +5,13 @@ from flask import Blueprint
 from ckan.common import current_user
 from ckan.lib.helpers import helper_functions as h
 from ckan.plugins import toolkit as tk
-import ckan.model as model
 from ckan.views.dataset import (
     CreateView as BaseCreateView,
     EditView as BaseEditView,
-    _get_package_type,
-    _setup_template_variables,
-    _get_pkg_template,
-    _tag_string_to_list,
-    _form_save_redirect,
 )
-from ckan.types import Context, Response
-
-import ckan.lib.navl.dictization_functions as dict_fns
-from ckan.lib.search import (
-    SearchError, SearchQueryError, SearchIndexError
-)
+from ckan.types import Context
 import ckan.logic as logic
-from typing import Any, Iterable, Optional, Union, cast
-from ckan.common import _, config, g, request
+from ckan.common import _, request
 
 log = logging.getLogger(__name__)
 
@@ -33,8 +21,6 @@ dataset = Blueprint(
     url_prefix="/dataset",
     url_defaults={"package_type": "dataset"},
 )
-NotAuthorized = logic.NotAuthorized
-check_access = logic.check_access
 
 class CreateView(BaseCreateView):
     def __init__(self):
