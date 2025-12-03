@@ -5,9 +5,7 @@
         <span class="badge bg-secondary">{{ _('Draft') }}</span>
     {% endif %}
 
-    {% if package.get('publishing_status', '').startswith('draft') %}
-        <span class="badge bg-secondary">{{ _('Draft') }}</span>
-    {% elif package.get('publishing_status', '').startswith('in_review') and in_review %}
+    {% if package.get('publishing_status', '').startswith('in_review') and in_review %}
         <span class="badge bg-warning">{{ _('Review requested') }}</span>
     {% elif package.get('publishing_status', '').startswith('in_review') %}
         <span class="badge bg-warning">{{ _('Review Pending') }}</span>

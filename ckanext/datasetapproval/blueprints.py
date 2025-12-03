@@ -29,6 +29,7 @@ def search_url(params, package_type=None):
     url = h.url_for('approval.dataset_review', id=toolkit.c.user)
     return url_with_params(url, params)
 
+
 def approve(id):
     return _make_action(id, 'approve')
 

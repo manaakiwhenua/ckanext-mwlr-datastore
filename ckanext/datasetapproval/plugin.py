@@ -106,9 +106,8 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             })
         return search_params
 
-    # --- user labels (what labels a user is allowed to see) ---
+    # IPermissionLabels
     def get_user_dataset_labels(self, user_obj):
-        # Start with the normal labels a user already has
         labels = super(DatasetapprovalPlugin, self) \
             .get_user_dataset_labels(user_obj)
 
@@ -119,6 +118,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
                     {u'user': user_obj.id}, {u'permission': u'admin'})
                 labels.extend(u'member-%s' % o['id'] for o in orgs)
         return labels
+
 
     # IBlueprint
     def get_blueprint(self):
