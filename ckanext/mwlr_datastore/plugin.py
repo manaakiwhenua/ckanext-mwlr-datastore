@@ -73,13 +73,23 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
             if author_value is None:
                 return []
             try:
-                return json.loads(author_value)
-            except ValueError:
-                return [author_value]
+                parsed = json.loads(author_value)
+                # Handle both list and dict formats
+                if isinstance(parsed, list):
+                    return parsed
+                elif isinstance(parsed, dict):
+                    # Empty dict {} should return empty list
+                    # Non-empty dict is unexpected but convert to list of values
+                    return list(parsed.values()) if parsed else []
+                else:
+                    return [parsed] if parsed else []
+            except (ValueError, TypeError):
+                return [author_value] if author_value else []
 
         author_value = listify_author(dataset_dict.get('author'))
 
-        if dataset_dict.get('author'):
+        # Only set vocab_author if there are actual authors (non-empty list)
+        if author_value:
             dataset_dict['vocab_author'] = author_value
 
         ## Any 'repeating subfields' schema item must be converted to
