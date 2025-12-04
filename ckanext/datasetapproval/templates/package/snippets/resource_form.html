@@ -27,11 +27,7 @@
    {{ super() }}
   <!-- Added instruction for publishing draft dataset -->
   {% if stage %}
-    {% if stage == 1 %}
-      <div class="alert alert-warning" role="alert">You're updating this resource as a draft. Once you done with updating, you can submit the dataset for review by visiting the dataset edit page and clicking the "Finish Update" button <a href="{{ h.url_for('dataset.edit', id=pkg_name)}}"> dataset edit page.</a> </div>
-    {% endif %}
-  {% else %}
-      <div class="alert alert-warning" role="alert">You're updating this resource as a draft. Once you done with updating, you can submit the dataset for review by visiting the dataset edit page and clicking the "Finish Update" button <a href="{{ h.url_for('dataset.edit', id=pkg_name)}}"> dataset edit page.</a> </div>
+      <div class="alert alert-warning" role="alert">You're updating this dataset as a draft. Once you've finished updating the dataset, you can submit the dataset for review by visiting the dataset resource edit page and clicking the "Submit for review" button <a href="{{ h.url_for('dataset.edit', id=pkg_name)}}"> dataset edit page.</a> </div>
   {% endif %}
 {% endblock %}
 
@@ -49,16 +45,16 @@
 {% endblock %}
 {% endif %}
 {% block again_button %}
-<button class="btn btn-default" name="save" value="again" type="submit">{{ _('Save & add another') }}</button>
+<button class="btn btn-default" name="save" value="again" type="submit">{{ _('Save as draft and upload another') }}</button>
 {% endblock %}  
 {% if stage %}
    {% block save_button %}
 {% if stage != 1 %}
   {% if 'complete' in stage %}
-    <button class="btn btn-warning" name="save" type="submit"  data-module="form-save" data-module="form-save" data-module-type="resource-draft">{{ _('Finish & save as draft') }}</button>
+    <button class="btn btn-warning" name="save" type="submit"  data-module="form-save" data-module="form-save" data-module-type="resource-draft">{{ _('Save as draft') }}</button>
   {% endif %}
 {% endif %}
-  <button class="btn btn-primary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{_('Finish')}}{% endblock %}</button>
+  <button class="btn btn-primary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{_('Submit for review')}}{% endblock %}</button>
 {% endblock %}
 {% else %}
 {% block add_button %}
