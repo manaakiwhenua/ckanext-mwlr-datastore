@@ -62,7 +62,7 @@ def _compose_email_subj_for_editors(state):
         return 'Your dataset request has been reviewed by the administrator.'
 
 
-def _get_publisher_name(context, id):
+def _get_editor_name(context, id):
     try:
         user_dict = toolkit.get_action('user_show')(context, {'id': id})
         return user_dict.get('display_name')
@@ -77,12 +77,14 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     package_title = data_dict.get('title')
     package_description = data_dict.get('notes', '')
     package_url = pkg_link
-    publisher_name = _get_publisher_name(context, data_dict.get('creator_user_id'))
+    package_dict = toolkit.get_action('package_show')(context, {'id': data_dict['id']})
+    creator_user_id = package_dict.get('creator_user_id')
+    editor_name = _get_editor_name(context, creator_user_id)
 
     email_body = f'''
     Dear {admin_name},
 
-    {'An'if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by {publisher_name}:
+    {'An'if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by user {editor_name.title()}.
 
     '{package_title}'
 
@@ -94,7 +96,7 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
 
     --
     Message sent by {site_title} ({site_url})
-    This is an automated message. Please do not reply to this email.
+    This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator.
     '''
     return email_body
 
