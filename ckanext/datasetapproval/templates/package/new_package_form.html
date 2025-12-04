@@ -10,7 +10,6 @@
 {% endblock %}
 
 {% block save_button %}
-    <button class="btn btn-secondary" type="submit" name="save" value="save-draft" >{{ _('Save as Draft') }}</button>
     <button class="btn btn-primary" type="submit" name="save">
       {%- block save_button_text -%}
         {%- if form_style == 'edit' -%}
