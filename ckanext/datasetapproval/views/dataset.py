@@ -29,7 +29,7 @@ class CreateView(BaseCreateView):
     def _prepare(self) -> Context:  # noqa
         log.debug("dataset self in createview _prepare: %r", self)
         context = super()._prepare()
-        context.update({'save_progress': tk.request.form.get("save") == "save-progress"})
+        context.update({'submit_review': tk.request.form.get("save") == "submit-review"})
         context.update({'admin_editing': h.is_admin(current_user.name)})
         return context
 
@@ -40,7 +40,7 @@ class EditView(BaseEditView):
     def _prepare(self) -> Context:
         log.debug("dataset self in editview _prepare: %r", self)
         context = super()._prepare()
-        context.update({'save_progress': tk.request.form.get("save") == "save-progress"})
+        context.update({'submit_review': tk.request.form.get("save") == "submit-review"})
         context.update({'admin_editing': h.is_admin(current_user.name)})
         return context
 

@@ -1,20 +1,14 @@
 {% ckan_extends %}
-
-{% block metadata_fields %}
-  {{ super() }}   
-  <!-- Added instruction for publishing draft dataset -->
-  {% if stage %}
-    {% if stage == 1 %}
-      <div class="alert alert-warning" role="alert">You're updating this resource as a draft. Once you done with updating, you can submit the dataset for review by visiting the dataset edit page and clicking the "Finish Update" button <a href="{{ h.url_for('dataset.edit', id=pkg_name)}}"> dataset edit page.</a> </div>
-    {% endif %}
-  {% else %}
-      <div class="alert alert-warning" role="alert">You're updating this resource as a draft. Once you done with updating, you can submit the dataset for review by visiting the dataset edit page and clicking the "Finish Update" button <a href="{{ h.url_for('dataset.edit', id=pkg_name)}}"> dataset edit page.</a> </div>
-  {% endif %}
-{% endblock %}
+<input type="hidden" name="review_state" id="review_state" value="" />
 
 {% block save_button %}
-  <button class="btn btn-secondary" name="save" type="submit" value="go-metadata">{{ _('Finish & save as draft') }}</button>
-  {{ super() }}
+  <button class="btn btn-secondary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{ _('Finish & save as in progress') }}{% endblock %}</button>
+  <button class="btn btn-primary" name="save" type="submit" value="go-metadata" onclick="document.getElementById('submit_review').value='submit'">{{ _('Submit') }}</button>
+{% endblock %}
+
+{% block add_button %}
+  <button class="btn btn-secondary" name="save" value="go-dataset-complete" type="submit">{{ _('Add') }}</button>
+  <button class="btn btn-primary" name="save" value="go-dataset-complete" type="submit" onclick="document.getElementById('submit_review').value='submit'">{{ _('Add & request review') }}</button>
 {% endblock %}
 
 <!-- TODO: need to make sure the add button saves it as in progress and doesn't update it to 'in_review' - or basically just doesn't update the status-->

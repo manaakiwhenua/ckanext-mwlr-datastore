@@ -7,9 +7,22 @@
 {% endblock %}
 
 {% block save_button %}
-<!-- TODO:  Add in an auth function here that checks whether this is valid to save as a draft (similar to check on Finish button in resource page)-->
-  {% if form_style == 'edit' %}
-    <button class="btn btn-secondary" type="submit" name="save" value="save-progress" >{{ _('Save as in progress') }}</button>  
-  {% endif %}
-    {{ super()}}
-{% endblock %}
+    <!-- button that is for saving in progress - available on both create and edit -->
+    <button class="btn btn-secondary" type="submit" name="save" >
+        {% if form_style == 'edit' %}
+            {{ _('Save as in progress') }}
+        {% else %}
+            {{ _('Next: Add Data') }}
+        {% endif %}
+    </button>
+    <!-- button that is for submitting for review - available only on edit -->
+     {% if form_style == 'edit' %}
+        <button class="btn btn-primary" type="submit" name="save" value="submit-review" >
+            {% if h.is_admin(c.user) %}
+                {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
+            {% else %}
+                {{ _('Submit for Review') }}
+            {% endif %}
+        </button>  
+    {% endif %}
+  {% endblock %}
