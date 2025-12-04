@@ -10,7 +10,7 @@ def package_show_with_approval(context, data_dict):
     user = context.get('user')
     package = get_package_object(context, data_dict)
 
-    if package.extras.get('publishing_status') in ['in_review', 'draft', 'rejected']:
+    if package.extras.get('publishing_status') in ['in_review', 'in_progress', 'rejected']:
         # Accessiable to within editors so that they can collabrate on the dataset
 
         try:

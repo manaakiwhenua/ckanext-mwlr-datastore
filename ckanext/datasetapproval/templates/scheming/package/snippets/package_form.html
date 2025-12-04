@@ -9,7 +9,7 @@
 {% block save_button %}
 <!-- TODO:  Add in an auth function here that checks whether this is valid to save as a draft (similar to check on Finish button in resource page)-->
   {% if form_style == 'edit' %}
-    <button class="btn btn-secondary" type="submit" name="save" value="save-draft" >{{ _('Save as Draft') }}</button>  
+    <button class="btn btn-secondary" type="submit" name="save" value="save-progress" >{{ _('Save as in progress') }}</button>  
   {% endif %}
     {{ super()}}
 {% endblock %}

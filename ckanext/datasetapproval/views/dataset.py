@@ -27,9 +27,9 @@ class CreateView(BaseCreateView):
         super().__init__()
     
     def _prepare(self) -> Context:  # noqa
-        log.debug("self in createview _prepare: %r", self)
+        log.debug("dataset self in createview _prepare: %r", self)
         context = super()._prepare()
-        context.update({'save_as_draft': tk.request.form.get("save") == "save-draft"})
+        context.update({'save_progress': tk.request.form.get("save") == "save-progress"})
         context.update({'admin_editing': h.is_admin(current_user.name)})
         return context
 
@@ -38,9 +38,9 @@ class EditView(BaseEditView):
         super().__init__()
     
     def _prepare(self) -> Context:
-        log.debug("self in editview _prepare: %r", self)
+        log.debug("dataset self in editview _prepare: %r", self)
         context = super()._prepare()
-        context.update({'save_as_draft': tk.request.form.get("save") == "save-draft"})
+        context.update({'save_progress': tk.request.form.get("save") == "save-progress"})
         context.update({'admin_editing': h.is_admin(current_user.name)})
         return context
 
