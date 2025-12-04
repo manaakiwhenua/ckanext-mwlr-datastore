@@ -2,19 +2,8 @@
 
 {% block stages %}
   {% if not h.is_admin(c.user) %}
-
-    <div class="alert alert-warning" role="alert">
-        <p><strong>{{ _('Note:') }}</strong></p>
-        {% if form_style != 'edit' %}
-          <p>This dataset will be submitted for review by the collection's reviewers once you have finished uploading data. During review, this dataset will remain private.</p>
-          <p> When approved, the dataset will remain private if you have selected 'Private' under the 'Visibility' section. Otherwise, the dataset will be made public on approval.</p>
-        {% else %}
-          <p>Changes made now won't be public until the dataset is approved.</p>
-        {% endif %}
-    </div>
-
+    {% snippet "package/snippets/dataset_approval_alert_note.html" %}
   {% endif %}
-
   {% if form_style != 'edit' %}
     {{ super() }}
   {% endif %}

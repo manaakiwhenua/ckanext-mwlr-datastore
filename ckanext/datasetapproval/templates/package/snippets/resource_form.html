@@ -14,6 +14,14 @@
 	{% endif %}
 {% endblock %}
 
+{% block stages %}
+  {% if not h.is_admin(c.user) %}
+    {% snippet "package/snippets/dataset_approval_alert_note.html" %}
+  {% endif %}
+  {% if form_style != 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
 
 {% block metadata_fields %}
    {{ super() }}
