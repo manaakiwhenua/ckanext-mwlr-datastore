@@ -1,3 +1,3 @@
-from ckanext.datasetapproval.views import dataset, resource
+from ckanext.datasetapproval.views import dataset
 
-__all__ = [dataset, resource]
+__all__ = [dataset]

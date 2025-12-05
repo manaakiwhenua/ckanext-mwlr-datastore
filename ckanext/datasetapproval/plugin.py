@@ -125,7 +125,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
     # IBlueprint
     def get_blueprint(self):
         full_blueprints = [views.dataset.registered_views(),  blueprints.approveBlueprint]
-        full_blueprints.extend(views.resource.registered_views())
         return full_blueprints
 
 
