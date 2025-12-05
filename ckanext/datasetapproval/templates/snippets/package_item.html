@@ -2,7 +2,7 @@
 
 {% block heading_meta %}
     {% if package.get('publishing_status', '').startswith('in_progress') %}
-        <span class="badge bg-secondary">{{ _('In progress') }}</span>
+        <span class="badge bg-secondary">{{ _('In Progress') }}</span>
     {% endif %}
 
     {% if package.get('publishing_status', '').startswith('in_review') and in_review %}

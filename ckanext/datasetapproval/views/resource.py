@@ -11,7 +11,7 @@ import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.logic as logic
 from ckan import model
 from ckan.types import Context
-import ckan.lib.helpers as h
+from ckan.lib.helpers import helper_functions as h
 
 log = logging.getLogger(__name__)
 
@@ -48,9 +48,9 @@ class EditView(BaseEditView):
     def __init__(self):
         super().__init__()
     
-    def _prepare(self) -> Context:  # noqa
+    def _prepare(self, id: str) -> Context:  # noqa
         log.debug("resource self in editview _prepare: %r", self)
-        context = super()._prepare()
+        context = super()._prepare(id)
         context.update({'submit_review': tk.request.form.get("submit_review") == "submit"})
         context.update({'admin_editing': h.is_admin(current_user.name)})
         return context

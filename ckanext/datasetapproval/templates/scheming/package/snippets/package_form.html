@@ -8,13 +8,11 @@
 
 {% block save_button %}
     <!-- button that is for saving in progress - available on both create and edit -->
-    <button class="btn btn-secondary" type="submit" name="save" >
-        {% if form_style == 'edit' %}
-            {{ _('Save as in progress') }}
-        {% else %}
-            {{ _('Next: Add Data') }}
-        {% endif %}
-    </button>
+     {% if form_style == 'edit' %}
+        <button class="btn btn-secondary" type="submit" name="save" >{{ _('Save as in progress') }}</button>
+    {% else %}
+        <button class="btn btn-primary" type="submit" name="save" >{{ _('Next: Add Data') }}</button>
+    {% endif %}
     <!-- button that is for submitting for review - available only on edit -->
      {% if form_style == 'edit' %}
         <button class="btn btn-primary" type="submit" name="save" value="submit-review" >

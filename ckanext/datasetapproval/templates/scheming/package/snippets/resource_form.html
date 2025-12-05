@@ -2,13 +2,13 @@
 <input type="hidden" name="review_state" id="review_state" value="" />
 
 {% block save_button %}
-  <button class="btn btn-secondary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{ _('Finish & save as in progress') }}{% endblock %}</button>
-  <button class="btn btn-primary" name="save" type="submit" value="go-metadata" onclick="document.getElementById('submit_review').value='submit'">{{ _('Submit') }}</button>
+  <button class="btn btn-secondary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{ _('Save as in progress') }}{% endblock %}</button>
+{% endblock %}
+
+{% block again_button %}
+  <button class="btn btn-default" name="save" value="again" type="submit">{{ _('Add another resource') }}</button>
 {% endblock %}
 
 {% block add_button %}
-  <button class="btn btn-secondary" name="save" value="go-dataset-complete" type="submit">{{ _('Add') }}</button>
-  <button class="btn btn-primary" name="save" value="go-dataset-complete" type="submit" onclick="document.getElementById('submit_review').value='submit'">{{ _('Add & request review') }}</button>
+  <button class="btn btn-secondary" name="save" value="go-dataset-complete" type="submit">{{ _('Save as in progress') }}</button>
 {% endblock %}
-
-<!-- TODO: need to make sure the add button saves it as in progress and doesn't update it to 'in_review' - or basically just doesn't update the status-->
