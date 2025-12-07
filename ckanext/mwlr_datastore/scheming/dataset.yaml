@@ -68,8 +68,7 @@ dataset_fields:
   required         : true
   help_text        : 'Please provide as Family Name, First Name'
   preset           : multiple_text
-  validators       : scheming_required scheming_multiple_text unicode_safe strip_value
-  
+  validators       : scheming_required scheming_multiple_text
 
 - field_name: maintainer
   label: Maintainer
@@ -111,6 +110,13 @@ dataset_fields:
   form_snippet     : text_no_autocomplete.html
   display_snippet  : link.html
   validators       : ignore_empty strip_value unicode_safe
+
+- field_name       : version
+  label            : 'Version'
+  form_placeholder : '1.0'
+  form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty strip_value unicode_safe package_version_validator
+  default          : 1.0
 
 - field_name       : doi
   label            : 'DOI'
