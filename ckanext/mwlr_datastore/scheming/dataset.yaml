@@ -44,10 +44,12 @@ dataset_fields:
 
 # True is 'Private', False is 'Public'
 - field_name       : chosen_visibility
-  label            : Visibility
+  label            : Visibility after review
   form_snippet     : visibility.html
   display_snippet  : null
-  validators       : ignore_empty unicode_safe
+  help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
+  required         : true
+  validators       : scheming_required unicode_safe
   default          : true
 
 - field_name       : publisher
