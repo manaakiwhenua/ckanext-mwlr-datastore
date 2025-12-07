@@ -2,7 +2,12 @@
 <input type="hidden" name="review_state" id="review_state" value="" />
 
 {% block save_button %}
-  <button class="btn btn-secondary" name="save" value="go-metadata" type="submit">{% block save_button_text %}{{ _('Save as in progress') }}{% endblock %}</button>
+  <button class="btn {{ 'btn-primary' if h.is_admin(c.user) else 'btn-secondary' }}"
+          name="save" value="go-metadata" type="submit">
+    {% block save_button_text %}
+      {{ _('Finish') if h.is_admin(c.user) else _('Save as in progress') }}
+    {% endblock %}
+  </button>
 {% endblock %}
 
 {% block again_button %}
@@ -10,5 +15,8 @@
 {% endblock %}
 
 {% block add_button %}
-  <button class="btn btn-secondary" name="save" value="go-dataset-complete" type="submit">{{ _('Save as in progress') }}</button>
+  <button class="btn {{ 'btn-primary' if h.is_admin(c.user) else 'btn-secondary' }}"
+          name="save" value="go-metadata" type="submit">
+      {{ _('Add') if h.is_admin(c.user) else _('Save as in progress') }}
+  </button>
 {% endblock %}
