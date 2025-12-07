@@ -117,7 +117,6 @@ dataset_fields:
   form_placeholder : '1.0'
   form_snippet     : text_no_autocomplete.html
   validators       : ignore_empty strip_value unicode_safe package_version_validator
-  default          : 1.0
 
 - field_name       : doi
   label            : 'DOI'
@@ -280,8 +279,7 @@ resource_fields:
   label            : Version
   form_placeholder : 1.0
   form_snippet     : text_no_autocomplete.html  
-  validators       : strip_value unicode_safe
-  default          : 1.0
+  validators       : ignore_empty strip_value unicode_safe
 
 - field_name: format
   label: Format
