@@ -52,7 +52,8 @@ dataset_fields:
 
 - field_name       : publisher
   label            : Publisher
-  validators       : ignore_empty unicode_safe strip_value
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
   default          : Landcare Research NZ Ltd
 
 - field_name       : publication_year
@@ -91,14 +92,14 @@ dataset_fields:
   validators       : scheming_required unicode_safe strip_value email_validator
 
 - field_name       : start_date
-  label            : 'Dataset Start Date'
+  label            : 'Start Date'
   help_text        : 'The start date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
   form_snippet     : text_no_autocomplete.html
   validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_date convert_to_extras
 
 - field_name       : end_date
-  label            : 'Dataset End Date'
+  label            : 'End Date'
   help_text        : 'The end date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
   validators       : ignore_empty strip_value ckanext_mwlr_datastore_is_date convert_to_extras
