@@ -17,7 +17,6 @@ def is_user_editor_of_org(org_id, user_id):
 def publishing_check(context, data_dict):
     admin_editing = context.get("admin_editing", False)
     submit_review = context.get("submit_review", False)
-    log.debug("publishing_check context: %r", context)
     user_id = (
         tk.current_user.id
         if tk.current_user and not tk.current_user.is_anonymous
@@ -48,7 +47,6 @@ def publishing_check(context, data_dict):
         else:
             data_dict["private"] = "true"
             data_dict['publishing_status'] = "in_progress"
-    log.debug("publishing_check final data_dict: %r", data_dict)
     return data_dict
 
 def set_visibility_on_approval_or_rejection(data_dict):
