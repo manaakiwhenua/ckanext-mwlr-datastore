@@ -1,8 +1,7 @@
 <div class="alert alert-warning" role="alert">
     <p><strong>{{ _('Note:') }}</strong></p>
     {% if form_style != 'edit' %}
-        <p>This dataset will be submitted for review by the collection's reviewers. During review, this dataset will remain private.</p>
-        <p> When approved, the dataset will remain private if you have selected 'Private' under the 'Visibility' section. Otherwise, the dataset will be made public.</p>
+        <p>The dataset will be submitted for review and will remain private. After the review, it will stay private unless you choose to make it public.</p>
     {% else %}
         <p>Changes made now won't be public until the dataset is approved.</p>
     {% endif %}
