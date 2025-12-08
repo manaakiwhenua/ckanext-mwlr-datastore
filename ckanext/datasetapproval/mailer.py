@@ -11,6 +11,9 @@ log = logging.getLogger(__name__)
 
 
 def mail_package_review_request_to_admins(context, data_dict, _type='new'):
+    if config.get('ckanext.approval.turn_on_email_notifications', 'true') != 'true':
+        log.debug('Email notifications are turned off, not sending approve/reject notification email.')
+        return
     members = core_member_list(
         context=context,
         data_dict={'id': data_dict.get('owner_org')}
@@ -38,6 +41,9 @@ def mail_package_review_request_to_admins(context, data_dict, _type='new'):
 
 
 def mail_package_approve_reject_notification_to_editors(package_id, publishing_status, rejection_reason=None):
+    if config.get('ckanext.approval.turn_on_email_notifications', 'true') != 'true':
+        log.debug('Email notifications are turned off, not sending approve/reject notification email.')
+        return
     package_dict = toolkit.get_action('package_show' )({'ignore_auth': True}, {'id':package_id })
     editor = model.User.get(package_dict.get('creator_user_id'))
     if editor.email:

@@ -29,7 +29,7 @@ def publishing_check(context, data_dict):
         data_dict.pop("currently_reviewing")
         rejection_reason = context.get("rejection_reason", None)
         data_dict = set_visibility_on_approval_or_rejection(data_dict)      
-        #mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"), rejection_reason)
+        mail_package_approve_reject_notification_to_editors(data_dict.get("id"), data_dict.get("publishing_status"), rejection_reason)
     ## if the dataset is being updated by an admin then should bypass the approval state
     elif admin_editing and data_dict.get("id"):
         old_data_dict = tk.get_action("package_show")(
@@ -42,7 +42,7 @@ def publishing_check(context, data_dict):
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft
     elif is_user_editor_of_org(org_id, user_id):
         if submit_review:
-            #mail_package_review_request_to_admins(context, data_dict)
+            mail_package_review_request_to_admins(context, data_dict)
             data_dict['publishing_status'] = "in_review"
         else:
             data_dict["private"] = "true"
