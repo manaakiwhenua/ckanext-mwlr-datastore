@@ -23,15 +23,6 @@
   {% endif %}
 {% endblock %}
 
-{% block metadata_fields %}
-   {{ super() }}
-  <!-- Added instruction for publishing draft dataset -->
-  {% if stage %}
-      <div class="alert alert-warning" role="alert">You're updating this dataset as a draft. Once you've finished updating the dataset, you can submit the dataset for review by clicking the "Submit for review" button. </div>
-  {% endif %}
-{% endblock %}
-
-
 {% block delete_button %}
 {% if data.id %}
   {% if h.check_access('resource_delete', {'id': data.id})  %}
