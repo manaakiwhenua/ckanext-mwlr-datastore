@@ -109,17 +109,17 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
         return search_params
 
     # IPermissionLabels
-    def get_user_dataset_labels(self, user_obj):
-        labels = super(DatasetapprovalPlugin, self) \
-            .get_user_dataset_labels(user_obj)
+    # def get_user_dataset_labels(self, user_obj):
+    #     labels = super(DatasetapprovalPlugin, self) \
+    #         .get_user_dataset_labels(user_obj)
 
-        if user_obj and hasattr(user_obj, 'plugin_extras') and user_obj.plugin_extras:
-            if user_obj.plugin_extras.get('has_approval_permission', False):
-                labels = [x for x in labels if not x.startswith('member')]
-                orgs = toolkit.get_action(u'organization_list_for_user')(
-                    {u'user': user_obj.id}, {u'permission': u'admin'})
-                labels.extend(u'member-%s' % o['id'] for o in orgs)
-        return labels
+    #     if user_obj and hasattr(user_obj, 'plugin_extras') and user_obj.plugin_extras:
+    #         if user_obj.plugin_extras.get('has_approval_permission', False):
+    #             labels = [x for x in labels if not x.startswith('member')]
+    #             orgs = toolkit.get_action(u'organization_list_for_user')(
+    #                 {u'user': user_obj.id}, {u'permission': u'admin'})
+    #             labels.extend(u'member-%s' % o['id'] for o in orgs)
+    #     return labels
 
 
     # IBlueprint
