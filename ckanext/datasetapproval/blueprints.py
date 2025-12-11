@@ -130,7 +130,7 @@ def _make_action(package_id, action='reject', rejection_reason=None):
         ) 
     except Exception as e:
         log.error('Error approving dataset %s: %s', package_id, str(e))
-        h.flash_error("Unable to update publishing status as dataset contents are invalid. Ensure dataset metadata and resources are valid via the \"manage\" button.")
+        h.flash_error("Unable to update publishing status of dataset. Ensure the both the dataset metadata and resources are valid via the \"manage\" button.")
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
     mail_package_approve_reject_notification_to_editors(package_id, updated_dict.get("publishing_status"), rejection_reason)
