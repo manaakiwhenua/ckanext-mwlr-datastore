@@ -42,6 +42,7 @@ def publishing_check(context, data_dict):
     elif is_user_editor_of_org(org_id, user_id):
         if submit_review:
             try:
+                # TODO: double check what should happen/who it should recommend to in this case
                 mail_package_review_request_to_admins(context, data_dict)
                 tk.h.flash_success("Review request sent to collection reviewers. You will be notified by email of approval or rejection.")
             except MailerException as e:
