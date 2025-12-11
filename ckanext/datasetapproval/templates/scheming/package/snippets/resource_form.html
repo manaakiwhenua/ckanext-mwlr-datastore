@@ -1,5 +1,14 @@
 {% ckan_extends %}
 
+{% block stages %}
+  {% if not h.is_admin(c.user) %}
+    {% snippet "snippets/dataset_approval_alert_note.html" %}
+  {% endif %}
+  {% if form_style != 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
 {% block save_button %}
   <button class="btn {{ 'btn-primary' if h.is_admin(c.user) else 'btn-secondary' }}"
           name="save" value="go-metadata" type="submit">

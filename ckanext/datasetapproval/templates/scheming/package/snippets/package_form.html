@@ -6,6 +6,15 @@
                 class="form-control">
 {% endblock %}
 
+{% block stages %}
+  {% if not h.is_admin(c.user) %}
+    {% snippet "snippets/dataset_approval_alert_note.html" %}
+  {% endif %}
+  {% if form_style != 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
 {% block save_button %}
     <!-- button that is for saving in progress - available on both create and edit -->
      {% if not h.is_admin(c.user) %}
