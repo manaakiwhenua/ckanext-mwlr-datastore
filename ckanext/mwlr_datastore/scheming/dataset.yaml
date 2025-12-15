@@ -48,7 +48,6 @@ dataset_fields:
   form_snippet     : visibility.html
   display_snippet  : null
   help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
-  required         : true
   validators       : scheming_required unicode_safe
   default          : true
 
@@ -196,20 +195,17 @@ resource_fields:
 
 - field_name: name
   label: Name
-  required: true
   form_placeholder: eg. January 2011 Gold Prices
   validators: scheming_required unicode_safe strip_value
 
 - field_name: description
   label: Description
   form_snippet: markdown.html
-  required: true
   form_placeholder: Some useful notes about the data
   validators: scheming_required unicode_safe strip_value
 
 - field_name : resource_type
   label      : Resource Type
-  required   : true
   preset: select
   help_text  : 'Select the type of resource being uploaded.'
   validators : scheming_required unicode_safe
