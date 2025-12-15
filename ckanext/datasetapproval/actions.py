@@ -72,12 +72,12 @@ def _wrap_publish_review(up_func, context, data_dict, *, action_name):
         try:
             mail_package_review_request_to_admins(context, data_dict)
             tk.h.flash_success(
-                "Review request sent to collection reviewers. You will be notified by email of approval or rejection."
+                "Review request sent to collection admins. You will be notified by email of the review outcome."
             )
         except MailerException:
             log.exception("%s: mail send failed", action_name)
             tk.h.flash_error(
-                "Unable to send review request to collection reviewers. Please contact an administrator."
+                "Unable to send review request to collection admins. Please contact the datastore administrator."
             )
     return result
 

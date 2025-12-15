@@ -139,7 +139,7 @@ def _make_action(package_id, action='reject', rejection_reason=None):
         )
     except Exception as e:
         log.error('Error approving dataset %s: %s', package_id, str(e))
-        h.flash_error("Unable to update publishing status of dataset. Ensure that both the dataset metadata and resources are valid via the \"manage\" button.")
+        h.flash_error("Unable to update publishing status of dataset. Ensure that the dataset metadata is valid via the \"Manage\" button.")
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
     try:
@@ -147,7 +147,7 @@ def _make_action(package_id, action='reject', rejection_reason=None):
         toolkit.h.flash_success("Review response sent to dataset creator.")
     except MailerException as e:
         log.error(f"Failed to send review request email: {e}")
-        toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact an administrator.")
+        toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact the datastore administrator.")
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 
 approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve)

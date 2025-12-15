@@ -5,7 +5,7 @@
 
   {% if c.pkg_dict.publishing_status  == 'in_review' %}
     <div class="alert alert-warning" role="alert">
-      <p>{% trans %}This dataset is waiting for reviewer approval.{% endtrans %}</p>
+      <p>{% trans %}This dataset is waiting for approval.{% endtrans %}</p>
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
       {# TODO: remove style #}
       <div style="margin-top: 10px">
