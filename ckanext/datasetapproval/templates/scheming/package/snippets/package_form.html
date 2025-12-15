@@ -17,21 +17,42 @@
 
 {% block save_button %}
     <!-- button that is for saving in progress - available on both create and edit -->
-     {% if not h.is_admin(c.user) %}
-        {% if form_style == 'edit'%}
-            <button class="btn btn-secondary" type="submit" name="save" >{{ _('Save as in progress') }}</button>
+  {% if form_style == 'edit' %}
+    {% if not h.is_admin(c.user) %}
+      <button class="btn btn-secondary" type="submit" name="save" >{{ _('Save as in progress') }}</button>
+    {% endif %}
+        {% if h.is_admin(c.user) %}
+          <button class="btn btn-primary" type="submit" name="save" value="submit-review" >
+            {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
+          </button> 
         {% else %}
-            <button class="btn btn-primary" type="submit" name="save" >{{ _('Next: Add Data') }}</button>
-        {% endif %}
-    {% endif %}
-    <!-- button that is for submitting for review - available only on edit -->
-     {% if form_style == 'edit' %}
-        <button class="btn btn-primary" type="submit" name="save" value="submit-review" >
-            {% if h.is_admin(c.user) %}
-                {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
-            {% else %}
-                {{ _('Submit for Review') }}
-            {% endif %}
-        </button>  
-    {% endif %}
-  {% endblock %}
+          {% set publishing_status = pkg_dict.get('publishing_status') %}
+          {% if publishing_status in ['approved'] %}
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#submitReview">
+              {{ _('Submit for Review') }}
+            </button>
+          {% else %}
+            <button class="btn btn-primary" type="submit" name="save" value="submit-review" >{{ _('Submit for Review') }}</button>
+          {% endif %}
+        {% endif %}   
+  {% else %}
+    <button class="btn btn-primary" type="submit" name="save" >{{ _('Next: Add Data') }}</button>
+  {% endif %}
+  <div class="modal" tabindex="-1" id="submitReview">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Submitting for review</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-start">This dataset has previously been approved, are you sure you wish to submit this for review again?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" type="submit" name="save" value="submit-review" >Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
