@@ -40,14 +40,8 @@ def publishing_check(context, data_dict):
         data_dict["chosen_visibility"] = data_dict.get("private", "true")
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft
     elif is_user_editor_of_org(org_id, user_id):
+        context.update({'send_request': submit_review})
         if submit_review:
-            try:
-                # TODO: double check what should happen/who it should recommend to in this case
-                mail_package_review_request_to_admins(context, data_dict)
-                tk.h.flash_success("Review request sent to collection reviewers. You will be notified by email of approval or rejection.")
-            except MailerException as e:
-                log.error(f"Failed to send review request email: {e}")
-                tk.h.flash_error("Unable to send review request to collection reviewers. Please contact an administrator.")
             data_dict['publishing_status'] = "in_review"
         else:
             data_dict["private"] = "true"
@@ -64,6 +58,29 @@ def set_visibility_on_approval_or_rejection(data_dict):
 
     return data_dict
 
+def _wrap_publish_review(up_func, context, data_dict, *, action_name):
+    log.debug("%s: checking publishing status", action_name)
+    publishing_check(context, data_dict)
+
+    try:
+        result = up_func(context, data_dict)
+    except Exception:
+        log.exception("%s: action failed", action_name)
+        raise
+
+    if context.get('send_request', True):
+        try:
+            mail_package_review_request_to_admins(context, data_dict)
+            tk.h.flash_success(
+                "Review request sent to collection reviewers. You will be notified by email of approval or rejection."
+            )
+        except MailerException:
+            log.exception("%s: mail send failed", action_name)
+            tk.h.flash_error(
+                "Unable to send review request to collection reviewers. Please contact an administrator."
+            )
+    return result
+
 @tk.chained_action
 @logic.side_effect_free
 def package_show(up_func, context, data_dict):
@@ -73,34 +90,22 @@ def package_show(up_func, context, data_dict):
 @tk.chained_action
 @logic.side_effect_free
 def package_create(up_func, context, data_dict):
-    publishing_check(context, data_dict)
-    result = up_func(context, data_dict)
-    return result
-
+    return _wrap_publish_review(up_func, context, data_dict, action_name="package_create")
 
 @tk.chained_action
 @logic.side_effect_free
 def package_update(up_func, context, data_dict):
-    publishing_check(context, data_dict)
-    result = up_func(context, data_dict)
-    return result
-
+    return _wrap_publish_review(up_func, context, data_dict, action_name="package_update")
 
 @tk.chained_action
 @logic.side_effect_free
 def package_patch(up_func, context, data_dict):
-    publishing_check(context, data_dict)
-    result = up_func(context, data_dict)
-    return result
+    return _wrap_publish_review(up_func, context, data_dict, action_name="package_patch")
 
 @p.toolkit.chained_action   
 def resource_create(up_func,context, data_dict):
-    publishing_check(context, data_dict)
-    result = up_func(context, data_dict)
-    return result
+    return _wrap_publish_review(up_func, context, data_dict, action_name="resource_create")
 
 @p.toolkit.chained_action   
 def resource_update(up_func,context, data_dict):
-    publishing_check(context, data_dict)
-    result = up_func(context, data_dict)
-    return result
+    return _wrap_publish_review(up_func, context, data_dict, action_name="resource_update")

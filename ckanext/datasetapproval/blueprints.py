@@ -117,17 +117,25 @@ def _make_action(package_id, action='reject', rejection_reason=None):
     }
     # grab the old dict
     set_private = action == 'reject'
-
+    context = {
+        'model': model,
+        'user': toolkit.c.user,
+        'ignore_auth': True,
+        'rejection_reason': rejection_reason
+    }
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
-    updated_dict = {'id': package_id, 'publishing_status': states[action], 'currently_reviewing': True}
+    pkg = toolkit.get_action('package_show')(
+            context,
+            {'id': package_id}
+        )
     if set_private:
-        updated_dict['private'] = True
+        pkg['private'] = True
     try:
-        toolkit.get_action('package_patch')(
-            {'model': model, 'user': toolkit.c.user, 'rejection_reason': rejection_reason},
-            updated_dict
-        ) 
+        toolkit.get_action('package_update')(
+            context,
+            pkg
+        )
     except Exception as e:
         log.error('Error approving dataset %s: %s', package_id, str(e))
         # TODO: double check what should happen/who it should recommend to in this case
