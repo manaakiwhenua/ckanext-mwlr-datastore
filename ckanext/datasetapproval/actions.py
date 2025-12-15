@@ -68,7 +68,7 @@ def _wrap_publish_review(up_func, context, data_dict, *, action_name):
         log.exception("%s: action failed", action_name)
         raise
 
-    if context.get('send_request', True):
+    if context.get('send_request', False):
         try:
             mail_package_review_request_to_admins(context, data_dict)
             tk.h.flash_success(
