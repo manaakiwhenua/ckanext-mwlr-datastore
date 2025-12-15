@@ -82,6 +82,7 @@ def _wrap_publish_review(up_func, context, data_dict, *, action_name):
     return result
 
 @tk.chained_action
+@logic.side_effect_free
 def package_show(up_func, context, data_dict):
     tk.check_access('package_show_with_approval', context, data_dict)
     return up_func(context, data_dict)
