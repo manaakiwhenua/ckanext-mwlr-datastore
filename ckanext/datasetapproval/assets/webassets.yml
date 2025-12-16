@@ -3,3 +3,11 @@ datasetapproval_css:
   output: ckanext-datasetapproval/%(version)s-approval.css
   contents:
     - css/approval.css
+
+datasetapproval_org_js:
+  output: ckanext-datasetapproval/%(version)s-approvalworkflow-org.js
+  contents:
+    - js/org_monitoring_helper.js
+  extra:
+    preload:
+      - base/main

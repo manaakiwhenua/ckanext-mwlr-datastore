@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block save_button %}
+{% asset 'datasetapproval/datasetapproval_org_js' %}
     <!-- button that is for saving in progress - available on both create and edit -->
       {% if form_style == 'edit' %}
         {% set selected_org = pkg_dict.owner_org %}

@@ -1,10 +1,9 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultPermissionLabels
-from ckan.authz import users_role_for_group_or_org
 from ckanext.datasetapproval import views
 
-from ckanext.datasetapproval import auth, actions, blueprints, helpers
+from ckanext.datasetapproval import actions, blueprints, helpers
 
 import json
 import logging as log
@@ -12,30 +11,9 @@ from ckan.common import _, c
 
 log = log.getLogger(__name__)
 
-import six
-from six import text_type
-def unicode_please(value):
-    if isinstance(value, six.binary_type):
-        try:
-            return six.ensure_text(value)
-        except UnicodeDecodeError:
-            return value.decode(u'cp1252')
-    return text_type(value)
-
-
-def editor_publishing_dataset(owner_org, user_obj):
-    '''
-    Check if user is editor of the organization
-    '''
-    user_capacity = users_role_for_group_or_org(owner_org, user_obj.name)
-    if user_obj.sysadmin:
-        return False
-    return user_capacity != 'admin'
-
 class DatasetapprovalPlugin(plugins.SingletonPlugin, 
         DefaultPermissionLabels, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
-    plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IConfigurer)
@@ -63,12 +41,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'resource_update': actions.resource_update,
         }
         
-    # IAuthFunctions
-    def get_auth_functions(self):
-        return {
-            'package_show_with_approval': auth.package_show_with_approval
-        }
-
     def is_fallback(self):
         # Return True to register this plugin as the default handler for
         return True
