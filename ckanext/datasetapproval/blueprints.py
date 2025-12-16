@@ -2,7 +2,6 @@ import logging
 from functools import partial
 
 from flask import Blueprint
-from typing import Union
 
 from ckan import model
 from ckan.lib import base
@@ -14,7 +13,7 @@ from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
 from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
 from ckan.views.dataset import url_with_params
-import ckan.logic as logic
+from typing import Union
 from ckan.types import Response
 
 log = logging.getLogger(__name__)
@@ -60,16 +59,6 @@ def pending_datasets(id: str) -> Union[Response, str]:
     }
 
     extra_vars = _extra_template_variables(context, data_dict)
-
-    am_following: bool = False
-    if not extra_vars['is_myself']:
-        try:
-            am_following = logic.get_action('am_following_user')(
-                {'user': toolkit.c.user}, {"id": id})
-        except logic.NotAuthorized:
-            am_following = False
-
-    extra_vars["am_following"] = am_following
 
     params_nopage = [(k, v) for k, v in toolkit.request.args.items(multi=True)
                      if k != u'page']
