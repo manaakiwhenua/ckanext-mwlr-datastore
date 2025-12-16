@@ -19,7 +19,6 @@
     <!-- button that is for saving in progress - available on both create and edit -->
       {% if form_style == 'edit' %}
         {% set selected_org = pkg_dict.owner_org %}
-        {{selected_org}}
         {% if not h.is_admin(c.user, selected_org) %}
           <button class="btn btn-secondary" type="submit" name="save" >{{ _('Save as in progress') }}</button>
         {% endif %}
