@@ -1,7 +1,7 @@
 {% ckan_extends %}
 
 {% block stages %}
-  {% if not h.is_admin(c.user) %}
+  {% if not h.is_admin(c.user, pkg_dict.owner_org) %}
     {% snippet "snippets/dataset_approval_alert_note.html" %}
   {% endif %}
   {% if form_style != 'edit' %}
@@ -10,10 +10,11 @@
 {% endblock %}
 
 {% block save_button %}
-  <button class="btn {{ 'btn-primary' if h.is_admin(c.user) else 'btn-secondary' }}"
+  <button class="btn {{ 'btn-primary' if h.is_admin(c.user, pkg_dict.owner_org) else 'btn-secondary' }}"
           name="save" value="go-metadata" type="submit">
     {% block save_button_text %}
-      {{ _('Finish') if h.is_admin(c.user) else _('Save as in progress') }}
+      {% set selected_org = pkg_dict.owner_org %}
+      {{ _('Finish') if h.is_admin(c.user, selected_org) else _('Save as in progress') }}
     {% endblock %}
   </button>
 {% endblock %}
@@ -23,8 +24,8 @@
 {% endblock %}
 
 {% block add_button %}
-  <button class="btn {{ 'btn-primary' if h.is_admin(c.user) else 'btn-secondary' }}"
+  <button class="btn {{ 'btn-primary' if h.is_admin(c.user, selected_org) else 'btn-secondary' }}"
           name="save" value="go-metadata" type="submit">
-      {{ _('Add') if h.is_admin(c.user) else _('Save as in progress') }}
+      {{ _('Add') if h.is_admin(c.user, selected_org) else _('Save as in progress') }}
   </button>
 {% endblock %}

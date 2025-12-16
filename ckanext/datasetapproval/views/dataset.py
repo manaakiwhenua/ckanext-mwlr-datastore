@@ -29,8 +29,9 @@ class CreateView(BaseCreateView):
     def _prepare(self) -> Context:  # noqa
         log.debug("dataset self in createview _prepare: %r", self)
         context = super()._prepare()
+        selected_org = tk.request.form.get("owner_org")
         context.update({'submit_review': tk.request.form.get("save") == "submit-review"})
-        context.update({'admin_editing': h.is_admin(current_user.name)})
+        context.update({'admin_editing': h.is_admin(current_user.name, selected_org)})
         return context
 
 class EditView(BaseEditView):
@@ -40,8 +41,9 @@ class EditView(BaseEditView):
     def _prepare(self) -> Context:
         log.debug("dataset self in editview _prepare: %r", self)
         context = super()._prepare()
+        selected_org = tk.request.form.get("owner_org")
         context.update({'submit_review': tk.request.form.get("save") == "submit-review"})
-        context.update({'admin_editing': h.is_admin(current_user.name)})
+        context.update({'admin_editing': h.is_admin(current_user.name, selected_org)})
         return context
 
 dataset.add_url_rule("/new", view_func=CreateView.as_view(str("new")))

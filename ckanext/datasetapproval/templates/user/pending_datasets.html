@@ -10,11 +10,8 @@
   {% block page_subheading %}
       <p>
         <em>
-          {% if h.is_admin(user.name) %}
-            {{ _('Datasets requested for your review:') }}
-          {% else %}
-            {{ _('Datasets you have requested for review:') }}
-          {% endif %}
+        {% block request_context %}
+        {% endblock %}
         </em>
       </p>
     {% endblock %}
@@ -23,7 +20,6 @@
   </h1>
   {% block package_list %}
   {% if user.datasets %}
-
     {% snippet 'snippets/package_list.html', packages=user.datasets, in_review=true %}
   {% else %}
     {{ _('There are no pending review requests.') }}

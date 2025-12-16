@@ -2,6 +2,7 @@ import logging
 from functools import partial
 
 from flask import Blueprint
+from typing import Union
 
 from ckan import model
 from ckan.lib import base
@@ -13,6 +14,8 @@ from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
 from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
 from ckan.views.dataset import url_with_params
+import ckan.logic as logic
+from ckan.types import Response
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +40,75 @@ def approve(id):
 def reject(id):
     rejection_reason = toolkit.request.form.get('rejection_reason')
     return _make_action(id, 'reject', rejection_reason=rejection_reason)
+
+
+def my_requests(id: str) -> Union[Response, str]:
+    if toolkit.request.endpoint.endswith('dataset_review'):
+        review_context = "admin_review"
+    else:
+        review_context = "editor_requests"
+    context: Context = {
+        u'user': toolkit.c.user,
+        u'auth_user_obj': toolkit.c.userobj,
+        u'for_view': True
+    }
+    data_dict: dict[str, Any] = {
+        u'id': id,
+        u'user_obj': toolkit.c.userobj,
+        u'include_datasets': True,
+        u'include_num_followers': True
+    }
+
+    extra_vars = _extra_template_variables(context, data_dict)
+
+    am_following: bool = False
+    if not extra_vars['is_myself']:
+        try:
+            am_following = logic.get_action('am_following_user')(
+                {'user': toolkit.c.user}, {"id": id})
+        except logic.NotAuthorized:
+            am_following = False
+
+    extra_vars["am_following"] = am_following
+
+    params_nopage = [(k, v) for k, v in toolkit.request.args.items(multi=True)
+                     if k != u'page']
+    limit = 20
+    page = h.get_page_number(toolkit.request.args)
+    pager_url = partial(_pager_url, params_nopage, 'dataset')
+
+    if review_context == "admin_review":
+        fq_string = f'NOT creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
+    else:
+        fq_string = f'creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
+    
+    search_dict = {
+        'rows': limit,
+        'start': limit * (page - 1),
+        'fq': fq_string,
+        'include_private': True
+        }
+
+    in_review_datasets = toolkit.get_action('package_search')(context,
+                                               data_dict=search_dict)
+    
+    extra_vars['user_dict'].update({
+        'datasets' : in_review_datasets['results'],
+        'total_count': in_review_datasets['count']
+        })
+    
+    extra_vars[u'page'] = h.Page(
+        collection = in_review_datasets['results'],
+        page = page,
+        url = pager_url,
+        item_count = in_review_datasets['count'],
+        items_per_page = limit
+    )
+    extra_vars[u'page'].items = in_review_datasets['results']
+    log.debug("PRINTING EXTRA VARS")
+    log.debug(extra_vars)
+    return base.render(f'user/{review_context}.html', extra_vars)
+
 
 def dataset_review(id):
     if toolkit.c.user != id:
@@ -76,7 +148,7 @@ def dataset_review(id):
     search_dict = {
         'rows': limit,
         'start': limit * (page - 1),
-        'fq': 'publishing_status:in_review',
+        'fq': f'NOT creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review',
         'include_private': True
         }
 
@@ -152,5 +224,5 @@ def _make_action(package_id, action='reject', rejection_reason=None):
 
 approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve)
 approveBlueprint.add_url_rule('/dataset-publish/<id>/reject', view_func=reject, methods=['POST'])
-approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=dataset_review)
-
+approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=my_requests, endpoint='dataset_review')
+approveBlueprint.add_url_rule(u'/user/<id>/my_requests', view_func=my_requests, endpoint='my_requests')
