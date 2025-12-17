@@ -58,14 +58,14 @@ def mail_package_approve_reject_notification_to_editors(package_id, publishing_s
 
 
 def _compose_email_subj_for_admins(_type):
-    return ' A {0} dataset is requested for review.'.format(_type)
+    return 'Dataset submitted for review'
 
 
 def _compose_email_subj_for_editors(state):
     if state == 'approved':
-        return 'Dataset request has been reviewed and approved by the administrator.'
+        return 'Dataset approved and published'
     else: 
-        return 'Your dataset request has been reviewed by the administrator.'
+        return 'Dataset rejected'
 
 
 def _get_editor_name(context, id):
@@ -87,23 +87,17 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     creator_user_id = package_dict.get('creator_user_id')
     editor_name = _get_editor_name(context, creator_user_id)
 
-    email_body = f'''
-    Dear {admin_name},
-
-    {'An'if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by user {editor_name.title()}.
-
-    '{package_title}'
-
-    {package_description}
-
-    To approve or reject the request, please visit the following page (while logged in as an admin):
-
-    {package_url}
-
-    --
-    Message sent by {site_title} ({site_url})
-    This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator.
-    '''
+    email_body = (
+        f"Dear {admin_name},\n\n"
+        f"{'An' if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by user {editor_name.title()}.\n\n"
+        f"Dataset title:\n{package_title}\n\n"
+        f"Submission note:\n{package_description}\n\n"
+        f"To approve or reject the request, please visit the following page (while logged in as an admin):\n\n"
+        f"{package_url}\n\n"
+        f"---\n"
+        f"Message sent by {site_title} ({site_url})\n"
+        f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
+    )
     return email_body
 
 
@@ -115,9 +109,9 @@ def _compose_email_body_for_editors(user, package_dict, state, rejection_reason=
     package_title = package_dict.get('title')
     package_url = pkg_link
 
-    approval_paragraph = f"Your dataset '{package_title}' has been approved and published."
+    approval_paragraph = f"Your dataset \"{package_title}\" has been approved and published."
     rejection_paragraph = (
-        f"Your dataset '{package_title}' has been reviewed and rejected by the reviewer. "
+        f"Your dataset \"{package_title}\" has been reviewed and rejected by the reviewer. "
         f"Please see the following feedback. You can update the dataset and resubmit it for further review.\n\n"
         f"Feedback:\n'{rejection_reason}'"
     )
@@ -125,7 +119,7 @@ def _compose_email_body_for_editors(user, package_dict, state, rejection_reason=
     email_body = (
         f"Dear {editor_name.title()},\n\n"
         f"{approval_paragraph if state == 'approved' else rejection_paragraph}\n\n"
-        f"To view your dataset, please visit the following page:\n\n"
+        f"You can view the dataset at the following link:\n\n"
         f"{package_url}\n\n"
         f"--\n"
         f"Message sent by {site_title} ({site_url})\n"
