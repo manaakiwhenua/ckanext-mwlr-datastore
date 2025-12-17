@@ -5,6 +5,7 @@ from ckan.lib.mailer import MailerException
 import ckan.plugins.toolkit as tk
 import ckan.plugins as p
 import ckan.logic as logic
+from ckan.lib.helpers import helper_functions as h
 
 from ckanext.datasetapproval.mailer import mail_package_review_request_to_admins 
 
@@ -105,3 +106,11 @@ def resource_create(up_func,context, data_dict):
 @p.toolkit.chained_action   
 def resource_update(up_func,context, data_dict):
     return _wrap_publish_review(up_func, context, data_dict, action_name="resource_update")
+
+@p.toolkit.side_effect_free
+def check_user_admin(*args):
+    user_id = tk.current_user.id
+    org_id = tk.request.args.get("org_id")
+    is_user_admin = h.is_admin(user_id, org_id)
+    log.debug("check_user_admin: user_id=%r org_id=%r is_user_admin=%r", user_id, org_id, is_user_admin)
+    return {"is_user_admin": is_user_admin}

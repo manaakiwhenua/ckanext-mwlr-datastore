@@ -39,6 +39,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'package_update': actions.package_update,
             'resource_create': actions.resource_create,
             'resource_update': actions.resource_update,
+            'check_user_admin': actions.check_user_admin,
         }
         
     def is_fallback(self):
