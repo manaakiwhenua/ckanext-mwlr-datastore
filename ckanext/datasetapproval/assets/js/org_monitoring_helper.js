@@ -1,6 +1,8 @@
 console.log("org monitoring helper loaded");
 var org_selected = document.getElementById("field-organizations");
 var submit_button = document.getElementById("submitButton");
+var save_button = document.getElementById("saveButton");
+var update_button = document.getElementById("updateButton");
 var selected_org = org_selected.value;
 check_is_user_admin(selected_org);
 
@@ -23,6 +25,12 @@ async function check_is_user_admin(org_id) {
         } 
         if (submit_button) {
             submit_button.hidden = !!data.result.is_user_admin;
+        }
+        if (save_button) {
+            save_button.hidden = !!data.result.is_user_admin;
+        }
+        if (update_button) {
+            update_button.hidden = !data.result.is_user_admin;
         }
     } catch (error) {
         console.error("Error fetching admin details:", error);

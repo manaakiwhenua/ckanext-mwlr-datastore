@@ -35,10 +35,8 @@ def publishing_check(context, data_dict):
         old_data_dict = tk.get_action("package_show")(
             context, {"id": data_dict.get("id")}
         )
-        ## if the dataset is currently in review, should remain in review and visibility should be whatever the admin has set it to
-        if old_data_dict.get("publishing_status") == "in_review":
-            data_dict["publishing_status"] = old_data_dict.get("publishing_status")
-        data_dict["chosen_visibility"] = data_dict.get("private", "true")
+        data_dict["publishing_status"] = "approved"
+        data_dict = set_visibility_on_approval_or_rejection(data_dict)
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft
     elif is_user_editor_of_org(org_id, user_id):
         context.update({'send_request': submit_review})

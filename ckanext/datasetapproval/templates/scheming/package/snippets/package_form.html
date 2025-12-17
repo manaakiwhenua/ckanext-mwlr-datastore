@@ -19,24 +19,21 @@
   {% asset 'datasetapproval/datasetapproval_org_js' %}
     <!-- button that is for saving in progress - available on both create and edit -->
   {% if form_style == 'edit' %}
-  {% set selected_org = pkg_dict.owner_org %}
-    {% if not h.is_admin(c.user, selected_org) %}
-      <button class="btn btn-secondary" type="submit" name="save" >{{ _('Save as in progress') }}</button>
-    {% endif %}
-        {% if h.is_admin(c.user, selected_org) %}
-          <button class="btn btn-primary" type="submit" name="save" value="submit-review" >
-            {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
-          </button> 
-        {% else %}
-          {% set publishing_status = pkg_dict.get('publishing_status') %}
-          {% if publishing_status in ['approved'] %}
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#submitReview" id="submitButton">
-              {{ _('Submit for Review') }}
-            </button>
-          {% else %}
-            <button class="btn btn-primary" type="submit" name="save" value="submit-review" id="submitButton">{{ _('Submit for Review') }}</button>
-          {% endif %}
-        {% endif %}   
+      <!-- save buttons -->
+      <button class="btn btn-secondary" type="submit" name="save" id="saveButton" hidden>{{ _('Save as in progress') }}</button>
+      <button class="btn btn-primary" type="submit" name="save" value="submit-review" hidden id="updateButton">
+        {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
+      </button> 
+
+      <!-- submit button -->
+      {% set publishing_status = pkg_dict.get('publishing_status') %}
+      {% if publishing_status in ['approved'] %}
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#submitReview" hidden id="submitButton">
+          {{ _('Submit for Review') }}
+        </button>
+      {% else %}
+        <button class="btn btn-primary" type="submit" name="save" value="submit-review" hidden id="submitButton">{{ _('Submit for Review') }}</button>
+      {% endif %} 
   {% else %}
     <button class="btn btn-primary" type="submit" name="save" >{{ _('Next: Add Data') }}</button>
   {% endif %}
