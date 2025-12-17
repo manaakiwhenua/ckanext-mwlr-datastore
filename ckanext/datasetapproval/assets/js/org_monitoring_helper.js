@@ -1,22 +1,14 @@
 console.log("org monitoring helper loaded");
 var org_selected = document.getElementById("field-organizations");
 var submit_button = document.getElementById("submitButton");
-console.log("submit button:", submit_button);
 var selected_org = org_selected.value;
-console.log("selected org: " + selected_org);
-//check_is_user_admin(selected_org);
+check_is_user_admin(selected_org);
 
-org_selected.addEventListener("DOMContentLoaded", function() {
+// handle change event on select 2 organization field dropdown
+$('#field-organizations').on('change', function() {
+    console.log('Change event fired');
     var selected_org = org_selected.value;
-    console.log("selected org changed to: " + selected_org);
-    //check_is_user_admin(selected_org);
-});
-
-
-org_selected.addEventListener("change", function() {
-    var selected_org = org_selected.value;
-    console.log("selected org changed to: " + selected_org);
-    //check_is_user_admin(selected_org);
+    check_is_user_admin(selected_org);
 });
 
 async function check_is_user_admin(org_id) {
