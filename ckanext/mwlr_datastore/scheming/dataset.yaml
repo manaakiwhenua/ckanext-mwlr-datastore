@@ -22,7 +22,8 @@ dataset_fields:
   label            : Description
   form_placeholder : 'A short description of the dataset'
   required         : true
-  validators       : scheming_required unicode_safe strip_value
+  validators       : ignore_empty unicode_safe strip_value
+  preset           : markdown
 
 # Don't add scheming_required or not_empty validator to tags as it causes issues with the tag_string_convert validator
 - field_name       : tag_string
