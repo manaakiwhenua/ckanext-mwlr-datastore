@@ -80,7 +80,7 @@ dataset_fields:
   display_snippet  : maintainer_display.html
   display_email_field : maintainer_email
   required         : true
-  help_text       : 'The person responsible for uploading and maintaining the dataset.'
+  help_text       : 'The person responsible for uploading and maintaining the dataset in Datastore.'
   validators       : scheming_required unicode_safe strip_value
 
 - field_name: maintainer_email
@@ -90,7 +90,7 @@ dataset_fields:
   display_snippet: null
   display_email_name_field: maintainer
   required         : true
-  help_text       : 'The email address of the person responsible for uploading and maintaining the dataset.'
+  help_text       : 'The email address of the person responsible for uploading and maintaining the dataset in Datastore.'
   validators       : scheming_required unicode_safe strip_value email_validator
 
 - field_name       : start_date
