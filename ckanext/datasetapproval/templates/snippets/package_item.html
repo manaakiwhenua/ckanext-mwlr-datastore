@@ -11,6 +11,10 @@
         <span class="badge bg-warning">{{ _('Review Pending') }}</span>
     {% endif %}
 
+    {% if package.get('publishing_status', '').startswith('approved') %}
+        <span class="badge bg-success">{{ _('Approved') }}</span>
+    {% endif %}
+
     {% if package.get('publishing_status', '').startswith('rejected') %}
         <span class="badge bg-danger">{{ _('Rejected') }}</span>
     {% endif %}
