@@ -37,6 +37,10 @@ def approve(id):
     return _make_action(id, 'approve')
 
 def reject(id):
+    ## need to update this here
+    ## collate all the info into desired format
+    ## send off the email for rejection
+    ## store in the db (somewhere)
     rejection_reason = toolkit.request.form.get('rejection_reason')
     return _make_action(id, 'reject', rejection_reason=rejection_reason)
 

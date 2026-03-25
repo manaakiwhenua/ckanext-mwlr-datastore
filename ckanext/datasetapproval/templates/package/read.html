@@ -12,36 +12,83 @@
         <a href="/dataset-publish/{{ c.pkg_dict.id }}/approve" class="btn btn-primary">
           {% trans %}Approve Dataset{% endtrans %}
         </a>
-        <!-- Rejection reason trigger button -->
+        <!-- Rejection feedback{ trigger button -->
         <button class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="modal" data-bs-target="#rejectReasonModal">
           {% trans %}Reject Dataset{% endtrans %}
         </button>
-        <!-- Rejection reasons pop-up modal -->
+        <!-- Rejection feedback{ pop-up modal -->
           <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-              <div class="modal-content">
+              <div class="modal-content" style="color:black">
                 <div class="modal-header p-4" style="background-color: #206b82; color: white">
-                  <h4 class="modal-title">{% trans %}Rejection Reason{% endtrans %}</h4>
+                  <h4 class="modal-title">{% trans %}Dataset Rejection Feedback{% endtrans %}</h4>
                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                   <form action="/dataset-publish/{{ c.pkg_dict.id }}/reject" method="post">
-                    <div class="m-3">
-                      <label for="rejection_reason" class="form-label" style="color: black; font-weight: normal;">
-                        {% trans %}Please let the dataset editor know what modifications are needed for dataset publication (max 1000 characters){% endtrans %}
-                      </label>
-                      <textarea 
-                        id="rejection_reason" 
-                        name="rejection_reason" 
-                        class="form-control"
-                        style="border-radius:8px; border:1px solid #206b82;"
-                        rows="4" 
-                        maxlength="1000" 
-                        required
-                        ondrop="return false;"
-                        oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
-                        placeholder="{% trans %}Explain the required modifications here...{% endtrans %}"></textarea>
-                    </div>
+
+                    <!-- Reviewer Details -->
+                    <fieldset class="mb-3">
+                      <legend>Reviewer Details</legend>
+
+                      <label class="form-label">Reviewer Name:</label>
+                      <input type="text" name="reviewer_name" class="form-control" required>
+
+                      <label class="form-label mt-2">Email:</label>
+                      <input type="email" name="reviewer_email" class="form-control" required>
+
+                      <label class="form-label mt-2">Date:</label>
+                      <input type="date" name="review_date" class="form-control" required>
+                    </fieldset>
+
+                    <!-- Compliance -->
+                    <fieldset class="mb-3">
+                      <legend>Compliance Status</legend>
+
+                      <label class="form-label">Compliance:</label>
+                      <input type="text" value="Non-compliant" class="form-control" readonly>
+
+                      <input type="hidden" name="compliance_status" value="non_compliant">
+                      <input type="hidden" name="decision" value="rejected">
+                    </fieldset>
+
+                    <!-- Rejection Details -->
+                    <fieldset class="mb-3">
+                      <legend>Rejection Details</legend>
+
+                      <label class="form-label">Rejection Reason:</label>
+                      <select name="rejection_reason" class="form-control" required>
+                        <option value="">Select reason</option>
+                        <option value="data_quality">Data quality issues</option>
+                        <option value="documentation">Incomplete or inadequate documentation</option>
+                        <option value="legal">Legal / contractual restrictions</option>
+                        <option value="cultural">Cultural / ethical concerns</option>
+                        <option value="privacy">Privacy / sensitivity issues</option>
+                        <option value="ip">IP / commercial risk</option>
+                        <option value="sop">Non-compliance with SOP</option>
+                        <option value="other">Other</option>
+                      </select>
+
+                      <label class="form-label mt-2">Brief Description:</label>
+                      <textarea name="brief_description" class="form-control" rows="3" required></textarea>
+                    </fieldset>
+
+                    <!-- Resubmission -->
+                    <fieldset class="mb-3">
+                      <legend>Resubmission</legend>
+
+                      <label class="form-label">Resubmission Allowed:</label><br>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="resubmission" value="yes" required>
+                        <label class="form-check-label">Yes</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="resubmission" value="no">
+                        <label class="form-check-label">No</label>
+                      </div>
+                      <label class="form-label mt-2">Actions Required:</label>
+                      <textarea name="actions_required" class="form-control" rows="4" required></textarea>
+                    </fieldset>
                     <div class="modal-footer" style="border: none">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
                       <button type="submit" class="btn" style="background-color:#C5432F;color:white;">
