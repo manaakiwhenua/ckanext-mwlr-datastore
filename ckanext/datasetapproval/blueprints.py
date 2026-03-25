@@ -44,9 +44,9 @@ def reject(id):
     ## update the package extras with publication date (if approved and heading towards being made public)
     ## send off the email for rejection
     ## store in the db (somewhere)
-    rejection_reason = toolkit.request.form.to_dict(flat=False)
-    log.debug(f"FORM CONTENTS for rejection of dataset {id}: {rejection_reason}")
-    return _make_action(id, 'reject', rejection_reason=rejection_reason)
+    feedback = toolkit.request.form.to_dict()
+    log.debug(f"FORM CONTENTS for rejection of dataset {id}: {feedback}")
+    return _make_action(id, 'reject', feedback=feedback)
 
 
 def pending_datasets(id: str) -> Union[Response, str]:
@@ -116,7 +116,7 @@ def _raise_not_authz_or_not_pending(id):
     else :
         raise toolkit.abort(404, 'Dataset "{}" not found'.format(id))
 
-def _make_action(package_id, action='reject', rejection_reason=None):
+def _make_action(package_id, action='reject', feedback=None):
     states = {
         'reject': 'rejected',
         'approve': 'approved'
@@ -127,7 +127,7 @@ def _make_action(package_id, action='reject', rejection_reason=None):
         'model': model,
         'user': toolkit.c.user,
         'ignore_auth': True,
-        'rejection_reason': rejection_reason
+        'feedback': feedback
     }
     # check access and state
     _raise_not_authz_or_not_pending(package_id)
@@ -149,7 +149,7 @@ def _make_action(package_id, action='reject', rejection_reason=None):
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
     try:
-        mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"), rejection_reason)
+        mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"),  feedback)
         toolkit.h.flash_success("Review response sent to dataset creator.")
     except MailerException as e:
         log.error(f"Failed to send review request email: {e}")

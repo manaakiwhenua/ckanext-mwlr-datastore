@@ -58,15 +58,10 @@
 
                       <label class="form-label">Rejection Reason:</label>
                       <select name="rejection_reason" class="form-control" required>
-                        <option value="">Select reason</option>
-                        <option value="data_quality">Data quality issues</option>
-                        <option value="documentation">Incomplete or inadequate documentation</option>
-                        <option value="legal">Legal / contractual restrictions</option>
-                        <option value="cultural">Cultural / ethical concerns</option>
-                        <option value="privacy">Privacy / sensitivity issues</option>
-                        <option value="ip">IP / commercial risk</option>
-                        <option value="sop">Non-compliance with SOP</option>
-                        <option value="other">Other</option>
+                        <option value="">{% trans %}Select reason{% endtrans %}</option>
+                        {% for key, label in h.get_rejection_reasons().items() %}
+                          <option value="{{ key }}">{{ _(label) }}</option>
+                        {% endfor %}
                       </select>
 
                       <label class="form-label mt-2">Brief Description:</label>

@@ -54,7 +54,9 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
     def get_helpers(self):
         return {
             'is_admin': helpers.is_admin,
-            'get_org_from_package_name': helpers.get_org_from_package_name
+            'get_org_from_package_name': helpers.get_org_from_package_name,
+            'vocab_label': helpers.vocab_label,
+            'get_rejection_reasons': helpers.get_rejection_reasons,
         }
 
     def before_search(self, search_params):

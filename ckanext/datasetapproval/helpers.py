@@ -5,6 +5,26 @@ from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
+VOCABS = {
+    "rejection_reason": {
+        "data_quality": "Data quality issues",
+        "documentation": "Incomplete or inadequate documentation",
+        "legal": "Legal / contractual restrictions",
+        "cultural": "Cultural / ethical concerns",
+        "privacy": "Privacy / sensitivity issues",
+        "ip": "IP / commercial risk",
+        "sop": "Non-compliance with SOP",
+        "other": "Other",
+    },
+    "resubmission": {
+        "yes": "Yes",
+        "no": "No",
+    },
+    "compliance_status": {
+        "non_compliant": "Non-compliant",
+    },
+}
+
 
 def _get_action(action, context_dict, data_dict):
     return toolkit.get_action(action)(context_dict, data_dict)
@@ -43,3 +63,9 @@ def is_admin(user, organisation=None):
         return any([i.get('capacity') == 'admin' \
                 and i.get('id') == organisation for i in user_orgs])
     return any([i.get('capacity') == 'admin' for i in user_orgs])
+
+def get_rejection_reasons():
+    return VOCABS.get('rejection_reason', {})
+
+def vocab_label(field, key):
+    return VOCABS.get(field, {}).get(key, key)
