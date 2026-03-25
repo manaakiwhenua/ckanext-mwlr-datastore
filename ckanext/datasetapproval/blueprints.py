@@ -39,9 +39,13 @@ def approve(id):
 def reject(id):
     ## need to update this here
     ## collate all the info into desired format
+    ## update the package_extras with reviewer details
+    ## update the package_extras with approval details
+    ## update the package extras with publication date (if approved and heading towards being made public)
     ## send off the email for rejection
     ## store in the db (somewhere)
-    rejection_reason = toolkit.request.form.get('rejection_reason')
+    rejection_reason = toolkit.request.form.to_dict(flat=False)
+    log.debug(f"FORM CONTENTS for rejection of dataset {id}: {rejection_reason}")
     return _make_action(id, 'reject', rejection_reason=rejection_reason)
 
 

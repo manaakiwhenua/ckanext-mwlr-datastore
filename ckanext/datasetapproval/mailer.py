@@ -46,6 +46,7 @@ def mail_package_approve_reject_notification_to_editors(package_id, publishing_s
         return
     package_dict = toolkit.get_action('package_show' )({'ignore_auth': True}, {'id':package_id })
     editor = model.User.get(package_dict.get('creator_user_id'))
+    log.debug(f"REJECTION REASON BODY: {_compose_email_body_for_editors(editor, package_dict, publishing_status, rejection_reason)}")
     if editor.email:
         subj = _compose_email_subj_for_editors(publishing_status)
         body = _compose_email_body_for_editors(editor, package_dict, publishing_status, rejection_reason)
@@ -101,24 +102,29 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     return email_body
 
 
-def _compose_email_body_for_editors(user, package_dict, state, rejection_reason=None):
+def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
     pkg_link = toolkit.url_for('dataset.read', id=package_dict['name'], qualified=True)
     editor_name = user.fullname or user.name
     site_title = config.get('ckan.site_title')
     site_url = config.get('ckan.site_url')
     package_title = package_dict.get('title')
     package_url = pkg_link
+    formatted_feedback = ""
+
+    for key, value in feedback.items():
+        formatted_feedback += f"- {key.replace('_', ' ').title()}: {value}\n"
 
     approval_paragraph = f"Your dataset \"{package_title}\" has been approved and published."
     rejection_paragraph = (
         f"Your dataset \"{package_title}\" has been reviewed and rejected by the reviewer. "
-        f"Please see the following feedback. You can update the dataset and resubmit it for further review.\n\n"
-        f"Feedback:\n'{rejection_reason}'"
+        f"You can update the dataset and resubmit it for further review.\n\n"
     )
     
     email_body = (
         f"Dear {editor_name.title()},\n\n"
         f"{approval_paragraph if state == 'approved' else rejection_paragraph}\n\n"
+        f"Please refer to the following comments.\n\n"
+        f"{formatted_feedback}\n"
         f"You can view the dataset at the following link:\n\n"
         f"{package_url}\n\n"
         f"--\n"
