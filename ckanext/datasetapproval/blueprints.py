@@ -12,7 +12,7 @@ import ckan.lib.helpers as h
 from ckan.lib.helpers import helper_functions as helpers
 from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
-from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
+from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors, _compose_email_body_for_editors
 from ckan.views.dataset import url_with_params
 from typing import Union
 from ckan.types import Response
@@ -35,7 +35,19 @@ def search_url(params, package_type=None):
 
 
 def approve(id):
-    return _make_action(id, 'approve')
+    feedback = toolkit.request.form.to_dict()
+    context: Context = {
+        u'user': toolkit.c.user,
+        u'auth_user_obj': toolkit.c.userobj,
+        u'for_view': True
+    }
+    pkg = toolkit.get_action('package_show')(
+            context,
+            {'id': id}
+        )
+    body = _compose_email_body_for_editors(context, pkg, "approved", feedback)
+    log.debug(f"APPROVAL FEEDBACK BODY: {body}")
+    return _make_action(id, 'approve', feedback=feedback)
 
 def reject(id):
     ## need to update this here
@@ -56,7 +68,8 @@ def reject(id):
         )
     ## add the reviewer and approver details to the dataset metadata
     pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""))
-
+    body = _compose_email_body_for_editors(context, pkg, "rejected", feedback)
+    log.debug(f"REJECTION FEEDBACK BODY: {body}")
     toolkit.get_action('package_update')(
         context,
         pkg

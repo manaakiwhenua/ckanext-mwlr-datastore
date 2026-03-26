@@ -1,0 +1,60 @@
+
+<form action="/dataset-publish/{{ c.pkg_dict.id }}/approve" method="post">
+    <div class="m-3 d-flex flex-column gap-2">
+        <!-- Approver Details -->
+        <fieldset class="mb-3">
+        <legend>Approver Details</legend>
+
+        <label class="form-label">Approver Name</label>
+        <input type="text" name="approver_name" class="form-control" required>
+
+        <label class="form-label mt-2">Email</label>
+        <input type="email" name="approver_email" class="form-control" required>
+
+        <label class="form-label mt-2">Date</label>
+        <input type="date" name="approve_date" class="form-control" required>
+        </fieldset>
+
+        <!-- Compliance & Approval -->
+        <fieldset class="mb-3">
+            <legend>Approval Decision</legend>
+
+            <label class="form-label">Compliance Status</label>
+            <select name="compliance_status" class="form-control" required>
+                <option value="">{% trans %}Select status{% endtrans %}</option>
+                {% for key, label in h.get_vocab_group("compliance_status").items() %}
+                    {% if key != "non_compliant" %}
+                        <option value="{{ key }}">{{ _(label) }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <label class="form-label mt-2">Approval Outcome</label>
+            <select name="approval_outcome" class="form-control" required>
+                <option value="">{% trans %}Select status{% endtrans %}</option>
+                {% for key, label in h.get_vocab_group("approval_outcome").items() %}
+                    <option value="{{ key }}">{{ _(label) }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="comments_box" class="form-label mt-2">{% trans %}Add any comments regarding the Approval below (max 1000 characters){% endtrans %}</label>
+            <textarea 
+                id="comments_box" 
+                name="comments_box" 
+                class="form-control" 
+                rows="3" 
+                maxlength="1000" 
+                required
+                ondrop="return false;" oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
+                placeholder="{% trans %}Comments here will be sent to the dataset editor...{% endtrans %}">
+            </textarea>
+        </fieldset>
+    </div>
+    <div class="modal-footer" style="border: none">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans
+        %}</button>
+    <button type="submit" class="btn btn-primary">
+        {% trans %}Send Approval{% endtrans %}
+    </button>
+    </div>
+</form>

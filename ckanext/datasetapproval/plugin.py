@@ -56,7 +56,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'is_admin': helpers.is_admin,
             'get_org_from_package_name': helpers.get_org_from_package_name,
             'vocab_label': helpers.vocab_label,
-            'get_rejection_reasons': helpers.get_rejection_reasons,
+            'get_vocab_group': helpers.get_vocab_group,
             'add_reviewal_details_to_pkg': helpers.add_reviewal_details_to_pkg,
         }
 

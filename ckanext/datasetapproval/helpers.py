@@ -22,7 +22,13 @@ VOCABS = {
     },
     "compliance_status": {
         "non_compliant": "Non-compliant",
+        "compliant": "Compliant",
+        "partial": "Partially compliant",
     },
+    "approval_outcome": {
+        "approved": "Approved",
+        "conditional": "Conditional Approval"
+    }
 }
 
 
@@ -64,16 +70,24 @@ def is_admin(user, organisation=None):
                 and i.get('id') == organisation for i in user_orgs])
     return any([i.get('capacity') == 'admin' for i in user_orgs])
 
-def get_rejection_reasons():
-    return VOCABS.get('rejection_reason', {})
+def get_vocab_group(group_name):
+    return VOCABS.get(group_name, {})
 
 def vocab_label(field, key):
     return VOCABS.get(field, {}).get(key, key)
 
-def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email):
+def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = datetime.now()):
+    ## does the review type need to be added here? Or is this present on the dataset form
     pkg_dict['reviewer_name'] = reviewer_name
     pkg_dict['reviewer_email'] = reviewer_email
-    current_date = datetime.now()
-    review_date = current_date.strftime("%Y-%m-%d")
-    pkg_dict['review_date'] = review_date
+    formatted_date = review_date.strftime("%Y-%m-%d")
+    pkg_dict['review_date'] = formatted_date
+    return pkg_dict
+
+def add_approval_details_to_pkg(pkg_dict, approver_name, approver_email, approval_date = datetime.now()):
+    ## does approval type need to be added here? Or is this present on the dataset form
+    pkg_dict['approver_name'] = approver_name
+    pkg_dict['approver_email'] = approver_email
+    formatted_date = approval_date.strftime("%Y-%m-%d")
+    pkg_dict['approval_date'] = formatted_date
     return pkg_dict

@@ -1,0 +1,13 @@
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="color:black">
+      <div class="modal-header p-4" style="background-color: #206b82; color: white">
+        <h4 class="modal-title fs-5" id="{{ modal_id }}Label">{{ review_title }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+      </div>
+      <div class="modal-body">
+        {% snippet body_snippet %}
+      </div>
+    </div>
+  </div>
+</div>

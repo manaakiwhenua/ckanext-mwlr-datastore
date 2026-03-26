@@ -1,0 +1,68 @@
+
+  <form action="/dataset-publish/{{ c.pkg_dict.id }}/reject" method="post">
+    <!-- Reviewer Details -->
+    <fieldset class="mb-3">
+      <legend>Reviewer Details</legend>
+
+      <label class="form-label">Reviewer Name</label>
+      <input type="text" name="reviewer_name" class="form-control" required>
+
+      <label class="form-label mt-2">Email:</label>
+      <input type="email" name="reviewer_email" class="form-control" required>
+    </fieldset>
+
+    <!-- Compliance -->
+    <fieldset class="mb-3">
+      <legend>Compliance Status</legend>
+
+      <label class="form-label">Compliance</label>
+      <select class="form-control" disabled>
+        {% for key, label in h.get_vocab_group("compliance_status").items() %}
+          <option value="{{ key }}"
+            {% if key == "non_compliant" %}selected{% endif %}>
+            {{ _(label) }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <input type="hidden" name="compliance_status" value="non_compliant">
+    </fieldset>
+
+    <!-- Rejection Details -->
+    <fieldset class="mb-3">
+      <legend>Rejection Details</legend>
+
+      <label class="form-label">Rejection Reason</label>
+      <select name="rejection_reason" class="form-control" required>
+        <option value="">{% trans %}Select reason{% endtrans %}</option>
+        {% for key, label in h.get_vocab_group("rejection_reason").items() %}
+          <option value="{{ key }}">{{ _(label) }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="brief_description" class="form-label mt-2">Brief Description (max 1000 characters)</label>
+      <textarea 
+        id="brief_description" 
+        name="brief_description" 
+        class="form-control" 
+        rows="3" 
+        maxlength="1000" 
+        required
+        ondrop="return false;" oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
+        placeholder="{% trans %}Why dataset cannot be published...{% endtrans %}">
+      </textarea>
+    </fieldset>
+
+    <!-- Resubmission -->
+    <fieldset class="mb-3">
+      <legend>Resubmission</legend>
+      <label class="form-label mt-2">Actions Required (max 1000 characters)</label>
+      <textarea name="actions_required" class="form-control" rows="4" maxlength="1000" required></textarea>
+    </fieldset>
+    <div class="modal-footer" style="border: none">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+      <button type="submit" class="btn" style="background-color:#C5432F;color:white;">
+        {% trans %}Send Rejection{% endtrans %}
+      </button>
+    </div>
+  </form>
