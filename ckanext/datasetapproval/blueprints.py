@@ -36,25 +36,27 @@ def search_url(params, package_type=None):
 
 def approve(id):
     feedback = toolkit.request.form.to_dict()
+    ## update the package here with the approver details
     context: Context = {
         u'user': toolkit.c.user,
         u'auth_user_obj': toolkit.c.userobj,
         u'for_view': True
     }
     pkg = toolkit.get_action('package_show')(
-            context,
-            {'id': id}
-        )
-    body = _compose_email_body_for_editors(context, pkg, "approved", feedback)
-    log.debug(f"APPROVAL FEEDBACK BODY: {body}")
+        context,
+        {'id': id}
+    )
+    log.debug(f"APPROVE DATE: {feedback.get('approve_date', None)}")
+    pkg = helpers.add_approval_details_to_pkg(pkg, feedback.get("approver_name", ""), feedback.get("approver_email", ""), feedback.get("approve_date", None))
+    # body = _compose_email_body_for_editors(context, pkg, "approved", feedback)
+    # log.debug(f"APPROVAL FEEDBACK BODY: {body}")
+    toolkit.get_action('package_update')(
+        context,
+        pkg
+    )
     return _make_action(id, 'approve', feedback=feedback)
 
 def reject(id):
-    ## need to update this here
-    ## update the package_extras with reviewer details
-    ## update the package_extras with approval details
-    ## update the package extras with publication date (if approved and heading towards being made public)
-    ## store in the db (somewhere)
     feedback = toolkit.request.form.to_dict()
     ## update the package here with the reviewer details
     context: Context = {
@@ -63,13 +65,14 @@ def reject(id):
         u'for_view': True
     }
     pkg = toolkit.get_action('package_show')(
-            context,
-            {'id': id}
-        )
-    ## add the reviewer and approver details to the dataset metadata
-    pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""))
-    body = _compose_email_body_for_editors(context, pkg, "rejected", feedback)
-    log.debug(f"REJECTION FEEDBACK BODY: {body}")
+        context,
+        {'id': id}
+    )
+    log.debug(f"REVIEW DATE: {feedback.get('review_date', None)}")
+    ## add the reviewer details to the dataset metadata
+    pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""), feedback.get("review_date", None))
+    # body = _compose_email_body_for_editors(context, pkg, "rejected", feedback)
+    # log.debug(f"REJECTION FEEDBACK BODY: {body}")
     toolkit.get_action('package_update')(
         context,
         pkg
@@ -184,7 +187,7 @@ def _make_action(package_id, action='reject', feedback=None):
         toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact the datastore administrator.")
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 
-approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve)
+approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve, methods=['POST'])
 approveBlueprint.add_url_rule('/dataset-publish/<id>/reject', view_func=reject, methods=['POST'])
 approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=pending_datasets, endpoint='dataset_review')
 approveBlueprint.add_url_rule(u'/user/<id>/my_requests', view_func=pending_datasets, endpoint='my_requests')

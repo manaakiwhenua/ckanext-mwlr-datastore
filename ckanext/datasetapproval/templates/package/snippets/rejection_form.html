@@ -9,6 +9,9 @@
 
       <label class="form-label mt-2">Email:</label>
       <input type="email" name="reviewer_email" class="form-control" required>
+
+      <label class="form-label mt-2">Date</label>
+      <input type="date" name="review_date" class="form-control" required>
     </fieldset>
 
     <!-- Compliance -->
@@ -48,6 +51,7 @@
         rows="3" 
         maxlength="1000" 
         required
+        style="color:black"
         ondrop="return false;" oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
         placeholder="{% trans %}Why dataset cannot be published...{% endtrans %}">
       </textarea>

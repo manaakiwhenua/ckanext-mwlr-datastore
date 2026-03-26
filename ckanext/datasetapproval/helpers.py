@@ -76,18 +76,22 @@ def get_vocab_group(group_name):
 def vocab_label(field, key):
     return VOCABS.get(field, {}).get(key, key)
 
-def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = datetime.now()):
+def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = None):
     ## does the review type need to be added here? Or is this present on the dataset form
     pkg_dict['reviewer_name'] = reviewer_name
     pkg_dict['reviewer_email'] = reviewer_email
-    formatted_date = review_date.strftime("%Y-%m-%d")
-    pkg_dict['review_date'] = formatted_date
+    if review_date is None:
+        current_date = datetime.now()
+        review_date = current_date.strftime("%Y-%m-%d")
+    pkg_dict['review_date'] = review_date
     return pkg_dict
 
-def add_approval_details_to_pkg(pkg_dict, approver_name, approver_email, approval_date = datetime.now()):
+def add_approval_details_to_pkg(pkg_dict, approver_name, approver_email, approve_date = None):
     ## does approval type need to be added here? Or is this present on the dataset form
     pkg_dict['approver_name'] = approver_name
     pkg_dict['approver_email'] = approver_email
-    formatted_date = approval_date.strftime("%Y-%m-%d")
-    pkg_dict['approval_date'] = formatted_date
+    if approve_date is None:
+        current_date = datetime.now()
+        approve_date = current_date.strftime("%Y-%m-%d")
+    pkg_dict['approve_date'] = approve_date
     return pkg_dict
