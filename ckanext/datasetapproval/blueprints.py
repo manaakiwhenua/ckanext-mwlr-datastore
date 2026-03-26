@@ -46,10 +46,7 @@ def approve(id):
         context,
         {'id': id}
     )
-    log.debug(f"APPROVE DATE: {feedback.get('approve_date', None)}")
     pkg = helpers.add_approval_details_to_pkg(pkg, feedback.get("approver_name", ""), feedback.get("approver_email", ""), feedback.get("approve_date", None))
-    # body = _compose_email_body_for_editors(context, pkg, "approved", feedback)
-    # log.debug(f"APPROVAL FEEDBACK BODY: {body}")
     toolkit.get_action('package_update')(
         context,
         pkg
@@ -68,11 +65,8 @@ def reject(id):
         context,
         {'id': id}
     )
-    log.debug(f"REVIEW DATE: {feedback.get('review_date', None)}")
     ## add the reviewer details to the dataset metadata
     pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""), feedback.get("review_date", None))
-    # body = _compose_email_body_for_editors(context, pkg, "rejected", feedback)
-    # log.debug(f"REJECTION FEEDBACK BODY: {body}")
     toolkit.get_action('package_update')(
         context,
         pkg
