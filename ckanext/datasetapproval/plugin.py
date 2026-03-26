@@ -57,6 +57,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'get_org_from_package_name': helpers.get_org_from_package_name,
             'vocab_label': helpers.vocab_label,
             'get_rejection_reasons': helpers.get_rejection_reasons,
+            'add_reviewal_details_to_pkg': helpers.add_reviewal_details_to_pkg,
         }
 
     def before_search(self, search_params):

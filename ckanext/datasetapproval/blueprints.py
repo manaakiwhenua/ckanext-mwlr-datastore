@@ -9,6 +9,7 @@ from ckan.plugins import toolkit
 import ckan.lib.base as base
 from ckan.views.user import _extra_template_variables
 import ckan.lib.helpers as h
+from ckan.lib.helpers import helper_functions as helpers
 from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
 from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
@@ -38,14 +39,28 @@ def approve(id):
 
 def reject(id):
     ## need to update this here
-    ## collate all the info into desired format
     ## update the package_extras with reviewer details
     ## update the package_extras with approval details
     ## update the package extras with publication date (if approved and heading towards being made public)
-    ## send off the email for rejection
     ## store in the db (somewhere)
     feedback = toolkit.request.form.to_dict()
-    log.debug(f"FORM CONTENTS for rejection of dataset {id}: {feedback}")
+    ## update the package here with the reviewer details
+    context: Context = {
+        u'user': toolkit.c.user,
+        u'auth_user_obj': toolkit.c.userobj,
+        u'for_view': True
+    }
+    pkg = toolkit.get_action('package_show')(
+            context,
+            {'id': id}
+        )
+    ## add the reviewer and approver details to the dataset metadata
+    pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""))
+
+    toolkit.get_action('package_update')(
+        context,
+        pkg
+    )
     return _make_action(id, 'reject', feedback=feedback)
 
 

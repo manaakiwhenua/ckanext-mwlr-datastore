@@ -1,5 +1,5 @@
 import logging
-
+from datetime import datetime
 from ckan.plugins import toolkit
 
 
@@ -69,3 +69,11 @@ def get_rejection_reasons():
 
 def vocab_label(field, key):
     return VOCABS.get(field, {}).get(key, key)
+
+def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email):
+    pkg_dict['reviewer_name'] = reviewer_name
+    pkg_dict['reviewer_email'] = reviewer_email
+    current_date = datetime.now()
+    review_date = current_date.strftime("%Y-%m-%d")
+    pkg_dict['review_date'] = review_date
+    return pkg_dict
