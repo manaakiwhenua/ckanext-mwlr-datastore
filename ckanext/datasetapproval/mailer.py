@@ -29,7 +29,6 @@ def mail_package_review_request_to_admins(context, data_dict, _type='new'):
     admins = list(set( org_admin + [admin[0] for admin in sysadmins]))
     for admin_id in admins :
         user = model.User.get(admin_id)
-        log.info(f"USER: {user}")
         if user.email:
             subj = _compose_email_subj_for_admins(_type)
             body = _compose_email_body_for_admins(context, data_dict, user, _type)
