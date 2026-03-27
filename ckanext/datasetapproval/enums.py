@@ -1,3 +1,5 @@
+from enum import Enum
+
 VOCABS = {
     "rejection_reason": {
         "data_quality": "Data quality issues",
@@ -23,3 +25,13 @@ VOCABS = {
         "conditional": "Conditional Approval"
     }
 }
+
+class ReviewerDecisions(Enum):
+    APPROVE = 'approve'
+    REJECT = 'reject'
+
+# Mapping of reviewer decisions to the publishing status of the dataset after review
+review_outcome_mapping = {
+        ReviewerDecisions.REJECT: 'rejected',
+        ReviewerDecisions.APPROVE: 'approved'
+    }

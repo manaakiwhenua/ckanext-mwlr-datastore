@@ -16,6 +16,8 @@ from ckanext.datasetapproval.mailer import mail_package_approve_reject_notificat
 from ckan.views.dataset import url_with_params
 from typing import Union
 from ckan.types import Response
+from ckanext.datasetapproval import models
+from ckanext.datasetapproval.enums import ReviewerDecisions, review_outcome_mapping
 
 log = logging.getLogger(__name__)
 
@@ -80,6 +82,8 @@ def pending_datasets(id: str) -> Union[Response, str]:
     else:
         review_context = "editor_requests"
     context: Context = {
+        u'model': model,
+        u'session': model.Session,
         u'user': toolkit.c.user,
         u'auth_user_obj': toolkit.c.userobj,
         u'for_view': True
@@ -147,7 +151,7 @@ def _make_action(package_id, action='reject', feedback=None):
         'approve': 'approved'
     }
     # grab the old dict
-    set_private = action == 'reject'
+    set_private = action == ReviewerDecisions.REJECT
     context = {
         'model': model,
         'user': toolkit.c.user,
@@ -173,6 +177,7 @@ def _make_action(package_id, action='reject', feedback=None):
         h.flash_error("Unable to update publishing status of dataset. Ensure that the dataset metadata is valid via the \"Manage\" button.")
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
+    models.save_reviewer_decision(package_id, feedback, review_outcome_mapping[action])
     try:
         mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"),  feedback)
         toolkit.h.flash_success("Review response sent to dataset creator.")

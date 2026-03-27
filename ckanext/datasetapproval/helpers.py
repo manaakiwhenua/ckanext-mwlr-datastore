@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime
+from ckanext.datasetapproval import models
+
 from ckan.plugins import toolkit
 from .enums import VOCABS
 
@@ -68,3 +70,11 @@ def add_approval_details_to_pkg(pkg_dict, approver_name, approver_email, approve
         approve_date = current_date.strftime("%Y-%m-%d")
     pkg_dict['approve_date'] = approve_date
     return pkg_dict
+
+def get_reviewer_decisions(dataset_id):
+    '''
+    Get all review decisions for a given dataset
+    '''
+    decisions = models.meta.Session.query(models.ReviewDecision).filter_by(dataset_id=dataset_id).all()
+    return decisions
+    
