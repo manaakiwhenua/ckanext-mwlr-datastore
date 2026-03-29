@@ -47,7 +47,6 @@ def mail_package_approve_reject_notification_to_editors(package_id, publishing_s
         return
     package_dict = toolkit.get_action('package_show' )({'ignore_auth': True}, {'id':package_id })
     editor = model.User.get(package_dict.get('creator_user_id'))
-    log.debug(f"FEEDBACK BODY: {_compose_email_body_for_editors(editor, package_dict, publishing_status, feedback)}")
     if editor.email:
         subj = _compose_email_subj_for_editors(publishing_status)
         body = _compose_email_body_for_editors(editor, package_dict, publishing_status, feedback)
