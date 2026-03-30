@@ -15,6 +15,18 @@
   <input type="hidden" name="compliance_status" value="non_compliant">
 </fieldset>
 
+<!-- Review Type -->
+<fieldset class="mb-3">
+  <legend>Review Type</legend>
+  <p><i>If no review has been undertaken, please contact the Datastore Administrator and outline why no review has been done.</i></p>
+  <label class="form-label">Review Type</label>
+  <select name="review_type" class="form-control" required>
+    <option value="">{% trans %}Select reason{% endtrans %}</option>
+    {% for key, label in h.get_vocab_group("review_type").items() %}
+      <option value="{{ key }}">{{ _(label) }}</option>
+    {% endfor %}
+  </select>
+
 <!-- Rejection Details -->
 <fieldset class="mb-3">
   <legend>Rejection Details</legend>

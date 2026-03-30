@@ -19,22 +19,17 @@ class ComplianceStatus(str, Enum):
     compliant = "Compliant"
     partial = "Partially compliant"
 
+class ReviewType(str, Enum):
+    metadata_documentation = "Metadata and Documentation Only Review"
+    scientific_technical = "Scientific and Technical Review"
+
+class ApproverType(str, Enum):
+    minimal = "Minimal Approval (\"Sign-off only\")"
+    compliance = "Approver Compliance Check"
+
 class VOCAB_ENUMS:
     rejection_reason = RejectionReason
     approval_outcome = ApprovalOutcome
     compliance_status = ComplianceStatus
-
-class ReviewActionType(Enum):
-    # Currently only approve and reject actions are supported. Possible future actions include 'recommend for approval'.
-    APPROVE = 'approve'
-    REJECT = 'reject'
-
-class ReviewerType(Enum):
-    # Allowing for possibility of multiple reviewer types. Currently only one reviewer type is supported. Suggested future types include 'approver'.
-    REVIEWER = 'reviewer'
-
-# Mapping of reviewer actions to the publishing status of the dataset after review
-review_outcome_mapping = {
-        ReviewActionType.REJECT: 'rejected',
-        ReviewActionType.APPROVE: 'approved'
-    }
+    review_type = ReviewType
+    approver_type = ApproverType

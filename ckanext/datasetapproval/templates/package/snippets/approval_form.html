@@ -12,6 +12,15 @@
         {% endfor %}
     </select>
 
+    <label class="form-label mt-2">Approval Type</label>
+    <p><i>If no approval obtained, please contact the Datastore Administrator and outline why no approval is needed.</i></p>
+    <select name="approver_type" class="form-control" required>
+        <option value="">{% trans %}Select type{% endtrans %}</option>
+        {% for key, label in h.get_vocab_group("approver_type").items() %}
+            <option value="{{ key }}">{{ _(label) }}</option>
+        {% endfor %}
+    </select>
+
     <label class="form-label mt-2">Approval Outcome</label>
     <select name="approval_outcome" class="form-control" required>
         <option value="">{% trans %}Select status{% endtrans %}</option>
