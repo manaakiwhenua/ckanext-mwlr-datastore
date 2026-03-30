@@ -66,7 +66,8 @@ def vocab_label(key, value):
         return value
 
 def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = None):
-    ## does the review type need to be added here? Or is this present on the dataset form
+    ## may need to change this in future but for now can leave if decided better to just store on a separate table
+    ## TODO: remove this if decided we no longer want to store details on pkg
     pkg_dict['reviewer_name'] = reviewer_name
     pkg_dict['reviewer_email'] = reviewer_email
     if review_date is None:
@@ -74,21 +75,3 @@ def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_
         review_date = current_date.strftime("%Y-%m-%d")
     pkg_dict['review_date'] = review_date
     return pkg_dict
-
-def add_approval_details_to_pkg(pkg_dict, approver_name, approver_email, approve_date = None):
-    ## does approval type need to be added here? Or is this present on the dataset form
-    pkg_dict['approver_name'] = approver_name
-    pkg_dict['approver_email'] = approver_email
-    if approve_date is None:
-        current_date = datetime.now()
-        approve_date = current_date.strftime("%Y-%m-%d")
-    pkg_dict['approve_date'] = approve_date
-    return pkg_dict
-
-def get_reviewer_decisions(dataset_id):
-    '''
-    Get all review decisions for a given dataset
-    '''
-    decisions = models.meta.Session.query(models.ReviewDecision).filter_by(dataset_id=dataset_id).all()
-    return decisions
-    

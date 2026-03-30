@@ -6,7 +6,22 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
       </div>
       <div class="modal-body">
-        {% snippet body_snippet %}
+        <form action="/dataset-publish/{{ c.pkg_dict.id }}/submit_feedback" method="post">
+          <!-- Details -->
+          <fieldset class="mb-3">
+            <legend>Details</legend>
+
+            <label class="form-label">Name</label>
+            <input type="text" name="feedback_name" class="form-control" required>
+
+            <label class="form-label mt-2">Email:</label>
+            <input type="email" name="feedback_email" class="form-control" required>
+
+            <label class="form-label mt-2">Date</label>
+            <input type="date" name="feedback_date" class="form-control" required>
+          </fieldset>
+          {% snippet body_snippet %}
+        </form>
       </div>
     </div>
   </div>

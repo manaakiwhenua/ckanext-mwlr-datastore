@@ -35,46 +35,12 @@ def search_url(params, package_type=None):
     url = h.url_for('approval.dataset_review', id=toolkit.c.user)
     return url_with_params(url, params)
 
-
-def approve(id):
-    feedback : dict[str, any] = toolkit.request.form.to_dict()
-    ## update the package here with the approver details
-    context: Context = {
-        u'user': toolkit.c.user,
-        u'auth_user_obj': toolkit.c.userobj,
-        u'for_view': True
-    }
-    pkg = toolkit.get_action('package_show')(
-        context,
-        {'id': id}
-    )
-    pkg = helpers.add_approval_details_to_pkg(pkg, feedback.get("approver_name", ""), feedback.get("approver_email", ""), feedback.get("approve_date", None))
-    toolkit.get_action('package_update')(
-        context,
-        pkg
-    )
-    return _make_action(id, ReviewDecisionType.APPROVE, feedback=feedback)
-
-def reject(id):
-    feedback : dict[str, any] = toolkit.request.form.to_dict()
-    ## update the package here with the reviewer details
-    context: Context = {
-        u'user': toolkit.c.user,
-        u'auth_user_obj': toolkit.c.userobj,
-        u'for_view': True
-    }
-    pkg = toolkit.get_action('package_show')(
-        context,
-        {'id': id}
-    )
-    ## add the reviewer details to the dataset metadata
-    pkg = helpers.add_reviewal_details_to_pkg(pkg, feedback.get("reviewer_name", ""), feedback.get("reviewer_email", ""), feedback.get("review_date", None))
-    toolkit.get_action('package_update')(
-        context,
-        pkg
-    )
-    return _make_action(id, ReviewDecisionType.REJECT, feedback=feedback)
-
+def submit_feedback(id):
+    feedback = toolkit.request.form.to_dict()
+    action = toolkit.request.form.get('action')
+    feedback.pop('action', None)  # Remove action from feedback to avoid confusion
+    log.debug(f"action: {action}, feedback: {feedback}")
+    return _make_action(id, action, feedback=feedback)
 
 def pending_datasets(id: str) -> Union[Response, str]:
     if toolkit.request.endpoint.endswith('dataset_review'):
@@ -181,7 +147,6 @@ def _make_action(package_id, action : ReviewDecisionType, feedback: dict[str, an
         toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact the datastore administrator.")
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 
-approveBlueprint.add_url_rule('/dataset-publish/<id>/approve', view_func=approve, methods=['POST'])
-approveBlueprint.add_url_rule('/dataset-publish/<id>/reject', view_func=reject, methods=['POST'])
+approveBlueprint.add_url_rule('/dataset-publish/<id>/submit_feedback', view_func=submit_feedback, methods=['POST'])
 approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=pending_datasets, endpoint='dataset_review')
 approveBlueprint.add_url_rule(u'/user/<id>/my_requests', view_func=pending_datasets, endpoint='my_requests')
