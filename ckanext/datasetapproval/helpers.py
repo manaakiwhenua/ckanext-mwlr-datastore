@@ -3,7 +3,7 @@ from datetime import datetime
 from ckanext.datasetapproval import models
 
 from ckan.plugins import toolkit
-from .enums import VOCABS
+from .enums import VOCAB_ENUMS
 
 log = logging.getLogger(__name__)
 
@@ -45,11 +45,25 @@ def is_admin(user, organisation=None):
                 and i.get('id') == organisation for i in user_orgs])
     return any([i.get('capacity') == 'admin' for i in user_orgs])
 
-def get_vocab_group(group_name):
-    return VOCABS.get(group_name, {})
 
-def vocab_label(field, key):
-    return VOCABS.get(field, {}).get(key, key)
+def get_vocab_group(group_name):
+    # need to map the group name to the correct enum class then grab all enums as a dict with key and value
+    enum_cls = getattr(VOCAB_ENUMS, group_name, None)
+    if not enum_cls:
+        log.warning(f"Vocabulary group {group_name} not found in VOCAB_ENUMS")
+        return {}
+    return {e.name: e.value for e in enum_cls}
+
+def vocab_label(key, value):
+    enum_cls = getattr(VOCAB_ENUMS, key, None)
+    if not enum_cls:
+        return value
+    log.debug(f"Getting label for key {key} and value {value} from enum {enum_cls}")
+    log.debug(f"Enum members: {enum_cls[value].value}")
+    try:
+        return enum_cls[value].value
+    except KeyError:
+        return value
 
 def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = None):
     ## does the review type need to be added here? Or is this present on the dataset form
