@@ -23,7 +23,7 @@ class ReviewType(str, Enum):
     metadata_documentation = "Metadata and Documentation Only Review"
     scientific_technical = "Scientific and Technical Review"
 
-class ApproverType(str, Enum):
+class ApprovalType(str, Enum):
     minimal = "Minimal Approval (\"Sign-off only\")"
     compliance = "Approver Compliance Check"
 
@@ -32,4 +32,4 @@ class VOCAB_ENUMS:
     approval_outcome = ApprovalOutcome
     compliance_status = ComplianceStatus
     review_type = ReviewType
-    approver_type = ApproverType
+    approval_type = ApprovalType

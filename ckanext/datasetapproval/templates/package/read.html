@@ -18,13 +18,13 @@
           </button>
           {% snippet "package/snippets/review_modal_wrapper.html",
             modal_id="approveReasonModal",
-            review_title=_("Approval Reason"),
+            review_title=_("Approval Feedback"),
             body_snippet="package/snippets/approval_form.html",
             review_type="approve"
           %}
           {% snippet "package/snippets/review_modal_wrapper.html",
             modal_id="rejectReasonModal",
-            review_title=_("Rejection Reason"),
+            review_title=_("Rejection Feedback"),
             body_snippet="package/snippets/rejection_form.html",
             review_type="reject"
           %}
