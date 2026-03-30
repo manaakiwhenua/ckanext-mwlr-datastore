@@ -11,10 +11,6 @@ VOCABS = {
         "sop": "Non-compliance with SOP",
         "other": "Other",
     },
-    "resubmission": {
-        "yes": "Yes",
-        "no": "No",
-    },
     "compliance_status": {
         "non_compliant": "Non-compliant",
         "compliant": "Compliant",
@@ -26,12 +22,12 @@ VOCABS = {
     }
 }
 
-class ReviewerDecisions(Enum):
+class ReviewDecisionType(Enum):
     APPROVE = 'approve'
     REJECT = 'reject'
 
 # Mapping of reviewer decisions to the publishing status of the dataset after review
 review_outcome_mapping = {
-        ReviewerDecisions.REJECT: 'rejected',
-        ReviewerDecisions.APPROVE: 'approved'
+        ReviewDecisionType.REJECT: 'rejected',
+        ReviewDecisionType.APPROVE: 'approved'
     }

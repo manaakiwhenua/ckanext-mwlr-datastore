@@ -17,7 +17,7 @@ from ckan.views.dataset import url_with_params
 from typing import Union
 from ckan.types import Response
 from ckanext.datasetapproval import models
-from ckanext.datasetapproval.enums import ReviewerDecisions, review_outcome_mapping
+from ckanext.datasetapproval.enums import ReviewDecisionType, review_outcome_mapping
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def search_url(params, package_type=None):
 
 
 def approve(id):
-    feedback = toolkit.request.form.to_dict()
+    feedback : dict[str, any] = toolkit.request.form.to_dict()
     ## update the package here with the approver details
     context: Context = {
         u'user': toolkit.c.user,
@@ -53,10 +53,10 @@ def approve(id):
         context,
         pkg
     )
-    return _make_action(id, 'approve', feedback=feedback)
+    return _make_action(id, ReviewDecisionType.APPROVE, feedback=feedback)
 
 def reject(id):
-    feedback = toolkit.request.form.to_dict()
+    feedback : dict[str, any] = toolkit.request.form.to_dict()
     ## update the package here with the reviewer details
     context: Context = {
         u'user': toolkit.c.user,
@@ -73,7 +73,7 @@ def reject(id):
         context,
         pkg
     )
-    return _make_action(id, 'reject', feedback=feedback)
+    return _make_action(id, ReviewDecisionType.REJECT, feedback=feedback)
 
 
 def pending_datasets(id: str) -> Union[Response, str]:
@@ -145,13 +145,8 @@ def _raise_not_authz_or_not_pending(id):
     else :
         raise toolkit.abort(404, 'Dataset "{}" not found'.format(id))
 
-def _make_action(package_id, action='reject', feedback=None):
-    states = {
-        'reject': 'rejected',
-        'approve': 'approved'
-    }
-    # grab the old dict
-    set_private = action == ReviewerDecisions.REJECT
+def _make_action(package_id, action : ReviewDecisionType, feedback: dict[str, any]=None):
+    set_private = action == ReviewDecisionType.REJECT
     context = {
         'model': model,
         'user': toolkit.c.user,
@@ -165,7 +160,8 @@ def _make_action(package_id, action='reject', feedback=None):
             {'id': package_id}
         )
     try:
-        pkg['publishing_status'] = states[action]
+        models.save_reviewer_decision(package_id, feedback, action)
+        pkg['publishing_status'] = review_outcome_mapping[action]
         if set_private:
             pkg['private'] = True
         toolkit.get_action('package_update')(
@@ -177,9 +173,8 @@ def _make_action(package_id, action='reject', feedback=None):
         h.flash_error("Unable to update publishing status of dataset. Ensure that the dataset metadata is valid via the \"Manage\" button.")
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
-    models.save_reviewer_decision(package_id, feedback, review_outcome_mapping[action])
     try:
-        mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"),  feedback)
+        mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"), feedback)
         toolkit.h.flash_success("Review response sent to dataset creator.")
     except MailerException as e:
         log.error(f"Failed to send review request email: {e}")
