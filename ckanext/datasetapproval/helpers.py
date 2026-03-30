@@ -58,8 +58,6 @@ def vocab_label(key, value):
     enum_cls = getattr(VOCAB_ENUMS, key, None)
     if not enum_cls:
         return value
-    log.debug(f"Getting label for key {key} and value {value} from enum {enum_cls}")
-    log.debug(f"Enum members: {enum_cls[value].value}")
     try:
         return enum_cls[value].value
     except KeyError:
