@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.create_table('review_comments',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('dataset_id', sa.UnicodeText(), sa.ForeignKey('package.id'), nullable=False),
+    sa.Column('dataset_id', sa.UnicodeText(), sa.ForeignKey('package.id'), nullable=False, index=True),
     sa.Column('review_action_id', sa.UnicodeText(), sa.ForeignKey('review_action.id'), nullable=False),
     sa.Column('compliance_status', sa.UnicodeText(), nullable=True),
     sa.Column('rejection_reason', sa.UnicodeText(), nullable=True),

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, UnicodeText, DateTime
+from sqlalchemy import Column, UnicodeText, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from ckan.plugins import toolkit
 import ckan.model.meta as meta
@@ -11,20 +11,20 @@ log = log.getLogger(__name__)
 class ReviewAction(toolkit.BaseModel):
     __tablename__ = 'review_action'
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
-    dataset_id = Column(UnicodeText, nullable=False)
+    dataset_id = Column(UnicodeText, ForeignKey('package.id'), nullable=False, index=True)
     reviewer_action = Column(UnicodeText)  # 'approve' or 'reject'. Possibility of future actions like 'recommend for approval' or 'request changes'
     reviewer_name = Column(UnicodeText)
     reviewer_email = Column(UnicodeText)
     review_date = Column(DateTime)    
     reviewer_type = Column(UnicodeText) # 'for now this will just be 'reviewer' - allows for the possibility of different types of reviewers in the future
     submitted_date = Column(DateTime(timezone=True))
-    submitted_by_user_id = Column(UnicodeText)
+    submitted_by_user_id = Column(UnicodeText, ForeignKey('user.id'), nullable=False)
 
 class ReviewComment(toolkit.BaseModel):
     __tablename__ = 'review_comments'
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
-    review_action_id = Column(UnicodeText, nullable=False)
-    dataset_id = Column(UnicodeText, nullable=False)
+    review_action_id = Column(UnicodeText, ForeignKey('review_action.id'), nullable=False)
+    dataset_id = Column(UnicodeText, ForeignKey('package.id'), nullable=False, index=True)
     compliance_status = Column(UnicodeText)
     rejection_reason = Column(UnicodeText)
     rejection_reason_comments = Column(UnicodeText)
