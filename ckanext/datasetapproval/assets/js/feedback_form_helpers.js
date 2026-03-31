@@ -4,6 +4,8 @@ document.querySelectorAll(".review-form").forEach(function(form) {
   const reviewWarning = form.querySelector(".review-warning");
 
   function checkReviewType() {
+    if (!reviewWarning) return; // quit early if the element doesn't exist
+    
     const reviewSelected = reviewType && reviewType.value;
     const approvalSelected = approvalType && approvalType.value;
 
