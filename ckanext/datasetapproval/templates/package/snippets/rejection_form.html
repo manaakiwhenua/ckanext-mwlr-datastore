@@ -46,8 +46,13 @@
   <textarea id="resubmission_comments" name="resubmission_comments" class="form-control" rows="4" maxlength="1000" required></textarea>
 </fieldset>
 <div class="modal-footer" style="border: none">
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+  <div class="reject-review-warning alert alert-warning mt-2 d-none" role="alert">
+      {% trans %}No review type selected. If this dataset requires no review or urgent publication, please contact the Datastore Administrator.{% endtrans %}
+  </div>
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      {% trans %}Cancel{% endtrans %}
+  </button>
   <button type="submit" class="btn" style="background-color:#C5432F;color:white;" name="action" value="reject">
-    {% trans %}Send Rejection{% endtrans %}
+      {% trans %}Send Rejection{% endtrans %}
   </button>
 </div>

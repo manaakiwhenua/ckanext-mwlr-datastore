@@ -11,3 +11,11 @@ datasetapproval_org_js:
   extra:
     preload:
       - base/main
+
+feedback_form_helpers_js:
+  output: ckanext-datasetapproval/%(version)s-feedback_form_helpers.js
+  contents:
+    - js/feedback_form_helpers.js
+  extra:
+    preload:
+      - base/main

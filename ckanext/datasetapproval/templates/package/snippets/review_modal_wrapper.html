@@ -1,3 +1,5 @@
+{% asset "datasetapproval/feedback_form_helpers_js" %}
+{% set action = "Approval" if review_type == "approve" else "Rejection" %}
 <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content" style="color:black">
@@ -6,10 +8,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
       </div>
       <div class="modal-body">
-        <form action="/dataset-publish/{{ c.pkg_dict.id }}/submit_feedback" method="post">
+        <form class="review-form" action="/dataset-publish/{{ c.pkg_dict.id }}/submit_feedback" method="post">
           <!-- Details -->
           <fieldset class="mb-3">
-            <legend>{{ "Approval" if review_type == "approve" else "Rejection"}} Details</legend>
+            <legend>{{ action }} Details</legend>
 
             <label class="form-label">Name</label>
             <input type="text" name="feedback_name" class="form-control" maxlength="100" required>
