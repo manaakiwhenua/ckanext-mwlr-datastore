@@ -46,9 +46,7 @@
   <textarea id="resubmission_comments" name="resubmission_comments" class="form-control" rows="4" maxlength="1000" required></textarea>
 </fieldset>
 <div class="modal-footer" style="border: none">
-  <div class="reject-review-warning alert alert-warning mt-2 d-none" role="alert">
-      {% trans %}No review type selected. If this dataset requires no review or urgent publication, please contact the Datastore Administrator.{% endtrans %}
-  </div>
+  {% snippet "package/snippets/feedback_snippets/review_warning.html" %}
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
       {% trans %}Cancel{% endtrans %}
   </button>

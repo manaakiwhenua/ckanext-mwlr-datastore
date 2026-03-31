@@ -16,16 +16,16 @@
           <button class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="modal" data-bs-target="#rejectReasonModal">
             {% trans %}Reject Dataset{% endtrans %}
           </button>
-          {% snippet "package/snippets/review_modal_wrapper.html",
+          {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
             modal_id="approveReasonModal",
             review_title=_("Approval Feedback"),
-            body_snippet="package/snippets/approval_form.html",
+            body_snippet="package/snippets/feedback_snippets/approval_form.html",
             review_type="approve"
           %}
-          {% snippet "package/snippets/review_modal_wrapper.html",
+          {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
             modal_id="rejectReasonModal",
             review_title=_("Rejection Feedback"),
-            body_snippet="package/snippets/rejection_form.html",
+            body_snippet="package/snippets/feedback_snippets/rejection_form.html",
             review_type="reject"
           %}
           </div>

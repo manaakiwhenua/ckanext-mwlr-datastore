@@ -22,9 +22,9 @@
             <label class="form-label mt-2">Date</label>
             <input type="date" name="feedback_date" class="form-control" required>
             
-            {% snippet "package/snippets/review_type.html", review_types=h.get_vocab_group("review_type").items() %}
+            {% snippet "package/snippets/feedback_snippets/review_type.html", review_types=h.get_vocab_group("review_type").items() %}
             {% if review_type == "approve" %}
-              {% snippet "package/snippets/approval_type.html", approval_types=h.get_vocab_group("approval_type").items() %}
+              {% snippet "package/snippets/feedback_snippets/approval_type.html", approval_types=h.get_vocab_group("approval_type").items() %}
             {% endif %}
           </fieldset>
           {% snippet body_snippet %}
