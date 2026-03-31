@@ -1,9 +1,10 @@
 <section class="module module-narrow module-shallow">
   <h2 class="module-heading"><i class="fa fa-info-circle"></i> {{ _('Guidance Tips') }}</h2>
   <div class="module-content">
+    {% set data_management_email = h.retrieve_data_management_email() %}
     <ul>
         <li>{{ _('Recommended file formats: CSV, JSON, XML, PDF, GeoJSON, Shapefile (zipped), TIFF, PNG') }}</li>
-        <li>{{ _('Maximum file size: 50MB. For larger files, please contact the <a href="mailto:DataManagement@landcareresearch.co.nz">data management team</a> for guidance before uploading.') }}</li>
+        <li>{{ _('Maximum file size: 50MB. For larger files, please contact the <a href="mailto:' ~ data_management_email ~ '">data management team</a> for guidance before uploading.') }}</li>
         <li>{{ _('All required metadata fields must be completed') }}</li>
         <li>{{ _('Use open, non-proprietary formats where possible to support reuse and long-term access.') }}</li>
     </ul>
