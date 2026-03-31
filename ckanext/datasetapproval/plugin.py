@@ -55,6 +55,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'vocab_label': helpers.vocab_label,
             'get_vocab_group': helpers.get_vocab_group,
             'add_reviewal_details_to_pkg': helpers.add_reviewal_details_to_pkg,
+            'get_workflow_actions': helpers.get_workflow_actions,
         }
 
     def before_search(self, search_params):

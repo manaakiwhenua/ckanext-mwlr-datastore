@@ -74,10 +74,10 @@ def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_
     pkg_dict['review_date'] = review_date
     return pkg_dict
 
-def get_reviewer_actions(dataset_id):
+def get_workflow_actions(dataset_id):
     '''
     Get all review actions for a given dataset
     '''
-    actions = models.meta.Session.query(models.ReviewAction).filter_by(dataset_id=dataset_id).all()
+    actions = models.meta.Session.query(models.WorkflowAction).filter_by(dataset_id=dataset_id).all()
     return actions
     

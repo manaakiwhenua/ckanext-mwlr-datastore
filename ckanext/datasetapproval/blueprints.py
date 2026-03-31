@@ -17,7 +17,7 @@ from ckan.views.dataset import url_with_params
 from typing import Union
 from ckan.types import Response
 from ckanext.datasetapproval import models
-from ckanext.datasetapproval.enums import ReviewActionType, review_outcome_mapping
+from ckanext.datasetapproval.enums import WorkflowActionType, review_outcome_mapping
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def submit_feedback(id):
     feedback = toolkit.request.form.to_dict()
     action = toolkit.request.form.get('action')
     feedback.pop('action', None)  # Remove action from feedback to avoid confusion
-    return _make_action(id, ReviewActionType(action), feedback=feedback)
+    return _make_action(id, WorkflowActionType(action), feedback=feedback)
 
 def pending_datasets(id: str) -> Union[Response, str]:
     if toolkit.request.endpoint.endswith('dataset_review'):
@@ -108,8 +108,8 @@ def _raise_not_authz_or_not_pending(id):
     else :
         raise toolkit.abort(404, 'Dataset "{}" not found'.format(id))
 
-def _make_action(package_id, action : ReviewActionType, feedback: dict[str, any]=None):
-    set_private = action == ReviewActionType.REJECT
+def _make_action(package_id, action : WorkflowActionType, feedback: dict[str, any]=None):
+    set_private = action == WorkflowActionType.REJECT
     context = {
         'model': model,
         'user': toolkit.c.user,
@@ -136,7 +136,7 @@ def _make_action(package_id, action : ReviewActionType, feedback: dict[str, any]
         return h.redirect_to(u'{}.read'.format('dataset'),
                              id=package_id)
     try:
-        models.save_reviewer_action_and_comments(package_id, feedback, action)
+        models.save_workflow_action_and_comments(package_id, feedback, action)
     except Exception as e:
         log.error(f"Error saving reviewer action and comments for dataset {package_id}: {e}")
         h.flash_error("Unable to save review feedback. Please contact the datastore administrator.")

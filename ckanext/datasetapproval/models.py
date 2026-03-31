@@ -4,15 +4,15 @@ from ckan.plugins import toolkit
 import ckan.model.meta as meta
 import datetime as dt
 import uuid
-from ckanext.datasetapproval.enums import ReviewActionType, ReviewerType
+from ckanext.datasetapproval.enums import WorkflowActionType, ReviewerType
 import logging as log
 log = log.getLogger(__name__)
 
-class ReviewAction(toolkit.BaseModel):
-    __tablename__ = 'review_action'
+class WorkflowAction(toolkit.BaseModel):
+    __tablename__ = 'workflow_action'
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     dataset_id = Column(UnicodeText, ForeignKey('package.id'), nullable=False, index=True)
-    reviewer_action = Column(UnicodeText)  # 'approve' or 'reject'. Possibility of future actions like 'recommend for approval' or 'request changes'
+    workflow_action = Column(UnicodeText)  # 'approve' or 'reject'. Possibility of future actions like 'recommend for approval' or 'request changes'
     reviewer_name = Column(UnicodeText)
     reviewer_email = Column(UnicodeText)
     review_date = Column(DateTime)    
@@ -23,7 +23,7 @@ class ReviewAction(toolkit.BaseModel):
 class ReviewComment(toolkit.BaseModel):
     __tablename__ = 'review_comments'
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
-    review_action_id = Column(UnicodeText, ForeignKey('review_action.id'), nullable=False)
+    workflow_action_id = Column(UUID(as_uuid=True), ForeignKey('workflow_action.id'), nullable=False)
     dataset_id = Column(UnicodeText, ForeignKey('package.id'), nullable=False, index=True)
     compliance_status = Column(UnicodeText)
     rejection_reason = Column(UnicodeText)
@@ -34,43 +34,43 @@ class ReviewComment(toolkit.BaseModel):
     approval_outcome = Column(UnicodeText)
     approval_outcome_comments = Column(UnicodeText)
 
-def save_reviewer_action_and_comments(dataset_id, feedback : dict[str, any], review_action_type : ReviewActionType):
+def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     try:        
-        review_action = create_review_action(dataset_id, feedback, review_action_type)
-        review_comment = create_review_comment(dataset_id, feedback, review_action.id)
-        meta.Session.add(review_action)
+        workflow_action = create_workflow_action(dataset_id, feedback, workflow_action_type)
+        review_comment = create_review_comment(dataset_id, feedback, workflow_action.id)
+        meta.Session.add(workflow_action)
         meta.Session.add(review_comment)
         meta.Session.commit()
     except Exception as e:
         log.error(f"Error saving reviewer actions and comments: {e}")
         meta.Session.rollback()
 
-def create_review_action(dataset_id, feedback : dict[str, any], review_action_type : ReviewActionType):
+def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     reviewer_name = feedback.get("feedback_name", "")
     reviewer_email = feedback.get("feedback_email", "")
     review_date = feedback.get("feedback_date", None)
 
-    review_action = ReviewAction(
+    workflow_action = WorkflowAction(
         id = uuid.uuid4(),
         dataset_id=dataset_id,
         reviewer_name=reviewer_name,
         reviewer_email=reviewer_email,  
-        reviewer_action=review_action_type.value,
+        workflow_action=workflow_action_type.value,
         reviewer_type = ReviewerType.REVIEWER.value,
         submitted_date=dt.datetime.now(dt.timezone.utc),
         submitted_by_user_id=toolkit.c.userobj.id,
         review_date=review_date
     )
-    return review_action
+    return workflow_action
 
-def create_review_comment(dataset_id, feedback : dict[str, any], review_action_id):
+def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action_id):
     approval_outcome_comments = feedback.get("approval_outcome_comments", None)
     if approval_outcome_comments and approval_outcome_comments.isspace():
         approval_outcome_comments = None
 
     review_comment = ReviewComment(
         id = uuid.uuid4(),
-        review_action_id = review_action_id,
+        workflow_action_id = workflow_action_id,
         dataset_id = dataset_id,
         compliance_status = feedback.get("compliance_status", None),
         review_type = feedback.get("review_type", None),

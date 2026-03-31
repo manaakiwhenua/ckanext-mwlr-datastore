@@ -1,4 +1,4 @@
-"""Add reviewer decision table
+"""Add workflow action table
 
 Revision ID: bd1fb1967d43
 Revises: 
@@ -17,17 +17,18 @@ branch_labels = None
 depends_on = None
     
 def upgrade():
-    op.create_table('review_action',
+    op.create_table('workflow_action',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('dataset_id', sa.UnicodeText(), sa.ForeignKey('package.id'), nullable=False, index=True),
-    sa.Column('reviewer_action', sa.UnicodeText(), nullable=True),
+    sa.Column('workflow_action', sa.UnicodeText(), nullable=True),
     sa.Column('reviewer_email', sa.UnicodeText(), nullable=True),
     sa.Column('reviewer_name', sa.UnicodeText(), nullable=True),
     sa.Column('review_date', sa.DateTime(), nullable=True),
+    sa.Column('reviewer_type', sa.UnicodeText(), nullable=True),
     sa.Column('submitted_date', sa.DateTime(timezone=True), nullable=True),
     sa.Column('submitted_by_user_id', sa.UnicodeText(), sa.ForeignKey('user.id'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
 
 def downgrade():
-    op.drop_table('review_action')
+    op.drop_table('workflow_action')
