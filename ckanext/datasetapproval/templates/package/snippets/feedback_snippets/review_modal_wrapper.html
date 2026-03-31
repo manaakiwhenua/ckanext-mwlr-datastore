@@ -1,17 +1,18 @@
 {% asset "datasetapproval/feedback_form_helpers_js" %}
-{% set action = "Approval" if review_type == "approve" else "Rejection" %}
+{% set decision = "Approval" if review_type == "approve" else "Rejection" %}
 <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content" style="color:black">
       <div class="modal-header p-4" style="background-color: #206b82; color: white">
-        <h4 class="modal-title fs-5" id="{{ modal_id }}Label">{{ review_title }}</h4>
+        <h4 class="modal-title fs-5" id="{{ modal_id }}Label">{{ decision }} Feedback</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
       </div>
       <div class="modal-body">
         <form class="review-form" action="/dataset-publish/{{ c.pkg_dict.id }}/submit_feedback" method="post">
-          <!-- Details -->
-          <fieldset class="mb-3">
-            <legend>{{ action }} Details</legend>
+          <div class="mb-3">
+            <!-- Details -->
+            <fieldset class="mb-3">
+            <legend>{{ decision }} Details</legend>
 
             <label class="form-label">Name</label>
             <input type="text" name="feedback_name" class="form-control" maxlength="100" required>
@@ -27,7 +28,25 @@
               {% snippet "package/snippets/feedback_snippets/approval_type.html", approval_types=h.get_vocab_group("approval_type").items() %}
             {% endif %}
           </fieldset>
-          {% snippet body_snippet %}
+          {% if review_type == "approve" %}
+            {% snippet "package/snippets/feedback_snippets/approval_form.html" %}
+          {% else %}
+            {% snippet "package/snippets/feedback_snippets/rejection_form.html" %}
+          {% endif %}
+          </div>
+          <div class="modal-footer" style="border: none">
+            {% snippet "package/snippets/feedback_snippets/review_warning.html" %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                {% trans %}Cancel{% endtrans %}
+            </button>
+            <button type="submit" 
+                    class="btn {% if review_type == 'approve' %}btn-primary{% endif %}" 
+                    {% if review_type == 'reject' %}style="background-color:#C5432F;color:white;"{% endif %}
+                    name="action" 
+                    value="{{ review_type }}">
+                {% trans %}Send {{decision}}{% endtrans %}
+            </button>
+          </div>
         </form>
       </div>
     </div>

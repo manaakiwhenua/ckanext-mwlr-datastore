@@ -42,15 +42,6 @@
 <!-- Resubmission -->
 <fieldset class="mb-3">
   <legend>Resubmission</legend>
-  <label for="resubmission_comments" class="form-label mt-2">Actions Required (max 1000 characters)</label>
-  <textarea id="resubmission_comments" name="resubmission_comments" class="form-control" rows="4" maxlength="1000" required></textarea>
+  <label class="form-label mt-2">Actions Required (max 1000 characters)</label>
+  <textarea name="actions_required" class="form-control" rows="4" maxlength="1000" required></textarea>
 </fieldset>
-<div class="modal-footer" style="border: none">
-  {% snippet "package/snippets/feedback_snippets/review_warning.html" %}
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-      {% trans %}Cancel{% endtrans %}
-  </button>
-  <button type="submit" class="btn" style="background-color:#C5432F;color:white;" name="action" value="reject">
-      {% trans %}Send Rejection{% endtrans %}
-  </button>
-</div>
