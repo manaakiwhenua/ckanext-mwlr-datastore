@@ -158,7 +158,6 @@ dataset_fields:
 - field_name       : use_limitations
   label            : 'Use Limitations'
   preset           : select
-  form_include_blank_choice: true
   help_text        : 'Select the usage limitations for this dataset.'
   validators       : ignore_empty unicode_safe
   choices     :
@@ -174,7 +173,6 @@ dataset_fields:
 - field_name       : access_conditions
   label            : 'Access Conditions'
   preset           : select
-  form_include_blank_choice: true
   help_text        : 'Select the access conditions for this dataset.'
   validators       : ignore_empty unicode_safe
   choices     :
@@ -204,7 +202,6 @@ dataset_fields:
 - field_name       : sensitivity_classification
   label            : 'Sensitivity Classification'
   preset           : select
-  form_include_blank_choice: true
   help_text        : 'Select the sensitivity classification for this dataset.'
   validators       : ignore_empty unicode_safe
   choices     :
