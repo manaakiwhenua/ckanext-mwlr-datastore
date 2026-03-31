@@ -47,8 +47,6 @@ def pending_datasets(id: str) -> Union[Response, str]:
     else:
         review_context = "editor_requests"
     context: Context = {
-        u'model': model,
-        u'session': model.Session,
         u'user': toolkit.c.user,
         u'auth_user_obj': toolkit.c.userobj,
         u'for_view': True
