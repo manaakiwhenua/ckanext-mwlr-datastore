@@ -20,15 +20,15 @@
         {% endfor %}
     </select>
 
-    <label for="comments_box" class="form-label mt-2">{% trans %}Add any comments regarding the Approval below (max 1000 characters){% endtrans %}</label>
+    <label for="approval_outcome_comments" class="form-label mt-2">{% trans %}Add any comments regarding the approval below (max 1000 characters){% endtrans %}</label>
     <textarea 
-        id="comments_box" 
-        name="comments_box" 
+        id="approval_outcome_comments" 
+        name="approval_outcome_comments" 
         class="form-control" 
         rows="3" 
         maxlength="1000" 
         required
-        ondrop="return false;" oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
+            ondrop="return false;"
         placeholder="{% trans %}Comments here will be sent to the dataset editor...{% endtrans %}"></textarea>
 </fieldset>
 <div class="modal-footer" style="border: none">

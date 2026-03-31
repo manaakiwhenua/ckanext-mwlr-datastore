@@ -27,23 +27,23 @@
     {% endfor %}
   </select>
 
-  <label for="brief_description" class="form-label mt-2">Brief Description (max 1000 characters)</label>
+  <label for="rejection_reason_comments" class="form-label mt-2">Brief Description (max 1000 characters)</label>
   <textarea 
-    id="brief_description" 
-    name="brief_description" 
+    id="rejection_reason_comments" 
+    name="rejection_reason_comments" 
     class="form-control" 
     rows="3" 
     maxlength="1000" 
     required
-    ondrop="return false;" oninput="this.value = this.value.replace(/[^\x00-\x7F]/g, '')"
+    ondrop="return false;"
     placeholder="{% trans %}Why dataset cannot be published...{% endtrans %}"></textarea>
 </fieldset>
 
 <!-- Resubmission -->
 <fieldset class="mb-3">
   <legend>Resubmission</legend>
-  <label class="form-label mt-2">Actions Required (max 1000 characters)</label>
-  <textarea name="actions_required" class="form-control" rows="4" maxlength="1000" required></textarea>
+  <label for="resubmission_comments" class="form-label mt-2">Actions Required (max 1000 characters)</label>
+  <textarea id="resubmission_comments" name="resubmission_comments" class="form-control" rows="4" maxlength="1000" required></textarea>
 </fieldset>
 <div class="modal-footer" style="border: none">
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>

@@ -17,17 +17,17 @@ branch_labels = None
 depends_on = None
     
 def upgrade():
-    op.create_table('review_decision',
+    op.create_table('review_action',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('dataset_id', sa.UnicodeText(), nullable=False),
-    sa.Column('review_date', sa.DateTime(), nullable=True),
-    sa.Column('decision', sa.UnicodeText(), nullable=True),
-    sa.Column('reviewer_name', sa.UnicodeText(), nullable=True),
+    sa.Column('dataset_id', sa.UnicodeText(), sa.ForeignKey('package.id'), nullable=False),
+    sa.Column('reviewer_action', sa.UnicodeText(), nullable=True),
     sa.Column('reviewer_email', sa.UnicodeText(), nullable=True),
-    sa.Column('reviewer_comments', sa.UnicodeText(), nullable=True),
+    sa.Column('reviewer_name', sa.UnicodeText(), nullable=True),
+    sa.Column('review_date', sa.DateTime(), nullable=True),
+    sa.Column('submitted_date', sa.DateTime(timezone=True), nullable=True),
     sa.Column('submitted_by_user_id', sa.UnicodeText(), sa.ForeignKey('user.id'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
 
 def downgrade():
-    op.drop_table('review_decision')
+    op.drop_table('review_action')
