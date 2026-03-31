@@ -25,6 +25,8 @@ def upgrade():
     sa.Column('rejection_reason', sa.UnicodeText(), nullable=True),
     sa.Column('rejection_reason_comments', sa.UnicodeText(), nullable=True),
     sa.Column('resubmission_comments', sa.UnicodeText(), nullable=True),
+    sa.Column('review_type', sa.UnicodeText(), nullable=True),
+    sa.Column('approval_type', sa.UnicodeText(), nullable=True),
     sa.Column('approval_outcome', sa.UnicodeText(), nullable=True),
     sa.Column('approval_outcome_comments', sa.UnicodeText(), nullable=True),
     sa.PrimaryKeyConstraint('id')

@@ -1,7 +1,7 @@
 <!-- Review Type -->
 <label class="form-label mt-2">Review Type</label>
 <select name="review_type" class="form-control" required>
-    <option value="">{% trans %}Select reason{% endtrans %}</option>
+    <option value="">{% trans %}Select type{% endtrans %}</option>
     {% for key, label in review_types %}
         <option value="{{ key }}">{{ _(label) }}</option>
     {% endfor %}

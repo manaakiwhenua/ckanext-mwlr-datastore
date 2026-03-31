@@ -28,6 +28,8 @@ class ReviewComment(toolkit.BaseModel):
     compliance_status = Column(UnicodeText)
     rejection_reason = Column(UnicodeText)
     rejection_reason_comments = Column(UnicodeText)
+    review_type = Column(UnicodeText)
+    approval_type = Column(UnicodeText)
     resubmission_comments = Column(UnicodeText)
     approval_outcome = Column(UnicodeText)
     approval_outcome_comments = Column(UnicodeText)
@@ -62,16 +64,21 @@ def create_review_action(dataset_id, feedback : dict[str, any], review_action_ty
     return review_action
 
 def create_review_comment(dataset_id, feedback : dict[str, any], review_action_id):
+    approval_outcome_comments = feedback.get("approval_outcome_comments", None)
+    if approval_outcome_comments and approval_outcome_comments.isspace():
+        approval_outcome_comments = None
+
     review_comment = ReviewComment(
         id = uuid.uuid4(),
         review_action_id = review_action_id,
         dataset_id = dataset_id,
         compliance_status = feedback.get("compliance_status", None),
+        review_type = feedback.get("review_type", None),
+        approval_type = feedback.get("approval_type", None),
         rejection_reason = feedback.get("rejection_reason", None),
         rejection_reason_comments = feedback.get("rejection_reason_comments", None),
         resubmission_comments = feedback.get("resubmission_comments", None),
         approval_outcome = feedback.get("approval_outcome", None),
-        approval_outcome_comments = feedback.get("approval_outcome_comments", None)
+        approval_outcome_comments = approval_outcome_comments
     )
-    log.debug(f"Created review comment: {review_comment.__dict__}")
     return review_comment

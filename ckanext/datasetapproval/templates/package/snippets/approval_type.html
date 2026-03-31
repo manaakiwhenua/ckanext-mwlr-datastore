@@ -1,5 +1,5 @@
 <label class="form-label mt-2">Approval Type</label>
-<select name="approver_type" class="form-control" required>
+<select name="approval_type" class="form-control" required>
     <option value="">{% trans %}Select type{% endtrans %}</option>
     {% for key, label in approval_types %}
         <option value="{{ key }}">{{ _(label) }}</option>
