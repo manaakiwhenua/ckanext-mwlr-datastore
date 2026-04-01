@@ -1,4 +1,4 @@
-"""Add review action table
+"""Add review comments table
 
 Revision ID: 6281c5dccb05
 Revises: bd1fb1967d43
