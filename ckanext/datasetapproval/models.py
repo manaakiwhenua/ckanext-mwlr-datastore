@@ -39,6 +39,7 @@ def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], wor
         workflow_action = create_workflow_action(dataset_id, feedback, workflow_action_type)
         review_comment = create_review_comment(dataset_id, feedback, workflow_action.id)
         meta.Session.add(workflow_action)
+        meta.Session.flush()  # Generate the workflow_action.id for the review_comment foreign key
         meta.Session.add(review_comment)
         meta.Session.commit()
     except Exception as e:
