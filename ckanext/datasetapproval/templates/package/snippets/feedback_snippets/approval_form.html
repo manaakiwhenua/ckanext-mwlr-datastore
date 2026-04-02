@@ -29,4 +29,21 @@
         maxlength="1000" 
         ondrop="return false;"
         placeholder="{% trans %}Comments here will be sent to the dataset editor...{% endtrans %}"></textarea>
-</fieldset>
+    </fieldset>
+
+    <fieldset class="mb-3 d-none approval-conditions">
+        <legend>Approval Conditions</legend>
+        
+        <label for="condition_details" class="form-label mt-2">Conditions</label>
+        <textarea 
+            id="condition_details" 
+            name="condition_details" 
+            class="form-control" 
+            rows="4" 
+            maxlength="1000" 
+            ondrop="return false;"
+            placeholder="{% trans %}Enter approval conditions here...{% endtrans %}"></textarea>
+
+        <label for="condition_expiry_date" class="form-label mt-2">Condition Expiry Date</label>
+        <input type="date" name="condition_expiry_date" class="form-control">
+    </fieldset>

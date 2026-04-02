@@ -1,6 +1,8 @@
 document.querySelectorAll(".review-form").forEach(function(form) {
   const reviewType = form.querySelector("[name='review_type']");
   const approvalType = form.querySelector("[name='approval_type']");
+  const approvalOutcome = form.querySelector("[name='approval_outcome']");
+  const approvalConditions = form.querySelector(".approval-conditions");
   const rejectionReason = form.querySelector("[name='rejection_reason']");
   const reviewWarning = form.querySelector(".review-warning");
 
@@ -46,6 +48,17 @@ document.querySelectorAll(".review-form").forEach(function(form) {
       }
   }
 
+  function toggleApprovalDescriptionVisibility() {
+    console.log("approval conditions", approvalConditions);
+    if (!approvalOutcome || !approvalConditions) return;
+
+    if (approvalOutcome.value === "conditional") {
+      approvalConditions.classList.remove("d-none");
+    } else {
+      approvalConditions.classList.add("d-none");
+    }
+  }
+
   checkReviewType();
 
   if (reviewType) {
@@ -57,5 +70,9 @@ document.querySelectorAll(".review-form").forEach(function(form) {
 
   if (approvalType) {
     approvalType.addEventListener("change", checkReviewType);
+  }
+
+  if (approvalOutcome) {
+    approvalOutcome.addEventListener("change", toggleApprovalDescriptionVisibility);
   }
 });
