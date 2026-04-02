@@ -6,6 +6,7 @@ import ckan.plugins.toolkit as tk
 import ckan.plugins as p
 import ckan.logic as logic
 from ckan.lib.helpers import helper_functions as h
+from .enums import ReviewType
 
 from ckanext.datasetapproval.mailer import mail_package_review_request_to_admins 
 
@@ -112,3 +113,15 @@ def check_user_admin(*args):
     is_user_admin = h.is_admin(user_id, org_id)
     log.debug("check_user_admin: user_id=%r org_id=%r is_user_admin=%r", user_id, org_id, is_user_admin)
     return {"is_user_admin": is_user_admin}
+
+@p.toolkit.side_effect_free
+def retrieve_rejection_reasons(*args):
+    review_type = tk.request.args.get("review_type")
+    try:
+        review_type_enum = ReviewType[review_type] if review_type else None
+    except ValueError:
+        review_type_enum = None
+    rejection_reasons = h.get_vocab_group("rejection_reason")
+    if review_type_enum == ReviewType.metadata_documentation:
+        rejection_reasons.pop("data_quality", None)
+    return rejection_reasons

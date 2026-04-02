@@ -37,6 +37,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'resource_create': actions.resource_create,
             'resource_update': actions.resource_update,
             'check_user_admin': actions.check_user_admin,
+            'retrieve_rejection_reasons': actions.retrieve_rejection_reasons,
         }
 
     def is_fallback(self):
