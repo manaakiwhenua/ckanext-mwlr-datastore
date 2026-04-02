@@ -43,8 +43,8 @@ class ReviewerType(Enum):
     # Allowing for possibility of multiple reviewer types. Currently only one reviewer type is supported. Suggested future types include 'approver'.
     REVIEWER = 'reviewer'
 
-# Mapping of reviewer actions to the publishing status of the dataset after review
-review_outcome_mapping = {
+# Mapping of reviewer actions to the publishing status of the dataset after review. These are for user facing labels
+review_outcome_mapping : dict[WorkflowActionType, str] = {
         WorkflowActionType.REJECT: 'rejected',
         WorkflowActionType.APPROVE: 'approved'
     }

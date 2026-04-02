@@ -3,7 +3,7 @@ from datetime import datetime
 from ckanext.datasetapproval import models
 
 from ckan.plugins import toolkit
-from .enums import VOCAB_ENUMS
+from .enums import VOCAB_ENUMS, review_outcome_mapping, WorkflowActionType
 
 log = logging.getLogger(__name__)
 
@@ -63,21 +63,19 @@ def vocab_label(key, value):
     except KeyError:
         return value
 
-def add_reviewal_details_to_pkg(pkg_dict, reviewer_name, reviewer_email, review_date = None):
-    ## may need to change this in future but for now can leave if decided better to just store on a separate table
-    ## TODO: remove this if decided we no longer want to store details on pkg
-    pkg_dict['reviewer_name'] = reviewer_name
-    pkg_dict['reviewer_email'] = reviewer_email
-    if review_date is None:
-        current_date = datetime.now()
-        review_date = current_date.strftime("%Y-%m-%d")
-    pkg_dict['review_date'] = review_date
-    return pkg_dict
-
 def get_workflow_actions(dataset_id):
     '''
     Get all review actions for a given dataset
     '''
-    actions = models.meta.Session.query(models.WorkflowAction).filter_by(dataset_id=dataset_id).all()
+    actions = models.meta.Session.query(models.WorkflowAction).filter_by(dataset_id=dataset_id).order_by(models.WorkflowAction.submitted_date.desc()).all()
     return actions
-    
+
+def map_workflow_action_to_decision_type(current_workflow_action : models.WorkflowAction):
+
+    try:
+        workflow_action_type = WorkflowActionType(current_workflow_action.workflow_action)
+    except ValueError:
+        log.warning(f"Workflow action {current_workflow_action.workflow_action} not found in WorkflowActionType enum")
+        return ""
+
+    return review_outcome_mapping[workflow_action_type]

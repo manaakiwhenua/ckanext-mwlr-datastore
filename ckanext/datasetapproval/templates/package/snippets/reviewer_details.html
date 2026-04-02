@@ -1,0 +1,22 @@
+
+<h3 class="pt-3">Reviewer details</h3>
+  <table class="table table-bordered table-striped">
+      <tbody>
+        <tr>
+          <th class="col-1">Reviewer name</th>
+          <td class="col-1">{{latest_workflow_action.reviewer_name}}</td>
+        </tr>
+        <tr>
+          <th class="col-1">Decision</th>
+          <td class="col-1">{{decision.capitalize()}}</td>
+        </tr>
+        <tr>
+          <th class="col-1">Review date</th>
+          <td class="col-1">{{latest_workflow_action.review_date.strftime('%Y-%m-%d')}}</td>
+        </tr>
+        <tr>
+          <th class="col-1">Review submitted date</th>
+          <td class="col-1">{{latest_workflow_action.submitted_date.astimezone().strftime('%Y-%m-%d')}}</td>
+        </tr>
+      </tbody>
+</table>

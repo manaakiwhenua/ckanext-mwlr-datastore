@@ -75,8 +75,6 @@
           </div>
         {% endif %}
       {% endblock %}
-      {# FIXME why is this here? seems wrong #}
-      <span class="insert-comment-thread"></span>
     {% endblock %}
     {% block package_resources %}
       {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
@@ -89,4 +87,10 @@
     {% block package_additional_info %}
       {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
     {% endblock %}
+
+    {% set workflow_actions = h.get_workflow_actions(pkg.id) %}
+    {% if workflow_actions %}
+        {% set latest_workflow_action = workflow_actions[0] %}
+        {% snippet "package/snippets/reviewer_details.html", latest_workflow_action=latest_workflow_action, decision=h.map_workflow_action_to_decision_type(latest_workflow_action) %}
+    {% endif %}
 {% endblock %}
