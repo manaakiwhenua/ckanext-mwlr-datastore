@@ -33,6 +33,8 @@ class ReviewComment(toolkit.BaseModel):
     resubmission_comments = Column(UnicodeText)
     approval_outcome = Column(UnicodeText)
     approval_outcome_comments = Column(UnicodeText)
+    approval_details = Column(UnicodeText)
+    condition_expiry_date = Column(DateTime)
 
 def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     try:        
@@ -66,8 +68,11 @@ def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_actio
 
 def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action_id):
     approval_outcome_comments = feedback.get("approval_outcome_comments", None)
+    approval_details = feedback.get("approval_details", None)
     if approval_outcome_comments and approval_outcome_comments.isspace():
         approval_outcome_comments = None
+    if approval_details and approval_details.isspace():
+        approval_details = None
 
     review_comment = ReviewComment(
         id = uuid.uuid4(),
@@ -80,6 +85,9 @@ def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action
         rejection_reason_comments = feedback.get("rejection_reason_comments", None),
         resubmission_comments = feedback.get("resubmission_comments", None),
         approval_outcome = feedback.get("approval_outcome", None),
-        approval_outcome_comments = approval_outcome_comments
+        approval_outcome_comments = approval_outcome_comments,
+        approval_details = approval_details,
+        condition_expiry_date = feedback.get("condition_expiry_date", None)
+
     )
     return review_comment

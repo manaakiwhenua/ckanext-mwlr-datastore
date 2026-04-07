@@ -20,10 +20,10 @@
         {% endfor %}
     </select>
 
-    <label for="approval_outcome_comments" class="form-label mt-2">{% trans %}Add any comments regarding the approval below (max 1000 characters){% endtrans %}</label>
+    <label for="approval_details" class="form-label mt-2">{% trans %}Add any comments regarding the approval below (max 1000 characters){% endtrans %}</label>
     <textarea 
-        id="approval_outcome_comments" 
-        name="approval_outcome_comments" 
+        id="approval_details" 
+        name="approval_details" 
         class="form-control" 
         rows="3" 
         maxlength="1000" 
@@ -34,10 +34,10 @@
     <fieldset class="mb-3 d-none approval-conditions">
         <legend>Approval Conditions</legend>
         
-        <label for="condition_details" class="form-label mt-2">Conditions</label>
+        <label for="approval_outcome_comments" class="form-label mt-2">Conditions</label>
         <textarea 
-            id="condition_details" 
-            name="condition_details" 
+            id="approval_outcome_comments" 
+            name="approval_outcome_comments" 
             class="form-control" 
             rows="4" 
             maxlength="1000" 
