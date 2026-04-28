@@ -48,8 +48,6 @@ def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], wor
         meta.Session.rollback()
 
 def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
-    log.debug("TESTING FEEDBACK CrEATE WORKFLOW")
-    log.debug(feedback)
     reviewer_name = feedback.get("feedback_name", "")
     reviewer_email = feedback.get("feedback_email", "")
     review_date = feedback.get("feedback_date", None)
@@ -65,8 +63,6 @@ def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_actio
         submitted_by_user_id=toolkit.c.userobj.id,
         review_date=review_date
     )
-    log.debug("CREATE WORKFLOW ACTION success")
-    log.debug(workflow_action)
     return workflow_action
 
 def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action_id):
@@ -78,11 +74,6 @@ def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action
     if approval_details and approval_details.isspace():
         approval_details = None
     condition_expiry_date = entered_date or None
-    
-
-    test_date = feedback.get("condition_expiry_date", None)
-    log.debug("TESTING")
-    log.debug("testing date: ", test_date)
 
     review_comment = ReviewComment(
         id = uuid.uuid4(),
@@ -99,6 +90,4 @@ def create_review_comment(dataset_id, feedback : dict[str, any], workflow_action
         condition_expiry_date = condition_expiry_date
 
     )
-    log.debug("CREATE REVIEW COMMENT success")
-    log.debug(review_comment.condition_expiry_date)
     return review_comment
