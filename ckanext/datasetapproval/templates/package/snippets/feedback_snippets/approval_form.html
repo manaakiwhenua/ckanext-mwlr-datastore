@@ -1,16 +1,6 @@
-<!-- Compliance & Approval -->
+<!-- Approval -->
  <fieldset class="mb-3">
     <legend>Approval Decision</legend>
-
-    <label class="form-label">Compliance Status</label>
-    <select name="compliance_status" class="form-control" required>
-        <option value="">{% trans %}Select status{% endtrans %}</option>
-        {% for key, label in h.get_vocab_group("compliance_status").items() %}
-            {% if key != "non_compliant" %}
-                <option value="{{ key }}">{{ _(label) }}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
 
     <label class="form-label mt-2">Approval Outcome</label>
     <select name="approval_outcome" class="form-control" required>

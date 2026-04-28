@@ -1,20 +1,3 @@
-<!-- Compliance -->
-<fieldset class="mb-3">
-  <legend>Compliance Status</legend>
-
-  <label class="form-label">Compliance</label>
-  <select class="form-control" disabled>
-    {% for key, label in h.get_vocab_group("compliance_status").items() %}
-      <option value="{{ key }}"
-        {% if key == "non_compliant" %}selected{% endif %}>
-        {{ _(label) }}
-      </option>
-    {% endfor %}
-  </select>
-
-  <input type="hidden" name="compliance_status" value="non_compliant">
-</fieldset>
-
 <!-- Rejection Details -->
 <fieldset class="mb-3">
   <legend>Rejection Decision</legend>

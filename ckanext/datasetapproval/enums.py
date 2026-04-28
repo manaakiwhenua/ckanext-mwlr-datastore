@@ -14,11 +14,6 @@ class ApprovalOutcome(str, Enum):
     approved = "Approved"
     conditional = "Approved with conditions"
 
-class ComplianceStatus(str, Enum):
-    non_compliant = "Non-compliant"
-    compliant = "Compliant"
-    partial = "Partially compliant"
-
 class ReviewType(str, Enum):
     metadata_documentation = "Metadata and Documentation Only Review"
     scientific_technical = "Scientific and Technical Review"
@@ -30,7 +25,6 @@ class ApprovalType(str, Enum):
 class VOCAB_ENUMS:
     rejection_reason = RejectionReason
     approval_outcome = ApprovalOutcome
-    compliance_status = ComplianceStatus
     review_type = ReviewType
     approval_type = ApprovalType
 
