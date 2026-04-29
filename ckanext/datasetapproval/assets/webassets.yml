@@ -19,3 +19,11 @@ feedback_form_helpers_js:
   extra:
     preload:
       - base/main
+
+package_form_helpers_js:
+  output: ckanext-datasetapproval/%(version)s-package_form_helpers.js
+  contents:
+    - js/package_form_helpers.js
+  extra:
+    preload:
+      - base/main

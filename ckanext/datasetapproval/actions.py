@@ -19,6 +19,8 @@ def is_user_editor_of_org(org_id, user_id):
 def publishing_check(context, data_dict):
     admin_editing = context.get("admin_editing", False)
     submit_review = context.get("submit_review", False)
+    bypass_review = context.get("bypass_review", False)
+    log.debug(f"visibility change: ", bypass_review)
     user_id = (
         tk.current_user.id
         if tk.current_user and not tk.current_user.is_anonymous
@@ -32,19 +34,18 @@ def publishing_check(context, data_dict):
         data_dict = set_visibility_on_approval_or_rejection(data_dict)      
     ## if the dataset is being updated by an admin then should bypass the approval state
     elif admin_editing and data_dict.get("id"):
-        old_data_dict = tk.get_action("package_show")(
-            context, {"id": data_dict.get("id")}
-        )
         data_dict["publishing_status"] = "approved"
         data_dict = set_visibility_on_approval_or_rejection(data_dict)
-    ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft
+    ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft or only changing visibility
     elif is_user_editor_of_org(org_id, user_id):
-        context.update({'send_request': submit_review})
-        if submit_review:
-            data_dict['publishing_status'] = "in_review"
-        else:
-            data_dict["private"] = "true"
-            data_dict['publishing_status'] = "in_progress"
+        ## if dataset approved and only visibility changed
+        if not bypass_review:
+            context.update({'send_request': submit_review})
+            if submit_review:
+                data_dict['publishing_status'] = "in_review"
+            else:
+                data_dict["private"] = "true"
+                data_dict['publishing_status'] = "in_progress"
     return data_dict
 
 def set_visibility_on_approval_or_rejection(data_dict):
@@ -91,10 +92,12 @@ def package_create(up_func, context, data_dict):
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
+    log.debug(f"PACKAGE UPDATE context: {context}, data_dict: {data_dict}")
     return _wrap_publish_review(up_func, context, data_dict, action_name="package_update")
 
 @tk.chained_action
 def package_patch(up_func, context, data_dict):
+    log.debug(f"PACKAGE PATCH context: {context}, data_dict: {data_dict}")
     return _wrap_publish_review(up_func, context, data_dict, action_name="package_patch")
 
 @p.toolkit.chained_action   
