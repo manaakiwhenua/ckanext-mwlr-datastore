@@ -124,6 +124,7 @@ def _make_action(package_id, action : WorkflowActionType, feedback: dict[str, an
         )
     try:        
         pkg['publishing_status'] = review_outcome_mapping[action]
+        pkg['currently_reviewing'] = True
         if set_private:
             pkg['private'] = True
         toolkit.get_action('package_update')(

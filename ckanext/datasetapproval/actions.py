@@ -29,7 +29,6 @@ def publishing_check(context, data_dict):
     ## if the dataset being created/updated is currently under review the status will be either "approved" or "rejected"
     if data_dict.get("currently_reviewing"):
         data_dict.pop("currently_reviewing")
-        rejection_reason = context.get("rejection_reason", None)
         data_dict = set_visibility_on_approval_or_rejection(data_dict)      
     ## if the dataset is being updated by an admin then should bypass the approval state
     elif admin_editing and data_dict.get("id"):
