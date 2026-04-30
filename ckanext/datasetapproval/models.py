@@ -36,7 +36,7 @@ class ReviewComment(toolkit.BaseModel):
     condition_expiry_date = Column(DateTime)
 
 class WorkflowHistoryEntry:
-    def __init__(self, action: WorkflowAction, comment: ReviewComment):
+    def __init__(self, action: WorkflowAction, comment: ReviewComment | None):
         self.action = action
         self.comment = comment
 

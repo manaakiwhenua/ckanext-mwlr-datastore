@@ -1,8 +1,7 @@
+from datetime import datetime
 import logging
-from ckanext.datasetapproval import models
-from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
 from ckan.plugins import toolkit
-from .enums import VOCAB_ENUMS, review_outcome_mapping, WorkflowActionType
+from .enums import VOCAB_ENUMS
 from zoneinfo import ZoneInfo
 
 log = logging.getLogger(__name__)
@@ -63,44 +62,8 @@ def vocab_label(key, value):
     except KeyError:
         return value
 
-def get_workflow_actions(dataset_id):
-    '''
-    Get all review actions and comments for a given dataset
-    '''
-    actions = models.meta.Session.query(WorkflowAction).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).all()
-    comments = models.meta.Session.query(ReviewComment).filter_by(dataset_id=dataset_id).all()
-
-    # Workflow actions and comments combined into a single object, with the comments nested under the relevant workflow action
-    workflow_actions_with_comments : list[WorkflowHistoryEntry] = []
-    for action in actions:
-        review_comment = next((c for c in comments if c.workflow_action_id == action.id), None)
-        workflow_actions_with_comments.append(WorkflowHistoryEntry(action, review_comment))
-
-    return workflow_actions_with_comments
-
-def get_workflow_action_comment(historical_action : WorkflowHistoryEntry):
-    outcome = historical_action.action.workflow_action
-    comment = historical_action.comment
-    display_comment = ''
-
-    if outcome == WorkflowActionType.REJECT.value and comment:
-        display_comment = f"Rejection reason: '{comment.rejection_reason.capitalize()}'. {comment.rejection_reason_comments.capitalize()}"
-    elif outcome == WorkflowActionType.APPROVE.value and comment:
-        display_comment = comment.approval_outcome_comments
-
-    return display_comment
-
-def convert_utc_to_local_time(utc_dt, tz_name='Pacific/Auckland'):
-    return utc_dt.astimezone(ZoneInfo(tz_name))
+def convert_utc_to_local_time_string(utc_dt : datetime, tz_name='Pacific/Auckland') -> str:
+    return utc_dt.astimezone(ZoneInfo(tz_name)).strftime('%Y-%m-%d %I:%M:%S %p') + f' ({ZoneInfo(tz_name).key})'
 
 def retrieve_data_management_email():
     return toolkit.config.get(u'ckan.datastore.data_management_email') or ""
-
-def map_workflow_action_to_decision_type(latest_workflow_action : WorkflowHistoryEntry):
-    try:
-        workflow_action_type = WorkflowActionType(latest_workflow_action.action.workflow_action)
-    except ValueError:
-        log.warning(f"Workflow action {latest_workflow_action.action.workflow_action} not found in WorkflowActionType enum")
-        return ""
-
-    return review_outcome_mapping[workflow_action_type]

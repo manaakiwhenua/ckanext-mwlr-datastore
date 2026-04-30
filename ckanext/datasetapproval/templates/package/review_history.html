@@ -19,15 +19,14 @@
                 {% set decision = h.map_workflow_action_to_decision_type(historical_action) %}
                 {% set workflow_action_comment = h.get_workflow_action_comment(historical_action) %}
                 <tr>
-                    <td>{{ h.convert_utc_to_local_time(historical_action.action.submitted_date).strftime('%Y-%m-%d %I:%M:%S %p') }}</td>
+                    <td>{{ h.convert_utc_to_local_time_string(historical_action.action.submitted_date) }}</td>
                     <td>{{historical_action.action.reviewer_name}}</td>
-                    <td>{{decision.capitalize()}}</td>
+                    <td>{{decision}}</td>
                     <td>{{workflow_action_comment}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
     {% else %}
         <p>{{ _('There is no review history for this dataset.') }}</p>
     {% endif %}
