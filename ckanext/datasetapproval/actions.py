@@ -93,12 +93,10 @@ def package_create(up_func, context, data_dict):
 
 @tk.chained_action
 def package_update(up_func, context, data_dict):
-    log.debug(f"PACKAGE UPDATE context: {context}, data_dict: {data_dict}")
     return _wrap_publish_review(up_func, context, data_dict, action_name="package_update")
 
 @tk.chained_action
 def package_patch(up_func, context, data_dict):
-    log.debug(f"PACKAGE PATCH context: {context}, data_dict: {data_dict}")
     return _wrap_publish_review(up_func, context, data_dict, action_name="package_patch")
 
 @p.toolkit.chained_action   

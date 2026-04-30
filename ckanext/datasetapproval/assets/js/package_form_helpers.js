@@ -1,13 +1,3 @@
-console.log("package form helpers loaded")
-
-// here can monitor the form as see if anything except the visibility has changed
-
-
-// button by default should simply state "Submit for review" unless "chosen_visibility" is updated (AND dataset is in approved state) 
-// then should be "Update Visibility"
-
-// if any other field is updated button should move back to "Submit for review"
-
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form.dataset-form")
     if (!form) return;
@@ -34,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const state = {};
 
         for (const [key, value] of formData.entries()) {
-            if (key === "save" || key === "submit_check") continue; // don't compare the submit button values
             if(!state[key]) {
                 state[key] = [];
             }
@@ -48,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function checkMeaningfulChanges() {
         const currentState = getFormState();
-        var visibilityChanged;
+        let visibilityChanged = false;
 
         //grab all fields that have been altered that aren't the chosen_visibility or bypass review flag
         const meaningfulChanges = Object.keys(currentState).filter((key) => {
@@ -62,24 +51,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        console.log("meaningful changes: ", meaningfulChanges);
+        bypassReview.value = visibilityChanged && meaningfulChanges.length === 0 ? "true" : "false";
 
-        // if visibility has changed, check if there have been any other changes
-        if (visibilityChanged) {
-            if (meaningfulChanges.length > 0) {
-                bypassReview.value = "false";
-            } else {
-                bypassReview.value = "true";
-            }
-            updateFormContent()
-        }
+        updateFormContent()
     }
     
     function updateFormContent() {
         if (bypassReview.value == "true") {
             submitButton.textContent = "Update Visibility";
 
-            // Toggle modal content
             reviewText.classList.add("d-none");
             visibilityText.classList.remove("d-none");
 
@@ -96,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             submitButton.textContent = "Submit for Review";
 
-            // Toggle modal content
             reviewText.classList.remove("d-none");
             visibilityText.classList.add("d-none");
 
