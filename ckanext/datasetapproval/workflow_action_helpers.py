@@ -1,6 +1,6 @@
 from ckanext.datasetapproval import models
 from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
-from .enums import review_outcome_mapping, WorkflowActionType
+from .enums import review_outcome_mapping, WorkflowActionType, VOCAB_ENUMS
 import logging
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def retrieve_workflow_comments(dataset_id: str) -> list[ReviewComment]:
 
 def get_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> str:
     '''
-    Get the relevant comment for a given workflow action, and format it for display
+    Get the relevant comment for a given workflow action and format it for display
     '''
     if not historical_action or not hasattr(historical_action, 'action'):
         log.warning("Workflow action is missing or does not have an 'action' attribute")
@@ -53,9 +53,10 @@ def get_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> str
     display_comment : str = ''
 
     if action_type == WorkflowActionType.REJECT.value and comment is not None:
-        reason : str = getattr(comment, 'rejection_reason', '') or ''
-        reason_comments : str = getattr(comment, 'rejection_reason_comments', '') or ''
-        display_comment = f"Rejection reason: '{reason.capitalize()}'. {reason_comments.capitalize()}"
+        rejection_reason : str = getattr(comment, 'rejection_reason', '') or ''
+        rejection_reason_comments : str = getattr(comment, 'rejection_reason_comments', '') or ''
+        display_reason : str = getattr(VOCAB_ENUMS.rejection_reason, rejection_reason, '')        
+        display_comment = f"Rejection reason: '{display_reason}'. {rejection_reason_comments.capitalize()}"
     elif action_type == WorkflowActionType.APPROVE.value and comment is not None:
         display_comment : str = getattr(comment, 'approval_outcome_comments', '') or ''
         display_comment = display_comment.capitalize()

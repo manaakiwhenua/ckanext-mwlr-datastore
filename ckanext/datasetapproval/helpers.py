@@ -63,7 +63,7 @@ def vocab_label(key, value):
         return value
 
 def convert_utc_to_local_time_string(utc_dt : datetime, tz_name='Pacific/Auckland') -> str:
-    return utc_dt.astimezone(ZoneInfo(tz_name)).strftime('%Y-%m-%d %I:%M:%S %p') + f' ({ZoneInfo(tz_name).key})'
+    return utc_dt.astimezone(ZoneInfo(tz_name)).strftime('%Y-%m-%d %I:%M %p') + f' ({ZoneInfo(tz_name).key} time)'
 
 def retrieve_data_management_email():
     return toolkit.config.get(u'ckan.datastore.data_management_email') or ""
