@@ -3,12 +3,20 @@
   <legend>Rejection Decision</legend>
 
   <label class="form-label">Rejection Reason</label>
-  <select name="rejection_reason" class="form-control" required>
-    <option value="">{% trans %}Select reason{% endtrans %}</option>
-    {% for key, label in h.get_vocab_group("rejection_reason").items() %}
-      <option value="{{ key }}">{{ _(label) }}</option>
-    {% endfor %}
-  </select>
+  {% for key, label in h.get_vocab_group("rejection_reason").items() %}
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        name="rejection_reason"
+        id="rejection_reason_{{ key }}"
+        value="{{ key }}"
+      >
+      <label class="form-check-label" for="rejection_reason_{{ key }}">
+        {{ _(label) }}
+      </label>
+    </div>
+  {% endfor %}
 
   <label for="rejection_reason_comments" class="form-label mt-2">Brief Description (max 1000 characters)</label>
   <textarea 
