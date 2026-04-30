@@ -43,15 +43,26 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Submitting for review</h5>
+          <h5 class="modal-title">
+            <span id="review-title">Submitting for review</span>
+            <span id="bypass-title" class="d-none">Updating dataset visibility</span>
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p class="text-start">This dataset has previously been approved, are you sure you wish to submit this for review again?</p>
+          <p id="review-text" class="text-start">
+            This dataset has previously been approved, are you sure you wish to submit this for review again?
+          </p>
+          <p id="visibility-text" class="text-start d-none">
+            You are about to make this approved dataset <span id="visibility-value"></span>, are you sure you wish to proceed?
+          </p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button class="btn btn-primary" type="submit" name="save" value="submit-review">Submit</button>
+          <button class="btn btn-primary" type="submit" name="save" value="submit-review">
+            <span id="submit-review-text">Submit</span>
+            <span id="bypass-review-text" class="d-none">Update</span>
+          </button>
         </div>
       </div>
     </div>

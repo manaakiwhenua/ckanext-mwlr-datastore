@@ -17,6 +17,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const bypassReview = document.getElementById("bypass-review-flag");
     if (!submitButton || publishingStatus.value !== "approved" || !bypassReview) return;
 
+    const submitReviewTitle = document.getElementById("review-title");
+    const bypassReviewTitle = document.getElementById("bypass-title");
+
+    const reviewText = document.getElementById("review-text");
+    const visibilityText = document.getElementById("visibility-text");
+    const visibilityField = form.querySelector("[name='chosen_visibility']");
+    const visibilityValue = document.getElementById("visibility-value");
+
+    const submitReviewText = document.getElementById("submit-review-text");
+    const bypassReviewText = document.getElementById("bypass-review-text");
+    
+
     function getFormState() {
         const formData = new FormData(form);
         const state = {};
@@ -32,10 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return state;
     }
 
-    const originalState = getFormState(form);
+    const originalState = getFormState();
 
     function checkMeaningfulChanges() {
-        const currentState = getFormState(form);
+        const currentState = getFormState();
         var visibilityChanged;
 
         //grab all fields that have been altered that aren't the chosen_visibility or bypass review flag
@@ -66,8 +78,33 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateFormContent() {
         if (bypassReview.value == "true") {
             submitButton.textContent = "Update Visibility";
+
+            // Toggle modal content
+            reviewText.classList.add("d-none");
+            visibilityText.classList.remove("d-none");
+
+            submitReviewText.classList.add("d-none");
+            bypassReviewText.classList.remove("d-none");
+
+            submitReviewTitle.classList.add("d-none");
+            bypassReviewTitle.classList.remove("d-none");
+
+            
+            if (visibilityField) {
+                visibilityValue.textContent = visibilityField.value === "public" ? "public" : "private";
+            }
         } else {
             submitButton.textContent = "Submit for Review";
+
+            // Toggle modal content
+            reviewText.classList.remove("d-none");
+            visibilityText.classList.add("d-none");
+
+            submitReviewText.classList.remove("d-none");
+            bypassReviewText.classList.add("d-none");
+
+            submitReviewTitle.classList.remove("d-none");
+            bypassReviewTitle.classList.add("d-none");
         }
     }
 
