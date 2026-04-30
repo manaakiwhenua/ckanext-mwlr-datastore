@@ -1,0 +1,35 @@
+<!-- Show all review history for this dataset -->
+{% extends "package/read_base.html" %}
+
+{% block primary_content_inner %}
+    <h2>{{ _('Review History') }}</h2>    
+    {% set workflow_history_actions = h.get_workflow_actions(pkg.id) %}
+    {% if workflow_history_actions %}
+        <table class="table table-bordered table-striped mt-3">
+            <thead>
+            <tr>
+                <th class="col-1">Review submitted date</th>
+                <th class="col-1">Reviewer name</th>
+                <th class="col-1">Decision</th>
+                <th class="col-2">Comments</th>
+            </tr>       
+            </thead>
+            <tbody>
+                {% for historical_action in workflow_history_actions %}
+                {% set decision = h.map_workflow_action_to_decision_type(historical_action) %}
+                {% set workflow_action_comment = h.get_workflow_action_comment(historical_action) %}
+                <tr>
+                    <td>{{ h.convert_utc_to_local_time(historical_action.action.submitted_date).strftime('%Y-%m-%d %I:%M:%S %p') }}</td>
+                    <td>{{historical_action.action.reviewer_name}}</td>
+                    <td>{{decision.capitalize()}}</td>
+                    <td>{{workflow_action_comment}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <p>{{ _('There is no review history for this dataset.') }}</p>
+    {% endif %}
+
+{% endblock %}

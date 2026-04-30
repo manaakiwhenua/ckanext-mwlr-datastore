@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block content_primary_nav %}
+    {{ super() }}
+    {% if h.is_admin(c.user, pkg.owner_org) %}
+    {{ h.build_nav_icon('approval.review_history', _('Review History'), icon='history', id=pkg.id) }}
+    {% endif %}
+{% endblock %}

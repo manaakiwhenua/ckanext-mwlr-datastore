@@ -4,7 +4,7 @@
       <tbody>
         <tr>
           <th class="col-1">Reviewer name</th>
-          <td class="col-1">{{latest_workflow_action.reviewer_name}}</td>
+          <td class="col-1">{{latest_workflow_action.action.reviewer_name}}</td>
         </tr>
         <tr>
           <th class="col-1">Decision</th>
@@ -12,11 +12,11 @@
         </tr>
         <tr>
           <th class="col-1">Review date</th>
-          <td class="col-1">{{latest_workflow_action.review_date.strftime('%Y-%m-%d')}}</td>
+          <td class="col-1">{{latest_workflow_action.action.review_date.strftime('%Y-%m-%d')}}</td>
         </tr>
         <tr>
           <th class="col-1">Review submitted date</th>
-          <td class="col-1">{{latest_workflow_action.submitted_date.astimezone().strftime('%Y-%m-%d')}}</td>
+          <td class="col-1">{{h.convert_utc_to_local_time(latest_workflow_action.action.submitted_date).strftime('%Y-%m-%d %I:%M:%S %p')}}</td>
         </tr>
       </tbody>
 </table>

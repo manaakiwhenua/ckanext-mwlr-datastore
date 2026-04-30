@@ -35,6 +35,11 @@ class ReviewComment(toolkit.BaseModel):
     approval_details = Column(UnicodeText)
     condition_expiry_date = Column(DateTime)
 
+class WorkflowHistoryEntry:
+    def __init__(self, action: WorkflowAction, comment: ReviewComment):
+        self.action = action
+        self.comment = comment
+
 def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     try:        
         workflow_action = create_workflow_action(dataset_id, feedback, workflow_action_type)
@@ -59,7 +64,7 @@ def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_actio
         reviewer_email=reviewer_email,  
         workflow_action=workflow_action_type.value,
         reviewer_type = ReviewerType.REVIEWER.value,
-        submitted_date=dt.datetime.now(dt.timezone.utc),
+        submitted_date= dt.datetime.now(dt.timezone.utc),
         submitted_by_user_id=toolkit.c.userobj.id,
         review_date=review_date
     )
