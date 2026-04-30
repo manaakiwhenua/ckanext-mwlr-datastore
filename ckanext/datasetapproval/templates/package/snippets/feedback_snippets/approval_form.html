@@ -23,17 +23,19 @@
 
     <fieldset class="mb-3 d-none approval-conditions">
         <legend>Approval Conditions</legend>
-        
-        <label for="approval_outcome_comments" class="form-label mt-2">Conditions</label>
-        <textarea 
-            id="approval_outcome_comments" 
-            name="approval_outcome_comments" 
-            class="form-control" 
-            rows="4" 
-            maxlength="1000" 
-            ondrop="return false;"
-            placeholder="{% trans %}Enter approval conditions here...{% endtrans %}"></textarea>
+        <div class="form-group control-medium">
+            <label for="approval_outcome_comments" class="form-label mt-2">Conditions</label>
+            <textarea 
+                id="approval_outcome_comments" 
+                name="approval_outcome_comments" 
+                class="form-control" 
+                rows="4" 
+                maxlength="1000" 
+                ondrop="return false;"
+                placeholder="{% trans %}Enter approval conditions here...{% endtrans %}"></textarea>
 
-        <label for="condition_expiry_date" class="form-label mt-2">Condition Expiry Date</label>
-        <input type="date" name="condition_expiry_date" class="form-control">
+            <label for="condition_expiry_date" class="form-label mt-2">Condition Expiry Date</label>
+            <input type="date" name="condition_expiry_date" class="form-control" aria-describedby="condition-date-help">
+            <div name="condition-date-help" class="info-block"><i class="fa fa-info-circle"></i> Reminder date to review dataset conditions (no automatic changes).</span>
+        </div>
     </fieldset>
