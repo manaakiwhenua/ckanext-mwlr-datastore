@@ -10,16 +10,13 @@ console.log("package form helpers loaded")
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form.dataset-form")
-    const publishingStatus = form.querySelector("#field-publishing_status");
-    console.log("publishing status: ", publishingStatus.value)
-    const submitButton = form.querySelector("#submitButton");
-    console.log("submit button text: ", submitButton)
-    const chosen_visibility = "chosen_visibility"
-    const bypassReview = document.getElementById("bypass-review-flag");
-    console.log("visibility", bypassReview)
+    if (!form) return;
 
-    if (!form || !submitButton || publishingStatus.value !== "approved" || !bypassReview) return; // guard clause
-    console.log("made it here: ");
+    const publishingStatus = form.querySelector("#field-publishing_status");
+    const submitButton = form.querySelector("#submitButton");
+    const bypassReview = document.getElementById("bypass-review-flag");
+    if (!submitButton || publishingStatus.value !== "approved" || !bypassReview) return;
+
     function getFormState() {
         const formData = new FormData(form);
         const state = {};
@@ -36,38 +33,56 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const originalState = getFormState(form);
-    console.log("original form state: ", originalState)
 
-    function normalize(value) {
-        return JSON.stringify(value || []);
-    }
-
-    function determineSubmitLogic() {
+    function checkMeaningfulChanges() {
         const currentState = getFormState(form);
-        var visibilityChanged = false;
+        var visibilityChanged;
+
         //grab all fields that have been altered that aren't the chosen_visibility or bypass review flag
-        const changedFields = Object.keys(currentState).filter((key) => {
-            if (key === "chosen_visibility"){
+        const meaningfulChanges = Object.keys(currentState).filter((key) => {
+            // don't add if visibility change but record this change
+            if (key === "chosen_visibility") {
                 visibilityChanged = JSON.stringify(currentState[key]) !== JSON.stringify(originalState[key])
-            }
-            if (key !== "chosen_visibility" && key !== "bypass_review") {
-                return JSON.stringify(currentState[key]) !== JSON.stringify(originalState[key])
+            } else {
+                if (key !== "bypass_review"){
+                    return JSON.stringify(currentState[key]) !== JSON.stringify(originalState[key])
+                }
             }
         });
 
-        // if no fields where changed and visibility was changed
-        if (changedFields.length === 0 && visibilityChanged) {
-            submitButton.textContent = "Update visibility";
-            bypassReview.value = "true";
+        console.log("meaningful changes: ", meaningfulChanges);
 
+        // if visibility has changed, check if there have been any other changes
+        if (visibilityChanged) {
+            if (meaningfulChanges.length > 0) {
+                bypassReview.value = "false";
+            } else {
+                bypassReview.value = "true";
+            }
+            updateFormContent()
+        }
+    }
+    
+    function updateFormContent() {
+        if (bypassReview.value == "true") {
+            submitButton.textContent = "Update Visibility";
         } else {
             submitButton.textContent = "Submit for Review";
-            bypassReview.value = "false";
         }
-
-
     }
 
-    form.addEventListener("input", determineSubmitLogic);
-    form.addEventListener("change", determineSubmitLogic);
+    form.addEventListener("input", checkMeaningfulChanges);
+    form.addEventListener("change", checkMeaningfulChanges);
+    // the tag and license fields are handled with jquery select2 events so needed additional work
+    if (window.jQuery) {
+        jQuery("[name='license_id']").on("change select2:select select2:unselect", function () {
+            console.log("license changed:", jQuery(this).val());
+            checkMeaningfulChanges();
+        });
+
+        jQuery("[name='tag_string']").on("change select2:select select2:unselect", function () {
+            console.log("tags changed:", jQuery(this).val());
+            checkMeaningfulChanges();
+        });
+    }
 })
