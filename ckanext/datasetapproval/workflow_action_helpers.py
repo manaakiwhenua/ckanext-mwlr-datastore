@@ -58,8 +58,12 @@ def get_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> str
         display_reason : str = getattr(VOCAB_ENUMS.rejection_reason, rejection_reason, '')        
         display_comment = f"Rejection reason: '{display_reason}'. {rejection_reason_comments.capitalize()}"
     elif action_type == WorkflowActionType.APPROVE.value and comment is not None:
-        display_comment : str = getattr(comment, 'approval_outcome_comments', '') or ''
-        display_comment = display_comment.capitalize()
+        approval_type : str = getattr(VOCAB_ENUMS.approval_outcome, getattr(comment, 'approval_outcome', ''), '') or ''
+        approval_condition_details : str = getattr(comment, 'approval_details', '') or ''
+        approval_outcome_comments : str = getattr(comment, 'approval_outcome_comments', '') or ''
+
+        display_comment = [approval_type.capitalize(), approval_outcome_comments.capitalize(), approval_condition_details.capitalize()]
+        display_comment = '. '.join([c for c in display_comment if c != '']) 
 
     return display_comment
 
