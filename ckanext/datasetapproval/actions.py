@@ -19,8 +19,7 @@ def is_user_editor_of_org(org_id, user_id):
 def publishing_check(context, data_dict):
     admin_editing = context.get("admin_editing", False)
     submit_review = context.get("submit_review", False)
-    bypass_review = context.get("bypass_review", False)
-    log.debug(f"visibility change: ", bypass_review)
+    bypass_review = data_dict.get("bypass_review", False)
     user_id = (
         tk.current_user.id
         if tk.current_user and not tk.current_user.is_anonymous
@@ -39,7 +38,9 @@ def publishing_check(context, data_dict):
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft or only changing visibility
     elif is_user_editor_of_org(org_id, user_id):
         ## if dataset approved and only visibility changed
-        if not bypass_review:
+        if bypass_review:
+            data_dict = set_visibility_on_approval_or_rejection(data_dict)
+        else:
             context.update({'send_request': submit_review})
             if submit_review:
                 data_dict['publishing_status'] = "in_review"
