@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const reviewText = document.getElementById("review-text");
     const visibilityText = document.getElementById("visibility-text");
-    const visibilityField = form.querySelector("[name='chosen_visibility']");
+    const makePrivate = form.querySelector("[name='chosen_visibility']");
     const visibilityValue = document.getElementById("visibility-value");
 
     const submitReviewText = document.getElementById("submit-review-text");
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         bypassReview.value = visibilityChanged && meaningfulChanges.length === 0 ? "true" : "false";
-
+        
         updateFormContent()
     }
     
@@ -70,8 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
             bypassReviewTitle.classList.remove("d-none");
 
             
-            if (visibilityField) {
-                visibilityValue.textContent = visibilityField.value === "public" ? "public" : "private";
+            if (makePrivate) {
+                visibilityValue.textContent = makePrivate.value === "false" ? "public" : "private";
             }
         } else {
             submitButton.textContent = "Submit for Review";
