@@ -20,6 +20,19 @@ class WorkflowAction(toolkit.BaseModel):
     submitted_date = Column(DateTime(timezone=True))
     submitted_by_user_id = Column(UnicodeText, ForeignKey('user.id'), nullable=False)
 
+    def as_dict(self):
+        return {
+            'id': str(self.id),
+            'dataset_id': self.dataset_id,
+            'workflow_action': self.workflow_action,
+            'reviewer_name': self.reviewer_name,
+            'reviewer_email': self.reviewer_email,
+            'review_date': self.review_date,
+            'reviewer_type': self.reviewer_type,
+            'submitted_date': self.submitted_date,
+            'submitted_by_user_id': self.submitted_by_user_id,
+        }
+
 class ReviewComment(toolkit.BaseModel):
     __tablename__ = 'review_comments'
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
@@ -35,10 +48,27 @@ class ReviewComment(toolkit.BaseModel):
     approval_details = Column(UnicodeText)
     condition_expiry_date = Column(DateTime)
 
+    def as_dict(self):
+        return {
+            'id': str(self.id),
+            'workflow_action_id': str(self.workflow_action_id),
+            'dataset_id': self.dataset_id,
+            'rejection_reason': self.rejection_reason,
+            'rejection_reason_comments': self.rejection_reason_comments,
+            'review_type': self.review_type,
+            'approval_type': self.approval_type,
+            'resubmission_comments': self.resubmission_comments,
+            'approval_outcome': self.approval_outcome,
+            'approval_outcome_comments': self.approval_outcome_comments,
+            'approval_details': self.approval_details,
+            'condition_expiry_date': self.condition_expiry_date,
+        }
+
 class WorkflowHistoryEntry:
-    def __init__(self, action: WorkflowAction, comment: ReviewComment | None):
-        self.action = action
-        self.comment = comment
+    def __init__(self, action: WorkflowAction, comment: ReviewComment | None):       
+# This is a helper class to combine workflow actions and their associated comments for easier retrieval and display in the UI. SQLAlchemy models need to be converted to dictionaries before they can be used in html templates
+        self.action = action.as_dict() if action else None
+        self.comment = comment.as_dict() if comment else None
 
 def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     try:        

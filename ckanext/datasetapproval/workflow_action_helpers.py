@@ -48,19 +48,19 @@ def get_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> str
         log.warning("Workflow action is missing or does not have an 'action' attribute")
         return '' 
 
-    action_type : str = getattr(historical_action.action, 'workflow_action', '').lower()
-    comment : ReviewComment | None = getattr(historical_action, 'comment', None)
+    action_type : str = historical_action.action.get('workflow_action', '').lower()
+    comment : ReviewComment | None = historical_action.comment
     display_comment : str = ''
 
-    if action_type == WorkflowActionType.REJECT.value and comment is not None:
-        rejection_reason : str = getattr(comment, 'rejection_reason', '') or ''
-        rejection_reason_comments : str = getattr(comment, 'rejection_reason_comments', '') or ''
+    if action_type == WorkflowActionType.REJECT.value and historical_action.comment is not None:
+        rejection_reason : str = comment.get('rejection_reason', '') or ''
+        rejection_reason_comments : str = comment.get('rejection_reason_comments', '') or ''
         display_reason : str = getattr(VOCAB_ENUMS.rejection_reason, rejection_reason, '')        
         display_comment = f"Rejection reason: '{display_reason}'. {rejection_reason_comments.capitalize()}"
     elif action_type == WorkflowActionType.APPROVE.value and comment is not None:
-        approval_type : str = getattr(VOCAB_ENUMS.approval_outcome, getattr(comment, 'approval_outcome', ''), '') or ''
-        approval_condition_details : str = getattr(comment, 'approval_details', '') or ''
-        approval_outcome_comments : str = getattr(comment, 'approval_outcome_comments', '') or ''
+        approval_type : str = getattr(VOCAB_ENUMS.approval_outcome, comment.get('approval_outcome', ''), '') or ''
+        approval_condition_details : str = comment.get('approval_details', '') or ''
+        approval_outcome_comments : str = comment.get('approval_outcome_comments', '') or ''
 
         display_comment = [approval_type.capitalize(), approval_outcome_comments.capitalize(), approval_condition_details.capitalize()]
         display_comment = '. '.join([c for c in display_comment if c != '']) 
@@ -77,9 +77,9 @@ def map_workflow_action_to_decision_type(workflow_action : WorkflowHistoryEntry)
         return ''
 
     try:
-        workflow_action_type : WorkflowActionType = WorkflowActionType(getattr(workflow_action.action, 'workflow_action', ''))
+        workflow_action_type : WorkflowActionType = WorkflowActionType(workflow_action.action.get('workflow_action', '').lower())
     except ValueError:
-        log.warning(f"Workflow action {getattr(workflow_action.action, 'workflow_action', '')} not found in WorkflowActionType enum")
+        log.warning(f"Workflow action {workflow_action.action.get('workflow_action', '')} not found in WorkflowActionType enum")
         return ''
 
     return review_outcome_mapping.get(workflow_action_type, '').capitalize()
