@@ -1,6 +1,8 @@
 import logging
 import ckan.authz as authz
-
+from ckanext.datasetapproval.auth import check_user_sysadmin_or_org_admin
+from ckanext.datasetapproval import models
+from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
 from ckan.lib.mailer import MailerException
 import ckan.plugins.toolkit as tk
 import ckan.plugins as p
@@ -81,6 +83,65 @@ def _wrap_publish_review(up_func, context, data_dict, *, action_name):
                 "Unable to send review request to collection admins. Please contact the datastore administrator."
             )
     return result
+
+def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
+    """
+    Get all reviewer actions and comments for a given dataset
+
+    Parameters:
+        context (dict): the CKAN action context, not used in this function but required as a parameter
+        data_dict (dict): a dictionary containing the dataset ID and owner organization ID.E.g. {'id': '1234', 'owner_org': '5678'}
+    """
+    dataset_id = data_dict.get("id")
+    owner_org = data_dict.get("owner_org")
+    user_name = context.get('user')
+
+    if not dataset_id or not isinstance(dataset_id, str):
+        log.warning("Dataset ID is missing or invalid when trying to retrieve workflow actions")
+        return []
+    
+    check_user_sysadmin_or_org_admin(owner_org, user_name)    
+    actions : list[WorkflowAction] = retrieve_workflow_actions(dataset_id)
+    comments : list[ReviewComment] = retrieve_workflow_comments(dataset_id)
+
+    # Workflow actions and comments combined into a single object, with the comments nested under the relevant workflow action
+    workflow_actions_with_comments : list[WorkflowHistoryEntry] = []
+    for action in actions:
+        review_comment : ReviewComment | None = next((c for c in comments if c.workflow_action_id == action.id), None)
+        workflow_actions_with_comments.append(WorkflowHistoryEntry(action, review_comment))
+    return workflow_actions_with_comments
+
+def retrieve_workflow_actions(dataset_id: str) -> list[WorkflowAction]:
+    try: 
+        actions = models.meta.Session.query(WorkflowAction).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).all()
+        return actions
+    except Exception as e:
+        log.error(f"Error retrieving workflow actions for dataset {dataset_id}: {e}")
+        return []
+
+def retrieve_workflow_comments(dataset_id: str) -> list[ReviewComment]:
+    try:
+        comments = models.meta.Session.query(ReviewComment).filter_by(dataset_id=dataset_id).all()
+        return comments
+    except Exception as e:
+        log.error(f"Error retrieving workflow comments for dataset {dataset_id}: {e}")
+        return []
+    
+def latest_workflow_action_show(context, data_dict) -> WorkflowHistoryEntry | None:
+    '''
+    Get only the most recent workflow action for a given dataset. Doesn't require permissions check or workflow action comments.
+    '''
+    dataset_id = data_dict.get("id")
+    if not dataset_id or not isinstance(dataset_id, str):
+        log.warning("Dataset ID is missing or invalid when trying to retrieve latest workflow action")
+        return None
+    
+    try:        
+        action = models.meta.Session.query(WorkflowAction).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).first()
+        return WorkflowHistoryEntry(action, None) if action else None
+    except Exception as e:
+        log.error(f"Error retrieving latest workflow action for dataset {dataset_id}: {e}")
+        return None
 
 @tk.chained_action
 @logic.side_effect_free

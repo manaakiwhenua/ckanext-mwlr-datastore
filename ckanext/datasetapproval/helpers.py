@@ -27,7 +27,7 @@ def get_org_from_package_name(package_name):
 def is_admin(user, organisation=None):
     """
     Returns True if user is admin of given organisation.
-    If office param is not provided checks if user is admin of any organisation
+    If organisation param is not provided checks if user is admin of ANY organisation
 
     :param user: user name
     :type user: string

@@ -3,8 +3,8 @@
 
 {% block primary_content_inner %}
     <h2>{{ _('Review History') }}</h2>    
-    {% set workflow_history_actions = h.get_workflow_actions(pkg.id) %}
-    {% if workflow_history_actions %}
+
+    {% if workflow_history %}
         <table class="table table-bordered table-striped mt-3">
             <thead>
             <tr>
@@ -15,7 +15,7 @@
             </tr>       
             </thead>
             <tbody>
-                {% for historical_action in workflow_history_actions %}
+                {% for historical_action in workflow_history %}
                 {% set decision = h.map_workflow_action_to_decision_type(historical_action) %}
                 {% set workflow_action_comment = h.get_workflow_action_comment(historical_action) %}
                 <tr>

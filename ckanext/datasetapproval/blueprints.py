@@ -152,19 +152,24 @@ def _make_action(package_id, action : WorkflowActionType, feedback: dict[str, an
         toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact the datastore administrator.")
     return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
 
-def show_review_history(id):
-    dataset_dict = toolkit.get_action('package_show')({'ignore_auth': True},{'id': id})
-    permission = users_role_for_group_or_org(dataset_dict.get('owner_org'), toolkit.c.userobj.name)
+def show_review_history(name):
+    '''
+    Show the review history page for a given dataset, which includes all workflow actions and comments left by reviewers. Only accessible to org admins and sysadmins.
+    '''
+    dataset_dict = toolkit.get_action('package_show')({'ignore_auth': True}, {'id': name}) 
+    dataset_id = dataset_dict.get('id') # Get the dataset ID from the dataset_dict since the workflow actions are linked to the dataset ID, not the name.
 
-    if not (toolkit.c.userobj.sysadmin or permission == 'admin'):
-        raise toolkit.abort(403, 'You do not have permission to view the review history of dataset "{}"'.format(id))
-    
+    workflow_history = toolkit.get_action('workflow_actions_show')(
+        {},
+        {'id': dataset_id, 'owner_org': dataset_dict.get('owner_org')}
+    )    
     return toolkit.render('package/review_history.html', {
-        'id': id,
+        'id': dataset_id,
         'pkg_dict': dataset_dict,
+        'workflow_history': workflow_history
     })
 
 approveBlueprint.add_url_rule('/dataset-publish/<id>/submit_feedback', view_func=submit_feedback, methods=['POST'])
 approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=pending_datasets, endpoint='dataset_review')
 approveBlueprint.add_url_rule(u'/user/<id>/my_requests', view_func=pending_datasets, endpoint='my_requests')
-approveBlueprint.add_url_rule('/dataset/review_history/<id>', view_func=show_review_history, endpoint='review_history')
+approveBlueprint.add_url_rule('/dataset/review_history/<string:name>', view_func=show_review_history, endpoint='review_history')

@@ -39,7 +39,8 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'resource_update': actions.resource_update,
             'check_user_admin': actions.check_user_admin,
             'retrieve_rejection_reasons': actions.retrieve_rejection_reasons,
-            'retrieve_publishing_status': actions.retrieve_publishing_status
+            'workflow_actions_show': actions.workflow_actions_show,
+            'latest_workflow_action_show': actions.latest_workflow_action_show
         }
 
     def is_fallback(self):
@@ -57,8 +58,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'get_org_from_package_name': helpers.get_org_from_package_name,
             'vocab_label': helpers.vocab_label,
             'get_vocab_group': helpers.get_vocab_group,
-            'get_workflow_actions': workflow_action_helpers.get_workflow_actions,
-            'get_workflow_action_comment': workflow_action_helpers.get_workflow_action_comment,
+            'get_workflow_action_comment': workflow_action_helpers.format_workflow_action_comment,
             'convert_utc_to_local_time_string': helpers.convert_utc_to_local_time_string,
             'retrieve_data_management_email': helpers.retrieve_data_management_email,
             'map_workflow_action_to_decision_type': workflow_action_helpers.map_workflow_action_to_decision_type
@@ -114,4 +114,22 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             "retrieve_publishing_status": auth.retrieve_publishing_status
         }
 
+    # IPackageController
+    def before_dataset_view(self, pkg_dict):
+        '''
+        This method is called before rendering the read.html page.
+        You can add extra variables to the pkg_dict here which can then be accessed in the read.html template.
+        '''
+        try:
+            endpoint = toolkit.request.endpoint
+        except RuntimeError:
+            return pkg_dict
 
+        # Only add latest workflow action details to the dataset read page. No permissions or workflow action comments are required.
+        if endpoint and endpoint.endswith('dataset.read'):
+            latest_workflow_action = toolkit.get_action('latest_workflow_action_show')(
+                {},
+                {'id': pkg_dict['id']}
+            )
+            pkg_dict['latest_workflow_action'] = latest_workflow_action
+        return pkg_dict
