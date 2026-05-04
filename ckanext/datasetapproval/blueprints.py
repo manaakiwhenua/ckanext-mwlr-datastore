@@ -156,12 +156,12 @@ def show_review_history(name):
     '''
     Show the review history page for a given dataset, which includes all workflow actions and comments left by reviewers. Only accessible to org admins and sysadmins.
     '''
-    dataset_dict = toolkit.get_action('package_show')({'ignore_auth': True}, {'id': name}) 
-    dataset_id = dataset_dict.get('id') # Get the dataset ID from the dataset_dict since the workflow actions are linked to the dataset ID, not the name.
+    dataset_dict = toolkit.get_action('package_show')({'ignore_auth': True}, {'id': name})
+    dataset_id = toolkit.get_or_bust(dataset_dict, "id") # Get the dataset ID from the dataset_dict since the workflow actions are linked to the dataset ID, not the name.
 
     workflow_history = toolkit.get_action('workflow_actions_show')(
         {},
-        {'id': dataset_id, 'owner_org': dataset_dict.get('owner_org')}
+        {'id': dataset_id, 'owner_org': toolkit.get_or_bust(dataset_dict, "owner_org")}
     )    
     return toolkit.render('package/review_history.html', {
         'id': dataset_id,

@@ -1,6 +1,5 @@
 import logging
 import ckan.authz as authz
-from ckanext.datasetapproval.auth import check_user_sysadmin_or_org_admin
 from ckanext.datasetapproval import models
 from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
 from ckan.lib.mailer import MailerException
@@ -84,6 +83,7 @@ def _wrap_publish_review(up_func, context, data_dict, *, action_name):
             )
     return result
 
+@tk.side_effect_free
 def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
     """
     Get all reviewer actions and comments for a given dataset
@@ -92,15 +92,13 @@ def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
         context (dict): the CKAN action context, not used in this function but required as a parameter
         data_dict (dict): a dictionary containing the dataset ID and owner organization ID.E.g. {'id': '1234', 'owner_org': '5678'}
     """
-    dataset_id = data_dict.get("id")
-    owner_org = data_dict.get("owner_org")
-    user_name = context.get('user')
+    dataset_id = tk.get_or_bust(data_dict, "id")
 
     if not dataset_id or not isinstance(dataset_id, str):
         log.warning("Dataset ID is missing or invalid when trying to retrieve workflow actions")
         return []
     
-    check_user_sysadmin_or_org_admin(owner_org, user_name)    
+    tk.check_access('workflow_history_show', context, data_dict)    
     actions : list[WorkflowAction] = retrieve_workflow_actions(dataset_id)
     comments : list[ReviewComment] = retrieve_workflow_comments(dataset_id)
 
@@ -127,11 +125,12 @@ def retrieve_workflow_comments(dataset_id: str) -> list[ReviewComment]:
         log.error(f"Error retrieving workflow comments for dataset {dataset_id}: {e}")
         return []
     
+@tk.side_effect_free    
 def latest_workflow_action_show(context, data_dict) -> WorkflowHistoryEntry | None:
     '''
     Get only the most recent workflow action for a given dataset. Doesn't require permissions check or workflow action comments.
     '''
-    dataset_id = data_dict.get("id")
+    dataset_id = tk.get_or_bust(data_dict, "id")
     if not dataset_id or not isinstance(dataset_id, str):
         log.warning("Dataset ID is missing or invalid when trying to retrieve latest workflow action")
         return None
