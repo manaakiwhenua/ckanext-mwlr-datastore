@@ -1,7 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultPermissionLabels
-from ckanext.datasetapproval import actions, blueprints, helpers, views
+from ckanext.datasetapproval import actions, blueprints, helpers, views, auth
 
 import logging as log
 from ckan.common import _, c
@@ -18,6 +18,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IPermissionLabels, inherit=True)
+    plugins.implements(plugins.IAuthFunctions)
 
 
 
@@ -38,6 +39,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'resource_update': actions.resource_update,
             'check_user_admin': actions.check_user_admin,
             'retrieve_rejection_reasons': actions.retrieve_rejection_reasons,
+            'retrieve_publishing_status': actions.retrieve_publishing_status
         }
 
     def is_fallback(self):
@@ -102,5 +104,11 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
     def get_blueprint(self):
         full_blueprints = [views.dataset.registered_views(),  blueprints.approveBlueprint]
         return full_blueprints
+    
+    # IAuthFunctions
+    def get_auth_functions(self):
+        return {
+            "retrieve_publishing_status": auth.retrieve_publishing_status
+        }
 
 

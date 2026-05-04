@@ -1,11 +1,13 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const form = document.querySelector("form.dataset-form")
     if (!form) return;
 
-    const publishingStatus = form.querySelector("#field-publishing_status");
+    const publishingStatus = await retrieve_publishing_status();
     const submitButton = form.querySelector("#submitButton");
+    const modalSubmitButton = document.getElementById("modalSubmitButton");
+    const modalBypassButton = document.querySelector('button[name="save"][value="bypass-review"]');
     const bypassReview = document.getElementById("bypass-review-flag");
-    if (!submitButton || publishingStatus.value !== "approved" || !bypassReview) return;
+    if (!submitButton || publishingStatus !== "approved" || !bypassReview || !modalBypassButton || !modalSubmitButton) return;
 
     const submitReviewTitle = document.getElementById("review-title");
     const bypassReviewTitle = document.getElementById("bypass-title");
@@ -14,9 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const visibilityText = document.getElementById("visibility-text");
     const makePrivate = form.querySelector("[name='chosen_visibility']");
     const visibilityValue = document.getElementById("visibility-value");
-
-    const submitReviewText = document.getElementById("submit-review-text");
-    const bypassReviewText = document.getElementById("bypass-review-text");
     
 
     function getFormState() {
@@ -59,12 +58,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateFormContent() {
         if (bypassReview.value == "true") {
             submitButton.textContent = "Update Visibility";
+            modalBypassButton.classList.remove("d-none");
+            modalSubmitButton.classList.add("d-none");
 
             reviewText.classList.add("d-none");
             visibilityText.classList.remove("d-none");
-
-            submitReviewText.classList.add("d-none");
-            bypassReviewText.classList.remove("d-none");
 
             submitReviewTitle.classList.add("d-none");
             bypassReviewTitle.classList.remove("d-none");
@@ -75,12 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } else {
             submitButton.textContent = "Submit for Review";
+            modalBypassButton.classList.add("d-none");
+            modalSubmitButton.classList.remove("d-none");
 
             reviewText.classList.remove("d-none");
             visibilityText.classList.add("d-none");
-
-            submitReviewText.classList.remove("d-none");
-            bypassReviewText.classList.add("d-none");
 
             submitReviewTitle.classList.remove("d-none");
             bypassReviewTitle.classList.add("d-none");
@@ -102,3 +99,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 })
+
+async function retrieve_publishing_status() {
+    const pkgEl = document.getElementById('package-meta');
+    const package_id = pkgEl?.getAttribute('data-package-id');
+    var url = `/api/3/action/retrieve_publishing_status?package_id=${package_id}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.result;
+    } catch (error) {
+        console.error("Error fetching publishing status:", error);
+    }
+}

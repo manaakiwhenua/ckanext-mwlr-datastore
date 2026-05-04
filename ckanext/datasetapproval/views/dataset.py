@@ -46,6 +46,24 @@ class EditView(BaseEditView):
         context.update({'admin_editing': h.is_admin(current_user.name, selected_org)})
         return context
 
+    def post(self, package_type, id):
+        if tk.request.form.get("save") == "bypass-review":
+            context = self._prepare()
+            context.update({'bypass_review': True})
+            pkg_dict = tk.get_action("package_patch")(
+                context,
+                {
+                    "id": id,
+                    "chosen_visibility": tk.request.form.get("chosen_visibility"),
+                    "private": tk.request.form.get("private"),
+                },
+            )
+            tk.h.flash_success("Dataset visibility successfully updated")
+            return tk.redirect_to(u'{}.read'.format(package_type),
+                             id=pkg_dict['name'])
+
+        return super().post(package_type, id)
+    
 dataset.add_url_rule("/new", view_func=CreateView.as_view(str("new")))
 dataset.add_url_rule("/edit/<id>", view_func=EditView.as_view(str("edit")))
 
