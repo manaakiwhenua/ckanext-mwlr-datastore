@@ -95,11 +95,11 @@ def reset_db():
 def clean_db(reset_db, migrate_db_for):
     reset_db()
     logger.warning("Cleaning DB fixture!")
-    migrate_db_for('mnc_data')
+    migrate_db_for('dataset_approval')
 
 
 @pytest.fixture()
-@pytest.mark.ckan_config("ckan.plugins", "mnc_data")
+@pytest.mark.ckan_config("ckan.plugins", "dataset_approval")
 def standard_plugins_config(ckan_config):
     pass
 
