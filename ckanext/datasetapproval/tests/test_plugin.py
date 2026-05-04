@@ -47,7 +47,10 @@ To temporary patch the CKAN configuration for the duration of a test you can use
     def test_some_action():
         pass
 """
-import ckanext.datasetapproval.plugin as plugin
+import pytest
+from ckan.plugins.core import plugin_loaded
 
+# Check that the plugin loads
+@pytest.mark.usefixtures("standard_plugins")
 def test_plugin():
-    pass
+    assert plugin_loaded("dataset_approval")
