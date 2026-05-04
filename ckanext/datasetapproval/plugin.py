@@ -104,12 +104,6 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
     def get_blueprint(self):
         full_blueprints = [views.dataset.registered_views(),  blueprints.approveBlueprint]
         return full_blueprints
-    
-    # IAuthFunctions
-    def get_auth_functions(self):
-        return {
-            "retrieve_publishing_status": auth.retrieve_publishing_status
-        }
 
     # IPackageController
     def before_dataset_view(self, pkg_dict):
