@@ -20,13 +20,11 @@ def workflow_history_show(context, data_dict) -> dict:
     owner_org = tk.get_or_bust(data_dict, "owner_org")
     user_name = context.get('user')
     user_obj = model.User.get(user_name) if user_name else None
+
     is_sysadmin = user_obj and user_obj.sysadmin
-    permission = user_name and authz.users_role_for_group_or_org(owner_org, user_name) == 'admin'  
+    admin_permission = user_name and authz.users_role_for_group_or_org(owner_org, user_name) == 'admin'  
         
-    if not permission and not is_sysadmin:
-        return {"success": False}
-    else:
-        return {"success": True}
+    return {"success": admin_permission or is_sysadmin}
     
 
 def get_auth_functions():
