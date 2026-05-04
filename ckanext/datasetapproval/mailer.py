@@ -99,6 +99,7 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
         f"Message sent by {site_title} ({site_url})\n"
         f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
     )
+    log.debug(f"EMAIL BODY TO ADMINS: {email_body}")
     return email_body
 
 
@@ -132,4 +133,5 @@ def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
         f"Message sent by {site_title} ({site_url})\n"
         f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
     )
+    log.debug(f"EMAIL TO EDITORS: {email_body}")
     return email_body
