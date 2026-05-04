@@ -58,7 +58,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'get_org_from_package_name': helpers.get_org_from_package_name,
             'vocab_label': helpers.vocab_label,
             'get_vocab_group': helpers.get_vocab_group,
-            'get_workflow_action_comment': workflow_action_helpers.format_workflow_action_comment,
+            'format_workflow_action_comment': workflow_action_helpers.format_workflow_action_comment,
             'convert_utc_to_local_time_string': helpers.convert_utc_to_local_time_string,
             'retrieve_data_management_email': helpers.retrieve_data_management_email,
             'map_workflow_action_to_decision_type': workflow_action_helpers.map_workflow_action_to_decision_type
