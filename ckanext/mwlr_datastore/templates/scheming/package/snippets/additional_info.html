@@ -5,18 +5,17 @@ plugin the only change is the line "and pkg_dict[field.field_name]"
 which excludes listing empty package metadata in the Additional Info
 list box#}
 
-
-{%- set exclude_fields = [
-    'id',
-    'title',
-    'name',
-    'notes',
-    'tag_string',
-    'license_id',
-    'owner_org',
-    ] -%}
-
 {% block package_additional_info %}
+  {%- set exclude_fields = [
+      'id',
+      'title',
+      'name',
+      'notes',
+      'tag_string',
+      'license_id',
+      'owner_org',
+      'has_te_ao_māori_data'
+      ] -%}
   {%- for field in schema.dataset_fields -%}
     {%- if field.field_name not in exclude_fields
         and field.display_snippet is not none

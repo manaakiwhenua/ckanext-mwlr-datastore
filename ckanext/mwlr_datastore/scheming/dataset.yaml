@@ -75,6 +75,8 @@ dataset_fields:
 
 - field_name       : has_te_ao_māori_data
   label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
+  preset           : radio
+  default          : false 
   choices          :
     - value: true
       label: "Yes"
