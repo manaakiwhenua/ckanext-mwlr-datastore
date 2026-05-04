@@ -88,7 +88,7 @@
       {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
     {% endblock %}
 
-    {% if c.pkg_dict.get('latest_workflow_action') %}
+    {% if c.pkg_dict.get('latest_workflow_action') and c.pkg_dict.get('latest_workflow_action').action != None %}
         {% set latest_workflow_action = c.pkg_dict.get('latest_workflow_action') %}
         {% snippet "package/snippets/reviewer_details.html", latest_workflow_action=latest_workflow_action, decision=h.map_workflow_action_to_decision_type(latest_workflow_action) %}
     {% endif %}

@@ -99,8 +99,8 @@ def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
         return []
     
     tk.check_access('workflow_history_show', context, data_dict)    
-    actions : list[WorkflowAction] = retrieve_workflow_actions(dataset_id)
-    comments : list[ReviewComment] = retrieve_workflow_comments(dataset_id)
+    actions : list[WorkflowAction] = WorkflowAction.get_actions_for_dataset(dataset_id)
+    comments : list[ReviewComment] = ReviewComment.get_comments_for_dataset(dataset_id)
 
     # Workflow actions and comments combined into a single object, with the comments nested under the relevant workflow action
     workflow_actions_with_comments : list[WorkflowHistoryEntry] = []
@@ -108,23 +108,7 @@ def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
         review_comment : ReviewComment | None = next((c for c in comments if c.workflow_action_id == action.id), None)
         workflow_actions_with_comments.append(WorkflowHistoryEntry(action, review_comment))
     return workflow_actions_with_comments
-
-def retrieve_workflow_actions(dataset_id: str) -> list[WorkflowAction]:
-    try: 
-        actions = models.meta.Session.query(WorkflowAction).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).all()
-        return actions
-    except Exception as e:
-        log.error(f"Error retrieving workflow actions for dataset {dataset_id}: {e}")
-        return []
-
-def retrieve_workflow_comments(dataset_id: str) -> list[ReviewComment]:
-    try:
-        comments = models.meta.Session.query(ReviewComment).filter_by(dataset_id=dataset_id).all()
-        return comments
-    except Exception as e:
-        log.error(f"Error retrieving workflow comments for dataset {dataset_id}: {e}")
-        return []
-    
+  
 @tk.side_effect_free    
 def latest_workflow_action_show(context, data_dict) -> WorkflowHistoryEntry | None:
     '''
@@ -134,13 +118,8 @@ def latest_workflow_action_show(context, data_dict) -> WorkflowHistoryEntry | No
     if not dataset_id or not isinstance(dataset_id, str):
         log.warning("Dataset ID is missing or invalid when trying to retrieve latest workflow action")
         return None
-    
-    try:        
-        action = models.meta.Session.query(WorkflowAction).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).first()
-        return WorkflowHistoryEntry(action, None) if action else None
-    except Exception as e:
-        log.error(f"Error retrieving latest workflow action for dataset {dataset_id}: {e}")
-        return None
+    workflow_action = WorkflowAction.get_latest_action_for_dataset(dataset_id)
+    return WorkflowHistoryEntry(action=workflow_action, comment=None)
 
 @tk.chained_action
 @logic.side_effect_free

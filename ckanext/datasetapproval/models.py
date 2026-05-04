@@ -32,6 +32,24 @@ class WorkflowAction(toolkit.BaseModel):
             'submitted_date': self.submitted_date,
             'submitted_by_user_id': self.submitted_by_user_id,
         }
+    
+    @classmethod
+    def get_actions_for_dataset(cls, dataset_id: str) -> list['WorkflowAction']:
+        try: 
+            actions = meta.Session.query(cls).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).all()
+            return actions
+        except Exception as e:
+            log.error(f"Error retrieving workflow actions for dataset {dataset_id}: {e}")
+            return []
+        
+    @classmethod
+    def get_latest_action_for_dataset(cls, dataset_id: str) -> 'WorkflowAction':
+        try:         
+            action = meta.Session.query(cls).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).first()
+            return action
+        except Exception as e:
+            log.error(f"No workflow history, or error retrieving latest workflow action for dataset {dataset_id}: {e}")
+            return None
 
 class ReviewComment(toolkit.BaseModel):
     __tablename__ = 'review_comments'
@@ -63,6 +81,15 @@ class ReviewComment(toolkit.BaseModel):
             'approval_details': self.approval_details,
             'condition_expiry_date': self.condition_expiry_date,
         }
+    
+    @classmethod
+    def get_comments_for_dataset(cls, dataset_id: str) -> list['ReviewComment']:
+        try:
+            comments = meta.Session.query(cls).filter_by(dataset_id=dataset_id).all()
+            return comments
+        except Exception as e:
+            log.error(f"Error retrieving review comments for dataset {dataset_id}: {e}")
+            return []
 
 class WorkflowHistoryEntry:
     def __init__(self, action: WorkflowAction, comment: ReviewComment | None):       
