@@ -56,7 +56,7 @@ dataset_fields:
   label            : Publisher
   required         : true
   validators       : scheming_required unicode_safe strip_value
-  default          : Landcare Research NZ Ltd
+  default          : Bioeconomy Science Institute
 
 - field_name       : publication_year
   label            : Publication Year
@@ -72,6 +72,12 @@ dataset_fields:
   help_text        : 'Please provide as Family Name, First Name'
   preset           : multiple_text
   validators       : scheming_required scheming_multiple_text
+
+- field_name       : conditions_of_release
+  label            : Conditions of Release
+  required         : false
+  help_text        : 'Placeholder help text here'
+  validators       : scheming_required unicode_safe strip_value
 
 - field_name       : has_te_ao_māori_data
   label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
