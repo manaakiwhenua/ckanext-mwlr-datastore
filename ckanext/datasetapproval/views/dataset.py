@@ -9,6 +9,10 @@ from ckan.views.dataset import (
     CreateView as BaseCreateView,
     EditView as BaseEditView,
 )
+from ckan.lib.search import (
+    SearchIndexError
+)
+import ckan.lib.base as base
 from ckan.types import Context
 import ckan.logic as logic
 from ckan.common import _, request
@@ -21,6 +25,10 @@ dataset = Blueprint(
     url_prefix="/dataset",
     url_defaults={"package_type": "dataset"},
 )
+
+NotFound = logic.NotFound
+NotAuthorized = logic.NotAuthorized
+ValidationError = logic.ValidationError
 
 class CreateView(BaseCreateView):
     def __init__(self):
@@ -48,19 +56,38 @@ class EditView(BaseEditView):
 
     def post(self, package_type, id):
         if tk.request.form.get("save") == "bypass-review":
-            context = self._prepare()
-            context.update({'bypass_review': True})
-            pkg_dict = tk.get_action("package_patch")(
-                context,
-                {
-                    "id": id,
-                    "chosen_visibility": tk.request.form.get("chosen_visibility"),
-                    "private": tk.request.form.get("private"),
-                },
-            )
-            tk.h.flash_success("Dataset visibility successfully updated")
-            return tk.redirect_to(u'{}.read'.format(package_type),
-                             id=pkg_dict['name'])
+            try:
+                context = self._prepare()
+                context.update({'bypass_review': True})
+                pkg_dict = tk.get_action("package_patch")(
+                    context,
+                    {
+                        "id": id,
+                        "chosen_visibility": tk.request.form.get("chosen_visibility"),
+                        "private": tk.request.form.get("private"),
+                    },
+                )
+                tk.h.flash_success("Dataset visibility successfully updated")
+                return tk.redirect_to(u'{}.read'.format(package_type),
+                                id=pkg_dict['name'])
+            except NotAuthorized:
+                return base.abort(403, _(u'Unauthorized to read package %s') % id)
+            except NotFound:
+                return base.abort(404, _(u'Dataset not found'))
+            except SearchIndexError as e:
+                try:
+                    exc_str = str(repr(e.args))
+                except Exception:  # We don't like bare excepts
+                    exc_str = str(str(e))
+                return base.abort(
+                    500,
+                    _(u'Unable to update search index.') + exc_str
+                )
+            except ValidationError as e:
+                errors = e.error_dict
+                error_summary = e.error_summary
+                return self.get(package_type, id, pkg_dict, errors, error_summary)
+
 
         return super().post(package_type, id)
     
