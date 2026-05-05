@@ -1,14 +1,17 @@
 <!-- Approval -->
  <fieldset class="mb-3">
     <legend>Approval Decision</legend>
-
-    <label class="form-label mt-2">Approval Outcome</label>
-    <select name="approval_outcome" class="form-control" required>
-        <option value="">{% trans %}Select status{% endtrans %}</option>
-        {% for key, label in h.get_vocab_group("approval_outcome").items() %}
-            <option value="{{ key }}">{{ _(label) }}</option>
-        {% endfor %}
-    </select>
+    <div class="form-group control-medium">
+        <label class="form-label mt-2">Approval Outcome</label>
+        <select name="approval_outcome" class="form-control" required aria-describedby="approval-outcome-help">
+            <option value="">{% trans %}Select status{% endtrans %}</option>
+            {% for key, label in h.get_vocab_group("approval_outcome").items() %}
+                <option value="{{ key }}">{{ _(label) }}</option>
+            {% endfor %}
+        </select>
+        <div name="approval-outcome-help" class="info-block"><i class="fa fa-info-circle"></i>
+            <span class="approval-outcome-help-text">These outcomes do not result in functional changes to the dataset status.</span>
+        </div>
 
     <label for="approval_details" class="form-label mt-2">{% trans %}Add any comments regarding the approval below (max 1000 characters){% endtrans %}</label>
     <textarea 

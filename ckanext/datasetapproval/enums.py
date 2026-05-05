@@ -11,8 +11,9 @@ class RejectionReason(str, Enum):
     other = "Other"
 
 class ApprovalOutcome(str, Enum):
-    approved = "Approved"
-    conditional = "Approved with conditions"
+    approved = "Approved for Public Release"
+    conditional = "Approved with Conditions"
+    restricted = "Approved for Restricted Access"
 
 class ReviewType(str, Enum):
     metadata_documentation = "Metadata and Documentation Only Review"
