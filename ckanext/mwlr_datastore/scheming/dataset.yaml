@@ -56,7 +56,7 @@ dataset_fields:
   label            : Publisher
   required         : true
   validators       : scheming_required unicode_safe strip_value
-  default          : Bioeconomy Science Institute
+  default          : New Zealand Institute for Bioeconomy Science
 
 - field_name       : publication_year
   label            : Publication Year
