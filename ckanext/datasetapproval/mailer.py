@@ -7,6 +7,7 @@ from ckan.lib.mailer import mail_user
 from ckan.lib.base import render
 from ckan.logic.action.get import member_list as core_member_list
 from ckan.lib.helpers import helper_functions as h
+from ckanext.datasetapproval import workflow_action_helpers
 
 log = logging.getLogger(__name__)
 
@@ -111,8 +112,11 @@ def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
     package_url = pkg_link
     formatted_feedback = ""
     for key, value in feedback.items():
-        # if exists in vocab, otherwise just use raw value
-        label_value = h.vocab_label(key, value)
+        if key == "rejection_reasons":
+            label_value = workflow_action_helpers.format_rejection_reasons(value)
+        else:
+            # if exists in vocab, otherwise just use raw value
+            label_value = h.vocab_label(key, value)
         formatted_feedback += f"- {key.replace('_', ' ').title()}: {label_value}\n"
 
     approval_paragraph = f"Your dataset \"{package_title}\" has been approved and published."

@@ -48,8 +48,16 @@ def map_workflow_action_to_decision_type(workflow_action : WorkflowHistoryEntry)
 
     return review_outcome_mapping.get(workflow_action_type, '').capitalize()
 
-def format_rejection_reasons(raw_rejection_reason: str) -> str:
-    rejection_reasons : list[str] = raw_rejection_reason.strip("{}").split(",") if raw_rejection_reason else []
+def format_rejection_reasons(raw_rejection_reason: str | list[str]) -> str:
+    if not raw_rejection_reason:
+        return ""
+
+    # handle being passed through either as a string or list of strings
+    if isinstance(raw_rejection_reason, str):
+        rejection_reasons = raw_rejection_reason.strip("{}").split(",")
+    else:
+        rejection_reasons = raw_rejection_reason
+
     reason_list = []
     for rejection_reason in rejection_reasons:
         enumerated_reason = getattr(VOCAB_ENUMS.rejection_reasons, rejection_reason, '')
