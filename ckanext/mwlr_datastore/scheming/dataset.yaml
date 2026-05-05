@@ -76,7 +76,7 @@ dataset_fields:
 - field_name       : conditions_of_release
   label            : Conditions of Release
   required         : false
-  help_text        : 'Placeholder help text here'
+  help_text        : 'Document here any conditions associated with the release.'
   validators       : scheming_required unicode_safe strip_value
 
 - field_name       : has_te_ao_māori_data
