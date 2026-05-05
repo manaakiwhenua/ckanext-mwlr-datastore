@@ -79,20 +79,6 @@ dataset_fields:
   help_text        : 'Document here any conditions associated with the release.'
   validators       : scheming_required unicode_safe strip_value
 
-- field_name       : has_te_ao_māori_data
-  label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
-  preset           : radio
-  default          : false 
-  choices          :
-    - value: true
-      label: "Yes"
-    - value: false
-      label: "No"
-  required         : true
-  help_text        : 'If yes, a Te Ao Māori Data Review will be required before external release.'
-  validators       : scheming_required boolean_validator
-  output_validators: boolean_validator
-
 - field_name: maintainer
   label: Maintainer
   form_placeholder : Maintainer Name
