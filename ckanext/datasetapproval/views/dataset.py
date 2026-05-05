@@ -75,13 +75,10 @@ class EditView(BaseEditView):
             except NotFound:
                 return base.abort(404, _(u'Dataset not found'))
             except SearchIndexError as e:
-                try:
-                    exc_str = str(repr(e.args))
-                except Exception:  # We don't like bare excepts
-                    exc_str = str(str(e))
+                log.exception('SearchIndexError on package_patch')
                 return base.abort(
                     500,
-                    _(u'Unable to update search index.') + exc_str
+                    _(u'Unable to update search index.')
                 )
             except ValidationError as e:
                 errors = e.error_dict
