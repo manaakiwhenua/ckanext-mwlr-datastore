@@ -37,9 +37,8 @@ def search_url(params, package_type=None):
 
 def submit_feedback(id):
     feedback = toolkit.request.form.to_dict()
-    rejection_reasons = toolkit.request.form.getlist('rejection_reason')
-    feedback['rejection_reason'] = rejection_reasons if rejection_reasons else None
-    log.debug(f"TESTING FEEDBACK: {feedback}")
+    rejection_reasons = toolkit.request.form.getlist('rejection_reasons')
+    feedback['rejection_reasons'] = rejection_reasons if rejection_reasons else None
     action = toolkit.request.form.get('action')
     feedback.pop('action', None)  # Remove action from feedback to avoid confusion
     return _make_action(id, WorkflowActionType(action), feedback=feedback)

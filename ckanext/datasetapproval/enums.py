@@ -23,7 +23,7 @@ class ApprovalType(str, Enum):
     compliance = "Approver Compliance Check"
 
 class VOCAB_ENUMS:
-    rejection_reason = RejectionReason
+    rejection_reasons = RejectionReason
     approval_outcome = ApprovalOutcome
     review_type = ReviewType
     approval_type = ApprovalType
