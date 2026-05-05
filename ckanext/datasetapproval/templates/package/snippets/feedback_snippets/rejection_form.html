@@ -2,8 +2,8 @@
 <fieldset class="mb-3">
   <legend>Rejection Decision</legend>
 
-  <label class="form-label">Rejection Reason</label>
-  {% for key, label in h.get_vocab_group("rejection_reason").items() %}
+  <label class="form-label">Rejection Reasons</label>
+  {% for key, label in h.get_vocab_group("rejection_reasons").items() %}
     <div class="form-check">
       <input
         class="form-check-input"
@@ -12,7 +12,7 @@
         id="rejection_reasons_{{ key }}"
         value="{{ key }}"
       >
-      <label class="form-check-label" for="rejection_reasons_{{ key }}">
+      <label class="form-check-label multi-select-reasons" for="rejection_reasons_{{ key }}">
         {{ _(label) }}
       </label>
     </div>

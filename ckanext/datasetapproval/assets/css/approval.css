@@ -3,3 +3,11 @@
     justify-content: flex-end;
     flex-direction: row;
 }
+
+
+.multi-select-reasons {
+    font-weight: normal;
+}
+.multi-select-reasons::after {
+    content: "";
+}
