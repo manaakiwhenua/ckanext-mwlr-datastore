@@ -69,20 +69,17 @@ def convert_utc_to_local_time_string(utc_dt : datetime, tz_name='Pacific/Aucklan
 def retrieve_data_management_email():
     return toolkit.config.get(u'ckan.datastore.data_management_email') or ""
 
+def retrieve_reviewer_guidelines_link():
+    return toolkit.config.get(u'ckanext.approval.reviewer_guidelines_link') or ""
 
 
-def get_review_types_for_display(pkg_dict=None) -> list[ReviewRequest]:
-    if not pkg_dict:
-        return []
-    
-    review_type_enum = VOCAB_ENUMS.review_type
-    additional_reviews_requested = []
-    review_required_keys = [k for k in pkg_dict.keys() if k.endswith('_review_required') and pkg_dict.get(k) == True]
-
-    for review_required_key in review_required_keys:
-        review_type_key = review_required_key.replace('_review_required', '')
-        review_type = review_type_enum[review_type_key].value if review_type_key in review_type_enum.__members__ else review_type_key.replace('_', ' ').title()
-        review_request_comments = pkg_dict.get(f'{review_type_key}_review_notes', None)
-        additional_reviews_requested.append(ReviewRequest(review_type=review_type, review_request_comments=review_request_comments))
-
-    return additional_reviews_requested
+def get_helpers():
+    return {
+        'is_admin': is_admin,
+        'get_org_from_package_name': get_org_from_package_name,
+        'vocab_label': vocab_label,
+        'get_vocab_group': get_vocab_group,
+        'convert_utc_to_local_time_string': convert_utc_to_local_time_string,
+        'retrieve_data_management_email': retrieve_data_management_email,
+        'retrieve_reviewer_guidelines_link': retrieve_reviewer_guidelines_link,
+    }

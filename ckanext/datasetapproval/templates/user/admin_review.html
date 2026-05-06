@@ -5,8 +5,8 @@
         <i class="fa fa-info-circle"></i>
         Please follow the <strong>Reviewer Guidelines</strong> when reviewing datasets.
     </div>
-
-    <a href="https://library-services.landcareresearch.co.nz/Reviewer_Guidelines.html" class="btn btn-primary btn-sm" target="_blank">
+  {% set reviewer_guidelines = h.retrieve_reviewer_guidelines_link() %}
+    <a href="{{ reviewer_guidelines }}" class="btn btn-primary btn-sm" target="_blank">
         <i class="fa fa-external-link"></i>
         Open Guidelines
     </a>

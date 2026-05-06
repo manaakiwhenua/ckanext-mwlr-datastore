@@ -64,3 +64,9 @@ def format_rejection_reasons(raw_rejection_reason: str | list[str]) -> str:
         reason_list.append(enumerated_reason.value if enumerated_reason else rejection_reason)
     display_reasons = ", ".join(reason_list)
     return display_reasons or ''
+
+def get_helpers():
+    return {
+        'format_workflow_action_comment': format_workflow_action_comment,
+        'map_workflow_action_to_decision_type': map_workflow_action_to_decision_type,
+    }

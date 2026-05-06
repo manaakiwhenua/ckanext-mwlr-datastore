@@ -50,17 +50,11 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
 
     # ITemplateHelpers
     def get_helpers(self):
-        return {
-            'is_admin': helpers.is_admin,
-            'get_org_from_package_name': helpers.get_org_from_package_name,
-            'vocab_label': helpers.vocab_label,
-            'get_vocab_group': helpers.get_vocab_group,
-            'format_workflow_action_comment': workflow_action_helpers.format_workflow_action_comment,
-            'convert_utc_to_local_time_string': helpers.convert_utc_to_local_time_string,
-            'retrieve_data_management_email': helpers.retrieve_data_management_email,
-            'map_workflow_action_to_decision_type': workflow_action_helpers.map_workflow_action_to_decision_type,
-            'get_review_types_for_display': helpers.get_review_types_for_display
-        }
+        helper_functions = {}
+
+        helper_functions.update(helpers.get_helpers())
+        helper_functions.update(workflow_action_helpers.get_helpers())
+        return helper_functions
 
     def before_search(self, search_params):
         include_in_review = search_params.get('include_in_review', False)
