@@ -8,12 +8,8 @@
     {% block page_heading %}{{ _('Datasets') }}{% endblock %}
   </h2>
   {% block page_subheading %}
-      <p>
-        <em>
-        {% block request_context %}
-        {% endblock %}
-        </em>
-      </p>
+      {% block request_context %}
+      {% endblock %}
     {% endblock %}
   <h1>
     {% snippet 'snippets/search_result_text.html', query='', count=user.total_count, type='dataset' %}

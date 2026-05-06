@@ -1,5 +1,15 @@
 {% extends "user/pending_datasets.html" %}
 {% block request_context %}
-  {{ _('Datasets awaiting your review:') }}
+<div class="alert alert-primary review-guidelines-banner">
+    <div class="review-message">
+        <i class="fa fa-info-circle"></i>
+        Please follow the <strong>Reviewer Guidelines</strong> when reviewing datasets.
+    </div>
+
+    <a href="https://library-services.landcareresearch.co.nz/Reviewer_Guidelines.html" class="btn btn-primary btn-sm" target="_blank">
+        <i class="fa fa-external-link"></i>
+        Open Guidelines
+    </a>
+</div>
 {% endblock %}
 
