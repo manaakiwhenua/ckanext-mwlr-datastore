@@ -6,15 +6,23 @@ which excludes listing empty package metadata in the Additional Info
 list box#}
 
 
-{%- set exclude_fields = [
-    'id',
-    'title',
-    'name',
-    'notes',
-    'tag_string',
-    'license_id',
-    'owner_org',
-    ] -%}
+  {%- set exclude_fields = [
+      'id',
+      'title',
+      'name',
+      'notes',
+      'tag_string',
+      'license_id',
+      'owner_org',
+      'te_ao_māori_review_required',
+      'te_ao_māori_review_notes',
+      'scientific_technical_review_required',
+      'scientific_technical_review_notes',
+      'ethics_security_risk_review_required',
+      'ethics_security_risk_review_notes',
+      'intellectual_property_review_required',
+      'intellectual_property_review_notes',
+      ] -%}
 
 {% block package_additional_info %}
   {%- for field in schema.dataset_fields -%}
