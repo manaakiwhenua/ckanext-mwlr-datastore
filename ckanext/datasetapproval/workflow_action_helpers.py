@@ -22,11 +22,11 @@ def format_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> 
         rejection_reason_comments : str = comment.get('rejection_reason_comments', '') or ''
         display_comment = f"Rejection reasons: '{display_reasons}'. {rejection_reason_comments.capitalize()}"
     elif action_type == WorkflowActionType.APPROVE.value and comment is not None:
-        approval_type : str = getattr(VOCAB_ENUMS.approval_outcome, comment.get('approval_outcome', ''), '') or ''
+        approval_outcome : str = getattr(VOCAB_ENUMS.approval_outcome, comment.get('approval_outcome', ''), '') or ''
         approval_condition_details : str = comment.get('approval_details', '') or ''
         approval_outcome_comments : str = comment.get('approval_outcome_comments', '') or ''
         
-        display_comment = [approval_type.capitalize(), approval_outcome_comments.capitalize(), approval_condition_details.capitalize()]
+        display_comment = [approval_outcome.capitalize(), approval_outcome_comments.capitalize(), approval_condition_details.capitalize()]
         display_comment = '. '.join([c for c in display_comment if c != '']) 
 
     return display_comment

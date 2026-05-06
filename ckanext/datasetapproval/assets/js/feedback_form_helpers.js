@@ -1,6 +1,5 @@
 document.querySelectorAll(".review-form").forEach(function(form) {
   const reviewType = form.querySelector("[name='review_type']");
-  const approvalType = form.querySelector("[name='approval_type']");
   const approvalOutcome = form.querySelector("[name='approval_outcome']");
   const approvalConditions = form.querySelector(".approval-conditions");
   const rejectionReason = form.querySelector("[name='rejection_reason']");
@@ -10,14 +9,11 @@ document.querySelectorAll(".review-form").forEach(function(form) {
     if (!reviewWarning) return; // quit early if the element doesn't exist
     
     const reviewSelected = reviewType && reviewType.value;
-    const approvalSelected = approvalType && approvalType.value;
 
     if (!reviewSelected) {
-      if (reviewWarning) reviewWarning.classList.remove("d-none");
-    } else if (approvalType && !approvalSelected) {
-      if (reviewWarning) reviewWarning.classList.remove("d-none");
+      reviewWarning.classList.remove("d-none");
     } else {
-      if (reviewWarning) reviewWarning.classList.add("d-none");
+      reviewWarning.classList.add("d-none");
     }
   }
 
@@ -49,7 +45,6 @@ document.querySelectorAll(".review-form").forEach(function(form) {
   }
 
   function toggleApprovalDescriptionVisibility() {
-    console.log("approval conditions", approvalConditions);
     if (!approvalOutcome || !approvalConditions) return;
 
     if (approvalOutcome.value === "conditional") {
@@ -66,10 +61,6 @@ document.querySelectorAll(".review-form").forEach(function(form) {
       checkReviewType();
       retrieveRejectionReasons(reviewType.value);
     });
-  }
-
-  if (approvalType) {
-    approvalType.addEventListener("change", checkReviewType);
   }
 
   if (approvalOutcome) {
