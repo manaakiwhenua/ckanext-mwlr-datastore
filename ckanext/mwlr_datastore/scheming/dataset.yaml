@@ -187,16 +187,13 @@ dataset_fields:
       form_snippet    : text_no_autocomplete.html
       validators      : ignore_empty remove_whitespace unicode_safe
 
-
+# Multiple_checkbox is not ideal for these fields, as it's not designed for single true/false values. This was the requested design, but it may be worth revisiting in the future to use a more appropriate field type for boolean values. A blank checkbox results in an empty array.
 - field_name       : te_ao_māori_review_required
   label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
   preset           : multiple_checkbox
-  default          : false 
   choices          :
-    - value: true
+    - value: "true"
       label: "Yes"
-  validators       : scheming_required boolean_validator
-  output_validators: boolean_validator
 
 - field_name : te_ao_māori_review_notes
   label      : Please describe why a te ao Māori review is required
@@ -210,12 +207,9 @@ dataset_fields:
 - field_name       : scientific_technical_review_required
   label            : 'Does this dataset require review for scientific or technical aspects?'
   preset           : multiple_checkbox
-  default          : false 
   choices          :
-    - value: true
+    - value: "true"
       label: "Yes"
-  validators       : scheming_required boolean_validator
-  output_validators: boolean_validator
 
 - field_name : scientific_technical_review_notes
   label      : Please describe why a scientific or technical review is required
@@ -229,12 +223,9 @@ dataset_fields:
 - field_name       : ethics_security_risk_review_required
   label            : 'Does this dataset require review for ethics, security, or risk?'
   preset           : multiple_checkbox
-  default          : false 
   choices          :
-    - value: true
+    - value: "true"
       label: "Yes"
-  validators       : scheming_required boolean_validator
-  output_validators: boolean_validator
 
 - field_name : ethics_security_risk_review_notes
   label      : Please describe why an ethics, security, or risk review is required
@@ -248,12 +239,9 @@ dataset_fields:
 - field_name       : intellectual_property_review_required
   label            : 'Does this dataset require review for intellectual property or contractual issues?'
   preset           : multiple_checkbox
-  default          : false 
   choices          :
-    - value: true
+    - value: "true"
       label: "Yes"
-  validators       : scheming_required boolean_validator
-  output_validators: boolean_validator
 
 - field_name       : intellectual_property_review_notes
   label            : Please describe why an intellectual property or contractual review is required
