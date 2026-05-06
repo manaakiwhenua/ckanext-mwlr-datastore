@@ -202,8 +202,8 @@ dataset_fields:
   label      : Please describe why a te ao Māori review is required
   form_snippet     : textarea.html
   form_attrs:
-    data-conditional-field: te_ao_māori_review_required
-    data-conditional-value: "true"
+    data-conditional-visibility-controller: te_ao_māori_review_required
+    data-conditional-visibility-value: "true"
   help_text  : 'Provide any relevant information about the dataset that will assist with the te ao Māori data review process. This may include details about the relevance of the dataset to Māori people, communities, taonga species, mātauranga Māori, or Māori interests, as well as any potential risks or considerations for Māori data sovereignty.'
   validators : ignore_empty unicode_safe strip_value
 
@@ -221,8 +221,8 @@ dataset_fields:
   label      : Please describe why a scientific or technical review is required
   form_snippet     : textarea.html
   form_attrs:
-    data-conditional-field: scientific_technical_review_required
-    data-conditional-value: "true"
+    data-conditional-visibility-controller: scientific_technical_review_required
+    data-conditional-visibility-value: "true"
   help_text  : 'Provide any relevant information about the dataset that will assist with the scientific or technical review process. This may include details about the data collection methods, data quality, potential limitations, or any specific aspects that require attention during the review.'
   validators : ignore_empty unicode_safe strip_value
 
@@ -240,8 +240,8 @@ dataset_fields:
   label      : Please describe why an ethics, security, or risk review is required
   form_snippet     : textarea.html
   form_attrs:
-    data-conditional-field: ethics_security_risk_review_required
-    data-conditional-value: "true"
+    data-conditional-visibility-controller: ethics_security_risk_review_required
+    data-conditional-visibility-value: "true"
   help_text  : 'Provide any relevant information about the dataset that will assist with the ethics, security, or risk review process. This may include details about the sensitivity of the data, potential ethical considerations, security measures in place, or any specific risks associated with the dataset that require attention during the review.'
   validators : ignore_empty unicode_safe strip_value
 
@@ -259,8 +259,8 @@ dataset_fields:
   label            : Please describe why an intellectual property or contractual review is required
   form_snippet     : textarea.html
   form_attrs:
-    data-conditional-field: intellectual_property_review_required
-    data-conditional-value: "true"
+    data-conditional-visibility-controller: intellectual_property_review_required
+    data-conditional-visibility-value: "true"
   help_text        : 'Provide any relevant information about the dataset that will assist with the intellectual property review process. This may include details about licensing, contractual obligations, or any other considerations related to intellectual property.'
   validators       : ignore_empty unicode_safe strip_value
 
