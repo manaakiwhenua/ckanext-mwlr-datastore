@@ -28,10 +28,10 @@ package_form_helpers_js:
     preload:
       - base/main
 
-review_type_notes_helper_js:
-  output: ckanext-datasetapproval/%(version)s-review_type_notes_helper.js
+field_visibility_helper_js:
+  output: ckanext-datasetapproval/%(version)s-field_visibility_helper.js
   contents:
-    - js/review_type_notes_helper.js
+    - js/field_visibility_helper.js
   extra:
     preload:
       - base/main
