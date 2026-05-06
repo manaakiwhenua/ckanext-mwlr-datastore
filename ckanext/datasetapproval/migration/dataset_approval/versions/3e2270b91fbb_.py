@@ -18,7 +18,13 @@ depends_on = None
 
 def upgrade():
     op.drop_column('review_comments', 'approval_type')
+    # drop approval_details now using existing "approval_outcome_comments" column (as these are details on the approval outcome)
+    op.drop_column('review_comments', 'approval_details')
+    # add approval_conditions_comments
+    op.add_column('review_comments', sa.Column('approval_conditions_comments', sa.UnicodeText(), nullable=True))
 
 
 def downgrade():
     op.add_column('review_comments', sa.Column('approval_type', sa.UnicodeText(), nullable=True))
+    op.add_column('review_comments', sa.Column('approval_details', sa.UnicodeText(), nullable=True))
+    op.drop_column('review_comments', 'approval_conditions_comments')

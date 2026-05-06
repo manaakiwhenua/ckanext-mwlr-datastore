@@ -117,7 +117,11 @@ def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
         else:
             # if exists in vocab, otherwise just use raw value
             label_value = h.vocab_label(key, value)
-        formatted_feedback += f"- {key.replace('_', ' ').title()}: {label_value}\n"
+        # don't add into email if not present 
+        if label_value:
+            formatted_feedback += (
+                f"- {key.replace('_', ' ').title()}: {label_value}\n"
+            )
 
     approval_paragraph = f"Your dataset \"{package_title}\" has been approved and published."
     rejection_paragraph = (
