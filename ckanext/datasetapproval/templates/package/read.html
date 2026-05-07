@@ -8,7 +8,7 @@
       <p>{% trans %}This dataset is waiting for approval.{% endtrans %}</p>
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
         {% if c.pkg_dict.additional_reviews_requested %}
-          <p>This dataset requires review for
+          <p>This dataset requires
             <b>
               {% for review_request in c.pkg_dict.additional_reviews_requested %}
                 {{ review_request.review_type }}{% if not loop.last %}, {% endif %}{% if loop.last%}.{% endif %}
