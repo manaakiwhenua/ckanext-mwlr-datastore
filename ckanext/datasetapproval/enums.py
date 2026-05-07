@@ -18,6 +18,9 @@ class ApprovalOutcome(str, Enum):
 class ReviewType(str, Enum):
     metadata_documentation = "Metadata and Documentation Only Review"
     scientific_technical = "Scientific and Technical Review"
+    te_ao_māori = "Te Ao Māori Review"
+    ethics_security_risk = "Ethics and Security Risk Review"
+    intellectual_property = "Intellectual Property Review"
 
 class ApprovalType(str, Enum):
     minimal = "Minimal Approval (\"Sign-off only\")"

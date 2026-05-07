@@ -7,6 +7,9 @@
     <div class="alert alert-warning" role="alert">
       <p>{% trans %}This dataset is waiting for approval.{% endtrans %}</p>
       {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
+        {% if c.pkg_dict.additional_reviews_requested %}
+          <p>The submitter of the dataset has requested additional reviews. See review types and comments below. Please ensure that these additional types of review are completed before making a decision on the dataset.</p>       
+        {% endif %}
         {# TODO: remove style #}
         <div style="margin-top: 10px">
           <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approveReasonModal">
@@ -26,6 +29,21 @@
           %}
           </div>
         </div>
+        {% if c.pkg_dict.additional_reviews_requested %}
+        {% for review_request in c.pkg_dict.additional_reviews_requested %}
+        <div class="alert alert-warning" role="alert">
+            <p><b>{{ review_request.review_type }} Requested</b></p>
+            {% if review_request.review_request_comments %}
+             {{ review_request.review_request_comments[:2000] }}
+             {% if review_request.review_request_comments|length > 2000 %}
+              <i>... (truncated)</i>
+             {% endif %}
+            {% else %}
+              <i>No comments were provided by the submitter for this review request.</i>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
       {% endif %}
     </div>
   {% elif c.pkg_dict.publishing_status  == 'rejected' %}

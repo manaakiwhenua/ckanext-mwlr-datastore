@@ -4,7 +4,7 @@ from ckan.plugins import toolkit
 import ckan.model.meta as meta
 import datetime as dt
 import uuid
-from ckanext.datasetapproval.enums import WorkflowActionType, ReviewerType
+from ckanext.datasetapproval.enums import ReviewType, WorkflowActionType, ReviewerType
 import logging as log
 log = log.getLogger(__name__)
 
@@ -96,6 +96,13 @@ class WorkflowHistoryEntry:
 # This is a helper class to combine workflow actions and their associated comments for easier retrieval and display in the UI. SQLAlchemy models need to be converted to dictionaries before they can be used in html templates
         self.action = action.as_dict() if action else None
         self.comment = comment.as_dict() if comment else None
+
+class ReviewRequest:
+    review_type : ReviewType
+    review_request_comments : str | None
+    def __init__(self, review_type: ReviewType, review_request_comments: str | None = None):
+        self.review_type = review_type
+        self.review_request_comments = review_request_comments          
 
 def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
     try:        

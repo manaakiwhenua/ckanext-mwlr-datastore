@@ -58,7 +58,8 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'format_workflow_action_comment': workflow_action_helpers.format_workflow_action_comment,
             'convert_utc_to_local_time_string': helpers.convert_utc_to_local_time_string,
             'retrieve_data_management_email': helpers.retrieve_data_management_email,
-            'map_workflow_action_to_decision_type': workflow_action_helpers.map_workflow_action_to_decision_type
+            'map_workflow_action_to_decision_type': workflow_action_helpers.map_workflow_action_to_decision_type,
+            'get_review_types_for_display': helpers.get_review_types_for_display
         }
 
     def before_search(self, search_params):
@@ -116,13 +117,14 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
         except RuntimeError:
             return pkg_dict
 
-        # Only add latest workflow action details to the dataset read page. No permissions or workflow action comments are required.
+        # Add latest workflow action details and additional reviews requested to the dataset read page. No permissions or workflow action comments are required.
         if endpoint and endpoint.endswith('dataset.read'):
             latest_workflow_action = toolkit.get_action('latest_workflow_action_show')(
                 {},
                 {'id': pkg_dict['id']}
             )
             pkg_dict['latest_workflow_action'] = latest_workflow_action
+            pkg_dict['additional_reviews_requested'] = helpers.get_review_types_for_display(pkg_dict)
         return pkg_dict
         
     # IAuthFunctions
