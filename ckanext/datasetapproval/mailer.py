@@ -87,20 +87,39 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     package_url = pkg_link
     package_dict = toolkit.get_action('package_show')(context, {'id': data_dict['id']})
     creator_user_id = package_dict.get('creator_user_id')
-    editor_name = _get_editor_name(context, creator_user_id)
+    editor_name = _get_editor_name(context, creator_user_id)    
+    additional_reviews = get_additional_review_details(package_dict)
+    guidelines_paragraph = get_reviewer_guidelines()
 
     email_body = (
         f"Dear {admin_name},\n\n"
         f"{'An' if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by user {editor_name.title()}.\n\n"
         f"Dataset title:\n{package_title}\n\n"
         f"Submission note:\n{package_description}\n\n"
+        f"{additional_reviews}"
         f"To approve or reject the request, please visit the following page (while logged in as an admin):\n\n"
         f"{package_url}\n\n"
+        f"{guidelines_paragraph}"
         f"---\n"
         f"Message sent by {site_title} ({site_url})\n"
         f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
     )
     return email_body
+
+def get_additional_review_details(package_dict):
+    additional_reviews = h.get_review_types_for_display(package_dict)
+    if additional_reviews:
+        additional_review_types = [review.review_type for review in additional_reviews]
+    additional_reviews_paragraph = f"Additional review types requested:\n{', '.join(additional_review_types) if additional_reviews else 'None'}\n\n"
+    return additional_reviews_paragraph
+
+def get_reviewer_guidelines():
+    link_to_reviewer_guidelines = h.retrieve_reviewer_guidelines_link()
+    if link_to_reviewer_guidelines:
+        guidelines_paragraph = f"For information on how to review a dataset, please refer to the reviewer guidelines: {link_to_reviewer_guidelines}\n\n"
+    else:
+        guidelines_paragraph = ""
+    return guidelines_paragraph
 
 
 def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
