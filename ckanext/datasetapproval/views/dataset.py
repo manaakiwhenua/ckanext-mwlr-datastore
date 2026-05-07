@@ -59,6 +59,13 @@ class EditView(BaseEditView):
             try:
                 context = self._prepare()
                 context.update({'bypass_review': True})
+
+                # retrieving pkg_dict before attempting package_patch which may throw further exceptions
+                pkg_dict = tk.get_action("package_show")(
+                    {"ignore_auth": True},
+                    {"id": id},
+                )
+
                 pkg_dict = tk.get_action("package_patch")(
                     context,
                     {
