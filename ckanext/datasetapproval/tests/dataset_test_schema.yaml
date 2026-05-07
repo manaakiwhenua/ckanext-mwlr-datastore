@@ -56,7 +56,7 @@ dataset_fields:
   label            : Publisher
   required         : true
   validators       : scheming_required unicode_safe strip_value
-  default          : New Zealand Institute for Bioeconomy Science
+  default          : "Default Publisher"
 
 - field_name       : publication_year
   label            : Publication Year
@@ -64,7 +64,7 @@ dataset_fields:
   help_text        : 'The year the data will be or was made publicly available. If the dataset will remain private, provide the year it was completed.'
   form_placeholder : 'YYYY'
   required         : true
-  validators       : scheming_required unicode_safe strip_value ckanext_mwlr_datastore_is_year
+  validators       : scheming_required unicode_safe strip_value
 
 - field_name       : author
   label            : Authors
@@ -104,13 +104,13 @@ dataset_fields:
   help_text        : 'The start date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
   form_snippet     : text_no_autocomplete.html
-  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_date convert_to_extras
+  validators       : ignore_empty unicode_safe strip_value 
 
 - field_name       : end_date
   label            : 'End Date'
   help_text        : 'The end date the data was collected/created.'
   form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
-  validators       : ignore_empty strip_value ckanext_mwlr_datastore_is_date convert_to_extras
+  validators       : ignore_empty strip_value
   form_snippet     : text_no_autocomplete.html
 
 - field_name       : url
@@ -132,60 +132,6 @@ dataset_fields:
   form_snippet     : text_no_autocomplete.html
   help_text        : 'Provide a Digital Object Identifier (DOI) for the dataset if available.'
   validators       : ignore_empty unicode_safe strip_value unicode_safe
-
-- field_name       : latitude
-  label            : 'Latitude'
-  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
-  form_snippet     : text_no_autocomplete.html
-  help_text        : 'Optionally provide a spatial bounding-box by setting a latitude, longitude, area height and area width.'
-  display_snippet  : null
-  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
-
-- field_name       : longitude
-  label            : 'Longitude'
-  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., 166.166667'
-  form_snippet     : text_no_autocomplete.html
-  display_snippet  : null
-  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
-
-- field_name       : area_height
-  label            : 'Area Height'
-  form_placeholder : 'Extent height (km). Default is 0.05.'
-  form_snippet     : text_no_autocomplete.html
-  display_snippet  : null
-  validators       : ignore_empty strip_value unicode_safe ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
-
-- field_name       : area_width
-  label            : 'Area Width'
-  form_placeholder : 'Extent width (km). Default is 0.05.'
-  form_snippet     : text_no_autocomplete.html
-  display_snippet  : null
-  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
-
-- field_name       : spatial
-  label            : 'Spatial extent polygon'
-  form_placeholder : 'JSON-formatted polygon.'
-  form_snippet     : text_no_autocomplete.html
-  help_text        : 'Optionally provide a spatial bounding-polygon. An example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}. This will be automatically generated if the above parameters defining a spatial bounding-box have been set.'
-  display_snippet  : null
-  validators       : ignore_empty strip_value ckanext_mwlr_datastore_convert_spatial
-
-- field_name          : custom
-  label               : Custom Fields
-  ## validators          : ckanext_mwlr_datastore_convert_custom_fields  # Does not seem to act if validator is here.   Instead I have placed it in one of the repeating subfields. even though it is not subfield specific. Alan Heays 2023-12-18
-  repeating_label     : Custom Field
-  repeating_subfields :
-    - field_name      : custom_key
-      label           : Key
-      form_snippet    : text_no_autocomplete.html
-      ### validators      : remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
-      ### ignore      : validators_empty remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
-      validators      : ignore_empty remove_whitespace unicode_safe 
-      ### validators      : ckanext_mwlr_datastore_convert_custom_fields 
-    - field_name      : custom_value
-      label           : Value
-      form_snippet    : text_no_autocomplete.html
-      validators      : ignore_empty remove_whitespace unicode_safe
 
 - field_name       : publishing_status
   label            : 'Publishing Status'
@@ -289,5 +235,5 @@ resource_fields:
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
-  validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_datastore_remove_leading_dot_if_present clean_format unicode_safe
+  validators: if_empty_guess_format ignore_empty strip_value clean_format unicode_safe
 
