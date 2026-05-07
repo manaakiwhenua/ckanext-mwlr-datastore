@@ -48,6 +48,7 @@ def test_editor_submits_for_review(app, make_dataset, org_with_editor):
     dataset = make_dataset(
         organization["id"],
         editor,
+        private="true",
     )
     form_data = dict(dataset)
     env = {"REMOTE_USER": editor["name"]}
@@ -113,6 +114,7 @@ def test_admin_update_approved_dataset(app, make_dataset, org_with_admin):
     dataset = make_dataset(
         organization["id"],
         admin,
+        admin_editing=True,
         publishing_status="approved",
     )
     form_data = dict(dataset)
@@ -120,7 +122,8 @@ def test_admin_update_approved_dataset(app, make_dataset, org_with_admin):
 
     # admin should only send submit-review
     form_data["save"] = "submit-review" 
-    form_data["private"] = "false"
+    admin_chosen_visibility = "false"
+    form_data["private"] = admin_chosen_visibility # update the visibility as an admin
     response = app.post(
         f"/dataset/edit/{form_data['name']}",
         data=form_data,
@@ -136,4 +139,6 @@ def test_admin_update_approved_dataset(app, make_dataset, org_with_admin):
     )
 
     assert updated_dataset.get('publishing_status', None) == 'approved'
-    assert updated_dataset["private"] == False
+    assert updated_dataset["private"] == (
+        admin_chosen_visibility == "true"
+    )
