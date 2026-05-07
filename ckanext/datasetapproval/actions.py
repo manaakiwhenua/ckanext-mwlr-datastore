@@ -32,8 +32,8 @@ def publishing_check(context, data_dict):
     if data_dict.get("currently_reviewing"):
         data_dict.pop("currently_reviewing")
         data_dict = set_visibility_on_approval_or_rejection(data_dict)      
-    ## if the dataset is being updated by an admin then should bypass the approval state
-    elif admin_editing and data_dict.get("id"):
+    ## if the dataset is being created/updated by an admin then should bypass the review and move to "approved"
+    elif admin_editing:
         data_dict["publishing_status"] = "approved"
         data_dict = set_visibility_on_approval_or_rejection(data_dict)
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft or only changing visibility

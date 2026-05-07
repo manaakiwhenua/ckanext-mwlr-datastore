@@ -1,10 +1,12 @@
 import pytest
-
+import uuid
 from ckan.model import Repository
 import ckan.model.meta as meta
 import sqlalchemy as sa
 from sqlalchemy import MetaData, Table, inspect
 from sqlalchemy.orm import close_all_sessions
+from ckan.tests import factories
+import ckan.plugins.toolkit as tk
 
 import logging
 from typing import Any, Dict, List, Tuple, Optional
@@ -107,3 +109,65 @@ def standard_plugins_config(ckan_config):
 @pytest.fixture()
 def standard_plugins(standard_plugins_config, with_plugins):
     pass
+
+@pytest.fixture()
+def make_basic_data_dict():
+    def _make_basic_data_dict(org_id):
+        data = {
+            "name": f"dataset-{uuid.uuid4().hex[:8]}",
+            "title": "Basic Dataset",
+            "owner_org": org_id,
+            "publisher": "New Zealand Institute for Bioeconomy Science",
+            "publication_year": "2026",
+            "publishing_status": "in_progress",
+            "chosen_visibility": "false",
+            "author":"Test Author",
+            "maintainer": "Test Maintainer",
+            "maintainer_email": "maintainer@email.com",
+            "notes": "Testing Notes..."
+        }
+        return data
+    return _make_basic_data_dict
+
+@pytest.fixture()
+def org_with_editor():
+    user = factories.User()
+    users = [{"name": user["name"], "capacity": "editor"}]
+    organization = factories.Organization(users=users)
+
+    return organization, user
+
+
+@pytest.fixture()
+def org_with_admin():
+    user = factories.User()
+    users = [{"name": user["name"], "capacity": "admin"}]
+    organization = factories.Organization(users=users)
+
+    return organization, user
+
+
+@pytest.fixture()
+# creates a basic dataset (with chosen visibility of "false"(public)) given whether user is an admin or editor
+def make_dataset(make_basic_data_dict):
+    def _make_dataset(org_id, user, submit_review=False, admin_editing=False, **overrides):
+        
+        data = make_basic_data_dict(org_id)
+
+        data.update(overrides)
+        
+
+        # editor simply creating dataset, so not submitting for review
+        context = {
+            "user": user["name"],
+            "submit_review": submit_review,
+            "admin_editing": admin_editing,
+        }
+        logger.debug(f"data and context\ndata: {data}\ncontext: {context}")
+
+        return tk.get_action("package_create")(
+            context,
+            data
+        )
+
+    return _make_dataset

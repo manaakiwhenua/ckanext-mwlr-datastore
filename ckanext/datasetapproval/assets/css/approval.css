@@ -4,7 +4,8 @@
     flex-direction: row;
 }
 
-.form-group {
+/* approval/rejection form styling */
+.review-form-group {
     margin-bottom: 10px;
 }
 

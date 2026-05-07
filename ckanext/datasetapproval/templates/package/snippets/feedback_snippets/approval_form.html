@@ -1,7 +1,7 @@
 <!-- Approval -->
  <fieldset class="mb-3">
     <legend>Approval Decision</legend>
-    <div class="form-group control-medium">
+    <div class="review-form-group control-medium">
         <label class="form-label mt-2">Approval Outcome</label>
         <select name="approval_outcome" class="form-control" required aria-describedby="approval-outcome-help">
             <option value="">{% trans %}Select status{% endtrans %}</option>
@@ -26,7 +26,7 @@
 
     <fieldset class="mb-3 d-none approval-conditions">
         <legend>Approval Conditions</legend>
-        <div class="form-group control-medium">
+        <div class="review-form-group control-medium">
             <label for="approval_conditions_comments" class="form-label mt-2">Conditions</label>
             <textarea 
                 id="approval_conditions_comments" 
