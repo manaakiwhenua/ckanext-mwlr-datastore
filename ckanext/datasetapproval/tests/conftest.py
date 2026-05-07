@@ -117,11 +117,13 @@ def make_basic_data_dict():
             "name": f"dataset-{uuid.uuid4().hex[:8]}",
             "title": "Basic Dataset",
             "owner_org": org_id,
+            "private": "true",
             "publisher": "New Zealand Institute for Bioeconomy Science",
             "publication_year": "2026",
             "publishing_status": "in_progress",
             "chosen_visibility": "false",
             "author":"Test Author",
+            "author_email": "author@example.com",
             "maintainer": "Test Maintainer",
             "maintainer_email": "maintainer@email.com",
             "notes": "Testing Notes..."

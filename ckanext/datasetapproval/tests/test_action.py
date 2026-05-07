@@ -7,19 +7,9 @@ import ckan.plugins.toolkit as tk
 import logging
 logger = logging.getLogger(__name__)
 import pytest
-pytestmark = pytest.mark.usefixtures("standard_plugins")
-# what fixtures are needed?
-
-# create an org
-
-# have a user that is an admin of that org
-
-# have a user that is an editor of that org
-
-# have an already created, valid and approved dataset (belonging to that org)
 
 
-# passing through a newly created dataset function, and the database
+@pytest.mark.usefixtures("standard_plugins")
 def test_editor_create_dataset(make_dataset, org_with_editor):
     # get the org and the user with editor capacity in that org
     organization, user = org_with_editor
@@ -31,8 +21,7 @@ def test_editor_create_dataset(make_dataset, org_with_editor):
     assert test_dataset["publishing_status"] == "in_progress"
 
 
-
-# passing through a newly created dataset function, and the database
+@pytest.mark.usefixtures("standard_plugins")
 def test_admin_create_dataset(make_dataset, org_with_admin):
     # get the org and the user with admin capacity in that org
     organization, user = org_with_admin
@@ -42,3 +31,4 @@ def test_admin_create_dataset(make_dataset, org_with_admin):
 
     assert test_dataset["owner_org"] == organization["id"]
     assert test_dataset["publishing_status"] == "approved"
+
