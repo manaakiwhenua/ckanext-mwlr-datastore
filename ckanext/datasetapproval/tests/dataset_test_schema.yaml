@@ -1,0 +1,293 @@
+scheming_version: 2
+dataset_type: dataset
+
+dataset_fields:
+
+- field_name: title
+  label: Title
+  preset: title
+  form_snippet     : text_no_autocomplete.html
+  required         : true
+  form_placeholder : 'Enter the dataset title'
+  validators       : scheming_required if_empty_same_as("name") unicode_safe strip_value
+
+- field_name       : name
+  label            : URL
+  preset           : dataset_slug
+  form_placeholder : autofills, leave blank
+  required         : true
+  validators       : scheming_required unicode_safe name_validator package_name_validator strip_value
+
+- field_name       : notes
+  label            : Description
+  form_placeholder : 'A short description of the dataset'
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
+  preset           : markdown
+
+# Don't add scheming_required or not_empty validator to tags as it causes issues with the tag_string_convert validator
+- field_name       : tag_string
+  label            : Tags
+  preset           : tag_string_autocomplete
+  help_text        : 'eg. vegetation, soil carbon, possums'
+  validators       : ignore_empty tag_string_convert
+
+- field_name       : license_id
+  label            : License
+  form_snippet     : license.html
+  help_text        : 'License definitions and additional information can be found at http://creativecommons.org/licenses'
+  validators       : ignore_empty unicode_safe
+
+- field_name       : owner_org
+  label            : Collection
+  preset           : dataset_organization
+  validators       : owner_org_validator unicode_safe
+
+# True is 'Private', False is 'Public'
+- field_name       : chosen_visibility
+  label            : Visibility after review
+  form_snippet     : visibility.html
+  display_snippet  : null
+  help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
+  validators       : scheming_required unicode_safe
+  default          : true
+
+- field_name       : publisher
+  label            : Publisher
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
+  default          : New Zealand Institute for Bioeconomy Science
+
+- field_name       : publication_year
+  label            : Publication Year
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'The year the data will be or was made publicly available. If the dataset will remain private, provide the year it was completed.'
+  form_placeholder : 'YYYY'
+  required         : true
+  validators       : scheming_required unicode_safe strip_value ckanext_mwlr_datastore_is_year
+
+- field_name       : author
+  label            : Authors
+  required         : true
+  help_text        : 'Please provide as Family Name, First Name'
+  preset           : multiple_text
+  validators       : scheming_required scheming_multiple_text
+
+- field_name       : conditions_of_release
+  label            : Conditions of Release
+  required         : false
+  help_text        : 'Document here any conditions associated with the release.'
+  validators       : scheming_required unicode_safe strip_value
+
+- field_name: maintainer
+  label: Maintainer
+  form_placeholder : Maintainer Name
+  display_property : dc:contributor
+  display_snippet  : maintainer_display.html
+  display_email_field : maintainer_email
+  required         : true
+  help_text       : 'The person responsible for uploading and maintaining the dataset in Datastore.'
+  validators       : scheming_required unicode_safe strip_value
+
+- field_name: maintainer_email
+  label: Maintainer Email
+  form_placeholder: user@example.com
+  display_property: dc:contributor
+  display_snippet: null
+  display_email_name_field: maintainer
+  required         : true
+  help_text       : 'The email address of the person responsible for uploading and maintaining the dataset in Datastore.'
+  validators       : scheming_required unicode_safe strip_value email_validator
+
+- field_name       : start_date
+  label            : 'Start Date'
+  help_text        : 'The start date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_date convert_to_extras
+
+- field_name       : end_date
+  label            : 'End Date'
+  help_text        : 'The end date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  validators       : ignore_empty strip_value ckanext_mwlr_datastore_is_date convert_to_extras
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : url
+  label            : 'Source'
+  form_placeholder : 'http://example.com/dataset.json'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : link.html
+  validators       : ignore_empty strip_value unicode_safe
+
+- field_name       : version
+  label            : 'Version'
+  form_placeholder : '1.0'
+  form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty strip_value unicode_safe package_version_validator
+
+- field_name       : doi
+  label            : 'DOI'
+  form_placeholder : 'e.g. https://doi.org/10.7931/J2PK0D34'
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'Provide a Digital Object Identifier (DOI) for the dataset if available.'
+  validators       : ignore_empty unicode_safe strip_value unicode_safe
+
+- field_name       : latitude
+  label            : 'Latitude'
+  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., -50.666667'
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'Optionally provide a spatial bounding-box by setting a latitude, longitude, area height and area width.'
+  display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
+
+- field_name       : longitude
+  label            : 'Longitude'
+  form_placeholder : 'Centre of extent in WGS84 Decimal Degrees (0.00000) e.g., 166.166667'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
+
+- field_name       : area_height
+  label            : 'Area Height'
+  form_placeholder : 'Extent height (km). Default is 0.05.'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+  validators       : ignore_empty strip_value unicode_safe ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
+
+- field_name       : area_width
+  label            : 'Area Width'
+  form_placeholder : 'Extent width (km). Default is 0.05.'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : null
+  validators       : ignore_empty unicode_safe strip_value ckanext_mwlr_datastore_is_number ckanext_mwlr_datastore_convert_spatial
+
+- field_name       : spatial
+  label            : 'Spatial extent polygon'
+  form_placeholder : 'JSON-formatted polygon.'
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'Optionally provide a spatial bounding-polygon. An example, {"type":"Polygon","coordinates":[[[170,-34],[170,-38],[175,-38],[170,-34]]]}. This will be automatically generated if the above parameters defining a spatial bounding-box have been set.'
+  display_snippet  : null
+  validators       : ignore_empty strip_value ckanext_mwlr_datastore_convert_spatial
+
+- field_name          : custom
+  label               : Custom Fields
+  ## validators          : ckanext_mwlr_datastore_convert_custom_fields  # Does not seem to act if validator is here.   Instead I have placed it in one of the repeating subfields. even though it is not subfield specific. Alan Heays 2023-12-18
+  repeating_label     : Custom Field
+  repeating_subfields :
+    - field_name      : custom_key
+      label           : Key
+      form_snippet    : text_no_autocomplete.html
+      ### validators      : remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
+      ### ignore      : validators_empty remove_whitespace unicode_safe ckanext_mwlr_datastore_convert_custom_fields 
+      validators      : ignore_empty remove_whitespace unicode_safe 
+      ### validators      : ckanext_mwlr_datastore_convert_custom_fields 
+    - field_name      : custom_value
+      label           : Value
+      form_snippet    : text_no_autocomplete.html
+      validators      : ignore_empty remove_whitespace unicode_safe
+
+- field_name       : publishing_status
+  label            : 'Publishing Status'
+  form_snippet     : null
+  display_snippet  : null
+  validators       : ignore_missing
+
+resource_fields:
+
+- field_name: url
+  label: URL
+  preset: resource_url_upload
+  validators: ignore_empty unicode_safe strip_value
+
+- field_name: name
+  label: Name
+  form_placeholder: eg. January 2011 Gold Prices
+  validators: unicode_safe strip_value
+
+- field_name: description
+  label: Description
+  form_snippet: markdown.html
+  form_placeholder: Some useful notes about the data
+  validators: unicode_safe strip_value
+
+- field_name : resource_type
+  label      : Resource Type
+  preset: select
+  help_text  : 'Select the type of resource being uploaded.'
+  validators : unicode_safe
+  default    : dataset
+  sorted_choices : true 
+  choices   :
+    - value: audiovisual
+      label: Audiovisual
+    - value: book
+      label: Book
+    - value: book chapter
+      label: Book Chapter
+    - value: collection
+      label: Collection   
+    - value: computational notebook
+      label: Computational Notebook
+    - value: conference paper
+      label: Conference Paper
+    - value: conference proceeding
+      label: Conference Proceeding
+    - value: data paper
+      label: Data Paper
+    - value: dataset
+      label: Dataset
+    - value: dissertation
+      label: Dissertation
+    - value: event
+      label: Event
+    - value: image
+      label: Image
+    - value: instrument
+      label: Instrument
+    - value: interactive resource
+      label: Interactive Resource
+    - value: journal
+      label: Journal
+    - value: journal article
+      label: Journal Article
+    - value: model
+      label: Model
+    - value: output management plan
+      label: Output Management Plan
+    - value: peer review
+      label: Peer Review
+    - value: physical object
+      label: Physical Object
+    - value: preprint
+      label: Preprint
+    - value: report
+      label: Report
+    - value: service
+      label: Service
+    - value: software
+      label: Software
+    - value: sound
+      label: Sound
+    - value: standard
+      label: Standard
+    - value: study registration
+      label: Study Registration
+    - value: text
+      label: Text
+    - value: workflow
+      label: Workflow
+    - value: other
+      label: Other
+
+- field_name       : version
+  label            : Version
+  form_placeholder : 1.0
+  form_snippet     : text_no_autocomplete.html  
+  validators       : ignore_empty strip_value unicode_safe
+
+- field_name: format
+  label: Format
+  preset: resource_format_autocomplete
+  validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_datastore_remove_leading_dot_if_present clean_format unicode_safe
+
