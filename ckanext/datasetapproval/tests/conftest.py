@@ -126,7 +126,11 @@ def make_basic_data_dict():
             "author_email": "author@example.com",
             "maintainer": "Test Maintainer",
             "maintainer_email": "maintainer@email.com",
-            "notes": "Testing Notes..."
+            "notes": "Testing Notes...",
+            "ethics_security_risk_review_required": "false",
+            "intellectual_property_review_required": "false",
+            "scientific_technical_review_required": "false",
+            "te_ao_māori_review_required": "false",
         }
         return data
     return _make_basic_data_dict
