@@ -1,7 +1,7 @@
 <!-- Approval -->
- <fieldset class="mb-3">
+ <fieldset class="mb-2">
     <legend>Approval Decision</legend>
-    <div class="review-form-group control-medium">
+    <div class="review-form form-group control-medium">
         <label class="form-label mt-2">Approval Outcome</label>
         <select name="approval_outcome" class="form-control" required aria-describedby="approval-outcome-help">
             <option value="">{% trans %}Select status{% endtrans %}</option>
@@ -13,7 +13,7 @@
             <span class="approval-outcome-help-text">These outcomes do not result in functional changes to the dataset status.</span>
         </div>
 
-    <label for="approval_outcome_comments" class="form-label mt-2">{% trans %}Add any comments regarding the approval below (max 1000 characters){% endtrans %}</label>
+    <label for="approval_outcome_comments" class="form-label mt-2">{% trans %}Add any comments regarding the review(s) or approval (max 1000 characters){% endtrans %}</label>
     <textarea 
         id="approval_outcome_comments" 
         name="approval_outcome_comments" 
@@ -21,13 +21,13 @@
         rows="3" 
         maxlength="1000" 
         ondrop="return false;"
-        placeholder="{% trans %}Comments here will be sent to the dataset editor...{% endtrans %}"></textarea>
+        placeholder="{% trans %}Include any key points or issues arising from any review{% endtrans %}"></textarea>
     </fieldset>
 
-    <fieldset class="mb-3 d-none approval-conditions">
+    <fieldset class="mb-2 d-none approval-conditions">
         <legend>Approval Conditions</legend>
-        <div class="review-form-group control-medium">
-            <label for="approval_conditions_comments" class="form-label mt-2">Conditions</label>
+        <div class="review-form form-group control-medium">
+            <label for="approval_conditions_comments" class="form-label mt-2">{% trans %}Document any conditions relating to the approval{% endtrans %}</label>
             <textarea 
                 id="approval_conditions_comments" 
                 name="approval_conditions_comments" 
@@ -35,10 +35,12 @@
                 rows="4" 
                 maxlength="1000" 
                 ondrop="return false;"
-                placeholder="{% trans %}Enter approval conditions here...{% endtrans %}"></textarea>
+                placeholder="{% trans %}For example, data is released for review only, data is a provisional version not for commercial use{% endtrans %}"></textarea>
 
             <label for="condition_expiry_date" class="form-label mt-2">Condition Expiry Date</label>
             <input type="date" name="condition_expiry_date" class="form-control" aria-describedby="condition-date-help">
-            <div name="condition-date-help" class="info-block"><i class="fa fa-info-circle"></i> Reminder date to review dataset conditions (no automatic changes).</span>
+            <div name="condition-date-help" class="info-block">
+                <i class="fa fa-info-circle"></i> {% trans %}If required, set a date for when any conditions need reviewing.{% endtrans %}
+            </div>
         </div>
     </fieldset>
