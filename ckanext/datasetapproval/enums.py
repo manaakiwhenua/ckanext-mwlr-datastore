@@ -13,7 +13,7 @@ class RejectionReason(str, Enum):
 class ApprovalOutcome(str, Enum):
     approved = "Approved for Public Release"
     conditional = "Approved with Conditions"
-    restricted = "Approved for Restricted Access"
+    # restricted = "Approved for Restricted Access" # removed until restricted functionality implemented
 
 class ReviewType(str, Enum):
     metadata_documentation = "Metadata and Documentation Only Review"
