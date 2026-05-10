@@ -65,8 +65,23 @@ def format_rejection_reasons(raw_rejection_reason: str | list[str]) -> str:
     display_reasons = ", ".join(reason_list)
     return display_reasons or ''
 
+def map_workflow_action_to_review_types(workflow_action : WorkflowHistoryEntry) -> str:
+    if workflow_action.comment is None:
+        return ''
+    
+    review_types_for_display = []
+    review_types = workflow_action.comment.get('review_types', '')
+
+    for review_type in review_types:
+        enumerated_review_type = getattr(VOCAB_ENUMS.review_types, review_type, None)
+        if enumerated_review_type:
+            review_types_for_display.append(enumerated_review_type.value)
+
+    return ", ".join(review_types_for_display) if review_types_for_display else ''
+
 def get_helpers():
     return {
         'format_workflow_action_comment': format_workflow_action_comment,
         'map_workflow_action_to_decision_type': map_workflow_action_to_decision_type,
+        'map_workflow_action_to_review_types': map_workflow_action_to_review_types,
     }

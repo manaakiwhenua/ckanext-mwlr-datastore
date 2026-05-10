@@ -156,13 +156,11 @@ def check_user_admin(*args):
 
 @p.toolkit.side_effect_free
 def retrieve_rejection_reasons(*args):
-    review_type = tk.request.args.get("review_type")
-    try:
-        review_type_enum = ReviewType[review_type] if review_type else None
-    except ValueError:
-        review_type_enum = None
-    rejection_reasons = h.get_vocab_group("rejection_reason")
-    if review_type_enum == ReviewType.metadata_documentation:
+    review_types : list[str] = tk.request.args.get("review_types").split(",")
+    only_metadata_review = len(review_types) == 1 and review_types[0] == ReviewType.metadata_documentation.name
+        
+    rejection_reasons = h.get_vocab_group("rejection_reasons")
+    if only_metadata_review:
         rejection_reasons.pop("data_quality", None)
     return rejection_reasons
 

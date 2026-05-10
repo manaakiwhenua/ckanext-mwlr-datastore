@@ -25,7 +25,7 @@ class ReviewType(str, Enum):
 class VOCAB_ENUMS:
     rejection_reasons = RejectionReason
     approval_outcome = ApprovalOutcome
-    review_type = ReviewType
+    review_types = ReviewType
 
 class WorkflowActionType(Enum):
     # Currently only approve and reject actions are supported. Possible future actions include 'recommend for approval'.

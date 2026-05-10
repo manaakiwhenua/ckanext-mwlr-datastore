@@ -3,20 +3,22 @@
   <legend>Rejection Decision</legend>
 
   <label class="form-label">Rejection Reasons</label>
+  <div id="rejection_reason_checkbox_parent">
   {% for key, label in h.get_vocab_group("rejection_reasons").items() %}
-    <div class="form-check">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        name="rejection_reasons"
-        id="rejection_reasons_{{ key }}"
-        value="{{ key }}"
-      >
-      <label class="form-check-label multi-select-reasons" for="rejection_reasons_{{ key }}">
-        {{ _(label) }}
-      </label>
-    </div>
-  {% endfor %}
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          name="rejection_reasons"
+          id="rejection_reasons_{{ key }}"
+          value="{{ key }}"
+        >
+        <label class="form-check-label multi-select-reasons" for="rejection_reasons_{{ key }}">
+          {{ _(label) }}
+        </label>
+      </div>
+      {% endfor %}
+  </div>
 
   <label for="rejection_reason_comments" class="form-label mt-2">Brief Description (max 1000 characters)</label>
   <textarea 

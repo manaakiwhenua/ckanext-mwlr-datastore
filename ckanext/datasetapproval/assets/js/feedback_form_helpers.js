@@ -1,14 +1,15 @@
 document.querySelectorAll(".review-form").forEach(function(form) {
-  const reviewType = form.querySelector("[name='review_type']");
+  const reviewTypes = form.querySelectorAll("[name='review_types']");
   const approvalOutcome = form.querySelector("[name='approval_outcome']");
   const approvalConditions = form.querySelector(".approval-conditions");
-  const rejectionReason = form.querySelector("[name='rejection_reason']");
+  const rejectionReasons = form.querySelectorAll("[name='rejection_reasons']");
+  const rejectionReasonsParentDiv = form.querySelector("#rejection_reason_checkbox_parent");
   const reviewWarning = form.querySelector(".review-warning");
 
-  function checkReviewType() {
+  function checkDisplayOfReviewWarning() {
     if (!reviewWarning) return; // quit early if the element doesn't exist
     
-    const reviewSelected = reviewType && reviewType.value;
+    const reviewSelected = reviewTypes.length > 0 && Array.from(reviewTypes).some(rt => rt.checked); // check if at least one review type is selected
 
     if (!reviewSelected) {
       reviewWarning.classList.remove("d-none");
@@ -17,24 +18,36 @@ document.querySelectorAll(".review-form").forEach(function(form) {
     }
   }
 
-  function retrieveRejectionReasons(reviewTypeValue) {
-    if (rejectionReason) {
+  function updateRejectionReasons(reviewTypeValue) {
+    if (rejectionReasons.length > 0) {
       // make an API action call to grab the rejection reasons for the selected review type
-      var apiUrl = "/api/3/action/retrieve_rejection_reasons?review_type=" + reviewTypeValue;
+      var apiUrl = "/api/3/action/retrieve_rejection_reasons?review_types=" + reviewTypeValue;
 
       fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
 
-          // reset rejection reason, if selected, and repopulate with conditional reasons
-          rejectionReason.innerHTML = "";
-          rejectionReason.appendChild(new Option("Select reason", ""));
-
+          rejectionReasonsParentDiv.innerHTML = ""; // Clear existing options
           Object.entries(data.result).forEach(([value, text]) => {
-            let option = document.createElement("option");
-            option.value = value;
-            option.textContent = text;
-            rejectionReason.appendChild(option);
+            const checkboxDiv = document.createElement("div");
+            const checkboxInput = document.createElement("input");
+            const checkboxLabel = document.createElement("label");
+
+            checkboxDiv.classList.add("form-check");
+            checkboxInput.classList.add("form-check-input");
+            checkboxInput.type = "checkbox";
+            checkboxInput.name = "rejection_reasons";
+            checkboxInput.id = `rejection_reason_${value}`;
+            checkboxInput.value = value;
+
+            checkboxLabel.classList.add("form-check-label", "multi-select-reasons");
+            checkboxLabel.htmlFor = `rejection_reason_${value}`;
+            checkboxLabel.textContent = text;
+
+            checkboxDiv.appendChild(checkboxInput)
+            checkboxDiv.appendChild(checkboxLabel)
+
+            rejectionReasonsParentDiv.appendChild(checkboxDiv);
           });
 
         })
@@ -54,16 +67,28 @@ document.querySelectorAll(".review-form").forEach(function(form) {
     }
   }
 
-  checkReviewType();
+  checkDisplayOfReviewWarning();
 
-  if (reviewType) {
-    reviewType.addEventListener("change", function() {
-      checkReviewType();
-      retrieveRejectionReasons(reviewType.value);
+  // Attach the handler to each reviewType input
+  if (reviewTypes.length > 0) {
+    reviewTypes.forEach(function(rt) {
+      rt.addEventListener("change", handleReviewTypeChange);
     });
   }
 
   if (approvalOutcome) {
     approvalOutcome.addEventListener("change", toggleApprovalDescriptionVisibility);
+  }
+
+  function handleReviewTypeChange() {
+    checkDisplayOfReviewWarning();
+    const selectedReviewTypes = getSelectedReviewTypes();
+    updateRejectionReasons(selectedReviewTypes.join(","));
+  }
+  
+  function getSelectedReviewTypes() {
+    return Array.from(reviewTypes)
+      .filter(rt => rt.checked)
+      .map(rt => rt.value);
   }
 });
