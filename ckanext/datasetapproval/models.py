@@ -70,7 +70,7 @@ class ReviewComment(toolkit.BaseModel):
             'id': str(self.id),
             'workflow_action_id': str(self.workflow_action_id),
             'dataset_id': self.dataset_id,
-            'rejection_reasons': self.rejection_reasons,
+            'rejection_reasons': self.rejection_reasons.strip("{}").split(",") if isinstance(self.rejection_reasons, str) else [],
             'rejection_reason_comments': self.rejection_reason_comments,
             'review_types': self.review_types.strip("{}").split(",") if isinstance(self.review_types, str) else [],
             'resubmission_comments': self.resubmission_comments,

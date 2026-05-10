@@ -18,7 +18,7 @@
             <tbody>
                 {% for historical_action in workflow_history %}
                 {% set decision = h.map_workflow_action_to_decision_type(historical_action) %}
-                {% set review_types = h.map_workflow_action_to_review_types(historical_action) %}
+                {% set review_types = h.format_review_types(historical_action) %}
                 {% set workflow_action_comment = h.format_workflow_action_comment(historical_action) %}
                 <tr>
                     <td>{{ h.convert_utc_to_local_time_string(historical_action.action.submitted_date) }}</td>
