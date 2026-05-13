@@ -11,13 +11,13 @@
           <p>This dataset requires
             <b>
               {% for review_request in c.pkg_dict.additional_reviews_requested %}
-                {{ review_request.review_type }}{% if not loop.last %}, {% endif %}{% if loop.last%}.{% endif %}
+                {{ review_request.review_type_display_name }}{% if not loop.last %}, {% endif %}{% if loop.last%}.{% endif %}
               {% endfor %}
             </b>
           </p>       
         {% for review_request in c.pkg_dict.additional_reviews_requested %}
         <div class="alert alert-light" role="alert">
-            <p><b>{{ review_request.review_type }} Request Comments</b></p>
+            <p><b>{{ review_request.review_type_display_name }} Request Comments</b></p>
             {% if review_request.review_request_comments %}
              <p>{{ review_request.review_request_comments[:2000] }}</p>
              {% if review_request.review_request_comments|length > 2000 %}
@@ -40,11 +40,13 @@
           </button>
           {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
             modal_id="approveReasonModal",
-            review_type="approve"
+            review_type="approve",
+            additional_reviews_requested=c.pkg_dict.additional_reviews_requested
           %}
           {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
             modal_id="rejectReasonModal",
-            review_type="reject"
+            review_type="reject",
+            additional_reviews_requested=c.pkg_dict.additional_reviews_requested
           %}
           </div>
         </div>

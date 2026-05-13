@@ -23,7 +23,7 @@
             <label class="form-label mt-2">Date of {{ decision | lower }} decision</label>
             <input type="date" name="feedback_date" class="form-control" required>
             
-            {% snippet "package/snippets/feedback_snippets/review_type.html", review_types=h.get_vocab_group("review_types").items() %}
+            {% snippet "package/snippets/feedback_snippets/review_type.html", additional_reviews_requested=additional_reviews_requested, review_types=h.get_vocab_group("review_types").items() %}
           </fieldset>
           {% if review_type == "approve" %}
             {% snippet "package/snippets/feedback_snippets/approval_form.html" %}

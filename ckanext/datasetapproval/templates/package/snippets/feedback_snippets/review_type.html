@@ -1,8 +1,13 @@
-<!-- Review Type -->
-<label class="form-label mt-2">Select the review(s) undertaken</label>
-<select name="review_type" class="form-control">
-    <option value="">{% trans %}Select type{% endtrans %}</option>
-    {% for key, label in review_types %}
-        <option value="{{ key }}">{{ _(label) }}</option>
-    {% endfor %}
-</select>
+
+<label class="form-label mt-2">Select the review(s) completed</label>
+{% for key, label in review_types %}
+<!-- Display metadata_documentation by default -->
+    {% if additional_reviews_requested and key in additional_reviews_requested|map(attribute='review_type') or key == 'metadata_documentation' %} 
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="review_types" id="review_type_{{ key }}" value="{{ key }}">
+            <label class="form-check-label multi-select-reasons" for="review_type_{{ key }}">
+                {{ _(label) }}
+            </label>
+        </div>
+    {% endif %}
+{% endfor %}

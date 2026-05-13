@@ -96,9 +96,11 @@ class WorkflowHistoryEntry:
         self.comment = comment.as_dict() if comment else None
 
 class ReviewRequest:
-    review_type : ReviewType
+    review_type_display_name : str
+    review_type : str
     review_request_comments : str | None
-    def __init__(self, review_type: ReviewType, review_request_comments: str | None = None):
+    def __init__(self, review_type_display_name : str, review_type : str, review_request_comments: str | None = None):
+        self.review_type_display_name = review_type_display_name
         self.review_type = review_type
         self.review_request_comments = review_request_comments          
 
