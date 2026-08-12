@@ -1,0 +1,28 @@
+<section class="module module-narrow module-shallow">
+  <h2 class="module-heading"><i class="fa fa-info-circle"></i> Guidance Tips</h2>
+  <div class="module-content">
+    {% set data_management_email = h.get_env_var('CKAN__DATASTORE__DATA_MANAGEMENT_EMAIL', 'unknown') %}
+    <ul class="resource-help-list">
+      <li><strong>Recommended formats:</strong> CSV, JSON, XML, PDF, GeoJSON, Shapefile (ZIP), TIFF, PNG.</li>
+      <li><strong>Maximum file size:</strong> 50 MB. For larger files, contact the <a
+          href="mailto:{{ data_management_email }}">Data Management Team</a> before uploading.</li>
+      <li><strong>Required metadata:</strong> Complete all required metadata fields before submitting.</li>
+      <li><strong>Meaningful file names:</strong> Use clear, descriptive names that indicate the file content. Where
+        useful, include the subject, location, date/year, or version. Avoid names such as <code>data.csv</code>,
+        <code>final.xlsx</code>, or <code>image1.tif</code>.
+        <ul style="padding-left: 1em; padding-top: 0.5em;">
+          <li><strong>Good:</strong> <code>soil_samples_canterbury_2025.csv</code></li>
+          <li><strong>Avoid:</strong> <code>data.csv</code>, <code>IMG001.tif</code></li>
+        </ul>
+      </li>
+      <li><strong>File naming:</strong> Use consistent names with letters, numbers, underscores (_) or hyphens (-).
+        Avoid spaces, special characters, very long names, and sensitive information.</li>
+      <li><strong>Required metadata:</strong> Complete all required metadata fields before submitting.</li>
+      <li><strong>Open formats:</strong> Use open, non-proprietary formats where possible to support reuse and long-term
+        access.
+      </li>
+      <li><strong>README:</strong> Include a <code>README</code> file when additional information is needed to
+        understand or use the data. For example:<code>README.md</code> or <code>README.txt</code>.</li>
+    </ul>
+  </div>
+</section>
