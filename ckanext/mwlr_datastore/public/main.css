@@ -230,3 +230,13 @@ line-height:120%;
     text-align: center;
     line-height:120%;
 }
+
+.resource-help-list {
+  list-style-type: disc;
+  padding: 1.3em;
+  font-size: smaller;
+}
+
+.resource-help-list > li {
+  margin-bottom: 1em;
+}
