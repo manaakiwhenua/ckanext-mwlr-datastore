@@ -74,11 +74,11 @@ dataset_fields:
   preset           : multiple_text
   validators       : scheming_required scheming_multiple_text
 
-- field_name       : conditions_of_release
-  label            : Conditions of Release
-  required         : false
-  help_text        : 'Document here any conditions associated with the release.'
-  validators       : scheming_required unicode_safe strip_value
+# - field_name       : conditions_of_release
+#   label            : Conditions of Release
+#   required         : false
+#   help_text        : 'Document here any conditions associated with the release.'
+#   validators       : scheming_required unicode_safe strip_value
 
 - field_name: maintainer
   label: Maintainer
