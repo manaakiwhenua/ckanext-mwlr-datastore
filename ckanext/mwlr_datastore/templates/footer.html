@@ -15,7 +15,12 @@
       {%- if v.release %} <span title="release version">{{ v.release }}</span>{% endif -%}
       {%- if v.build %} build {{ v.build }}{% endif -%}
       {%- if v.commit %} <code title="git commit">{{ v.commit[:7] }}</code>{% endif -%}
-      &middot; mwlr_datastore {{ v.extension }}
+      {#- The extension's own package version is not rendered while it is
+          vendored in this repo: it ships in lockstep with the site, so a
+          static 0.0.1 implied an independent version that does not exist.
+          h.mwlr_versions() still returns it; render it again once the
+          extension has its own repo and its own tags, when
+          "DataStore 1.4.0 - mwlr_datastore 2.1.0" will mean something. #}
       &middot; CKAN {{ v.ckan }}
     </p>
 {% endblock %}
