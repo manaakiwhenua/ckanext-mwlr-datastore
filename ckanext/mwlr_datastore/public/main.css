@@ -243,18 +243,19 @@ line-height:120%;
 /* MWDS-360: non-production environment marker. A fixed corner ribbon that
    never shifts the layout, coloured per environment so it registers without
    being read. Only rendered when ckanext.mwlr_datastore.environment is set,
-   so production shows nothing. */
+   so production shows nothing. Top LEFT: the right-hand end of the account bar
+   carries the log in / register links, and the ribbon sat over them. */
 .mwlr-env-marker {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   z-index: 10000;
   padding: 0.35em 1.2em;
   font: 700 0.8rem/1.4 system-ui, sans-serif;
   letter-spacing: 0.12em;
   color: #fff;
   background: #6c757d;
-  border-bottom-left-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
