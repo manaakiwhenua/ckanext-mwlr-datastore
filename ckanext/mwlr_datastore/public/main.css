@@ -240,3 +240,28 @@ line-height:120%;
 .resource-help-list > li {
   margin-bottom: 1em;
 }
+/* MWDS-360: non-production environment marker. A fixed corner ribbon that
+   never shifts the layout, coloured per environment so it registers without
+   being read. Only rendered when ckanext.mwlr_datastore.environment is set,
+   so production shows nothing. */
+.mwlr-env-marker {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10000;
+  padding: 0.35em 1.2em;
+  font: 700 0.8rem/1.4 system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  color: #fff;
+  background: #6c757d;
+  border-bottom-left-radius: 0.5em;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.mwlr-env-dev   { background: #1e7e34; }
+.mwlr-env-test  { background: #b8860b; }
+.mwlr-env-stage { background: #c0392b; }
+
+/* MWDS-357: version line in the footer. */
+.mwlr-versions { font-size: 0.85em; opacity: 0.85; }
+.mwlr-versions code { font-size: 0.9em; }

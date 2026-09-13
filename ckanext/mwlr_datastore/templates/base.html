@@ -1,5 +1,18 @@
 {% ckan_extends %}
 
+{# MWDS-360: make a non-production site unmistakable. The environment name
+   comes from configuration (ckanext.mwlr_datastore.environment, set per
+   environment via CKANEXT__MWLR_DATASTORE__ENVIRONMENT), so one image serves
+   every environment and production, where it is unset, shows nothing. #}
+
+{# Tab title prefix - the cue that works when the tab is not focused, which is
+   when the mistake usually happens. #}
+{% block title -%}
+  {%- set env = h.mwlr_environment() -%}
+  {%- if env %}{{ env|upper }} - {% endif -%}
+  {{- super() -}}
+{%- endblock %}
+
 {# load css #}
 {% block custom_styles %}
   {{ super() }}
@@ -10,6 +23,17 @@
 {# install favicon #}
 {% block links %}
   <link rel="shortcut icon" href="/favicon-32x32.png" />
+{% endblock %}
+
+{# On-page marker - a fixed corner ribbon, coloured per environment so it
+   registers without being read. Rendered after the page so it never shifts
+   the layout. #}
+{% block body_extras %}
+  {{ super() }}
+  {% set env = h.mwlr_environment() %}
+  {% if env %}
+    <div class="mwlr-env-marker mwlr-env-{{ env }}" role="note" aria-label="{{ env|upper }} environment">{{ env|upper }}</div>
+  {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -23,7 +47,7 @@
     elsewhere.  This location was chosen because the template already
     existed in the extension and it is highly likely to be sourced on
     every CKAN page.#}
-  {% block google_tag %}  
-    {% snippet 'snippets/google_analytics_tag.html' %}  
-  {% endblock %}  
+  {% block google_tag %}
+    {% snippet 'snippets/google_analytics_tag.html' %}
+  {% endblock %}
 {% endblock %}

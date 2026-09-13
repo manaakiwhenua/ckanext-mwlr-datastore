@@ -48,6 +48,42 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         """Register template helper functions."""
         return {
             'get_env_var': self.get_env_var,
+            'mwlr_environment': self.mwlr_environment,
+            'mwlr_versions': self.mwlr_versions,
+        }
+
+    def mwlr_environment(self):
+        """The environment this site is, for non-production markers (MWDS-360).
+
+        Read from ``ckanext.mwlr_datastore.environment`` - set per environment
+        as CKANEXT__MWLR_DATASTORE__ENVIRONMENT - so one image serves every
+        environment. Unset on production, which is what makes production show
+        nothing. Normalised to a short lowercase token safe for a CSS class.
+        """
+        value = (toolkit.config.get('ckanext.mwlr_datastore.environment') or '').strip().lower()
+        return ''.join(c for c in value if c.isalnum() or c == '-')[:16]
+
+    def mwlr_versions(self):
+        """What is actually deployed (MWDS-357), every value read at runtime.
+
+        - ckan: from the running package, never hardcoded, so it cannot lie
+          after an upgrade.
+        - extension: this extension's installed version.
+        - build / commit: from the environment. VERSION_BUILD_NUMBER is set on
+          the Deployment by update-app-manifest; BUILD_NUMBER and GIT_COMMIT_ID
+          are baked into the image at build time.
+        """
+        from importlib.metadata import version, PackageNotFoundError
+        import ckan
+        try:
+            extension = version('ckanext-mwlr-datastore')
+        except PackageNotFoundError:
+            extension = 'unknown'
+        return {
+            'ckan': getattr(ckan, '__version__', 'unknown'),
+            'extension': extension,
+            'build': os.environ.get('VERSION_BUILD_NUMBER') or os.environ.get('BUILD_NUMBER') or '',
+            'commit': os.environ.get('GIT_COMMIT_ID') or '',
         }
 
     def get_env_var(self, var_name, default=None):

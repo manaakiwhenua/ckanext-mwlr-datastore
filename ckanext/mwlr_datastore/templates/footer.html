@@ -1,13 +1,17 @@
 {% ckan_extends %}
 
+{# MWDS-357: say what is actually deployed. Every value is read at runtime -
+   CKAN from the running package, the extension from its installed metadata,
+   build and commit from the environment the deployment sets - so none of
+   them can drift from what the user is looking at, and none is hardcoded. #}
 {% block footer_links_ckan %}
     {{ super() }}
-    <p><strong>Build</strong>: {{ h.get_env_var('VERSION_BUILD_NUMBER', 'unknown') }}</p>
-{% endblock %}
-
-{% block footer_content%}
-    
-    {{ super() }}
-    <p>CKAN Version: 2.10.4</p>
-
+    {% set v = h.mwlr_versions() %}
+    <p class="mwlr-versions">
+      <strong>DataStore</strong>
+      {%- if v.build %} build {{ v.build }}{% endif -%}
+      {%- if v.commit %} <code title="git commit">{{ v.commit[:7] }}</code>{% endif -%}
+      &middot; mwlr_datastore {{ v.extension }}
+      &middot; CKAN {{ v.ckan }}
+    </p>
 {% endblock %}
