@@ -1,14 +1,18 @@
 {% ckan_extends %}
 
-{# MWDS-357: say what is actually deployed. Every value is read at runtime -
-   CKAN from the running package, the extension from its installed metadata,
-   build and commit from the environment the deployment sets - so none of
-   them can drift from what the user is looking at, and none is hardcoded. #}
+{# MWDS-357 / MWDS-376: say what is actually deployed. Every value is read at
+   runtime - CKAN from the running package, the extension from its installed
+   metadata, release/build/commit from the environment the image and deployment
+   set - so none can drift from what the user is looking at, and none is
+   hardcoded. The release version is the git tag the release pull request cut;
+   the build key still identifies the exact artefact, because many builds share
+   a version. Either is omitted when absent rather than guessed. #}
 {% block footer_links_ckan %}
     {{ super() }}
     {% set v = h.mwlr_versions() %}
     <p class="mwlr-versions">
       <strong>DataStore</strong>
+      {%- if v.release %} <span title="release version">{{ v.release }}</span>{% endif -%}
       {%- if v.build %} build {{ v.build }}{% endif -%}
       {%- if v.commit %} <code title="git commit">{{ v.commit[:7] }}</code>{% endif -%}
       &middot; mwlr_datastore {{ v.extension }}

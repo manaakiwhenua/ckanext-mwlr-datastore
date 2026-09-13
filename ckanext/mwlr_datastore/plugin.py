@@ -72,6 +72,10 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         - build / commit: from the environment. VERSION_BUILD_NUMBER is set on
           the Deployment by update-app-manifest; BUILD_NUMBER and GIT_COMMIT_ID
           are baked into the image at build time.
+        - release: the semantic version this image was released as (MWDS-376),
+          baked at build time from the git tag. Empty for a local build and for
+          anything built before the first release, so the template omits it
+          rather than inventing one.
         """
         from importlib.metadata import version, PackageNotFoundError
         import ckan
@@ -84,6 +88,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
             'extension': extension,
             'build': os.environ.get('VERSION_BUILD_NUMBER') or os.environ.get('BUILD_NUMBER') or '',
             'commit': os.environ.get('GIT_COMMIT_ID') or '',
+            'release': os.environ.get('RELEASE_VERSION') or '',
         }
 
     def get_env_var(self, var_name, default=None):
