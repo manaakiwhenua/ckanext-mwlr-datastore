@@ -1,8 +1,8 @@
 # ckanext-mwlr-datastore
 
-CKAN extensions behind [DataStore](https://datastore.landcareresearch.co.nz), the research data catalogue run by the Bioeconomy Science Institute (formerly Manaaki Whenua – Landcare Research).
+The CKAN extension behind [DataStore](https://datastore.landcareresearch.co.nz), the research data catalogue run by the Bioeconomy Science Institute (formerly Manaaki Whenua – Landcare Research).
 
-Two plugins live here:
+One extension, providing two plugins:
 
 | plugin | what it does |
 |---|---|
