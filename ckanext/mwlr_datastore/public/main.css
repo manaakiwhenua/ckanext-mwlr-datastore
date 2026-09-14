@@ -215,7 +215,11 @@ line-height:120%;
 
 /* homepage promoted box */
 .module-promotion.card.box {
-    background-image: url(6-measuring-biodiversity264.jpg);
+    /* Root-relative: the brand images are served at the site root from the
+       product repo's branding directory (MWDS-377), not from beside this
+       stylesheet. A bare relative URL happened to resolve to the same place
+       and would break the day this file moves. */
+    background-image: url(/6-measuring-biodiversity264.jpg);
     /* background-size: cover; */
     background-repeat: no-repeat;
     /* background-position: center; */
