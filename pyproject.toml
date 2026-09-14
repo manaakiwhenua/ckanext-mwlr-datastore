@@ -1,7 +1,7 @@
 [project]
 name = "ckanext-mwlr-datastore"
 version = "0.0.1"
-description = "CKAN extensions behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme and view tracking"
+description = "The CKAN extension behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme and view tracking"
 readme = "README.md"
 authors = [
     {name = "Bioeconomy Science Institute", email = "DataManager@landcareresearch.co.nz"}
