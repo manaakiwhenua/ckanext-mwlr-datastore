@@ -1,0 +1,15 @@
+# Consolidates the identities git sees, for `git shortlog` and `git log --use-mailmap`.
+#
+# This file changes how names are DISPLAYED. It does not rewrite anyone's
+# commits, which is the point: a person's name in their own commit is theirs,
+# and a display mapping can be corrected later where a history rewrite cannot.
+# (GitHub does not read this file - it links commits by email address.)
+#
+# Format: Preferred Name <preferred@email> <commit@email>
+#
+# OPEN: Mary authored under three names - "Mary O'Leary", "maryo1234" and
+# "olearym" - all from the same address. Two of those she set herself and one
+# looks like a tooling default. Which she would like shown is hers to say, so
+# nothing is mapped here until she does. One line completes it, for example:
+#
+#   Mary O'Leary <olearym@landcareresearch.co.nz> <olearym@landcareresearch.co.nz>

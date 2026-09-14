@@ -1,123 +1,80 @@
-[![Tests](https://github.com//ckanext-mwlr-datastore/workflows/Tests/badge.svg?branch=main)](https://github.com//ckanext-mwlr-datastore/actions)
-
 # ckanext-mwlr-datastore
 
-**TODO:** Put a description of your extension here:  What does it do? What features does it have? Consider including some screenshots or embedding a video!
+CKAN extensions behind [DataStore](https://datastore.landcareresearch.co.nz), the research data catalogue run by the Bioeconomy Science Institute (formerly Manaaki Whenua – Landcare Research).
 
+Two plugins live here:
+
+| plugin | what it does |
+|---|---|
+| `mwlr_datastore` | the dataset schema, its validators, the theme templates, and helpers that report which environment and which build is running |
+| `mwlr_tracking` | page and resource view counts, shown on dataset and resource pages |
+
+It is written for our catalogue rather than as a general-purpose extension, and it is published because the work is publicly funded and because the CKAN community benefits from seeing how other people solved the same problems. You are welcome to use it, fork it, or lift a single validator out of it.
 
 ## Requirements
 
-**TODO:** For example, you might want to mention here which versions of CKAN this
-extension works with.
+| CKAN | supported |
+|---|---|
+| 2.10 | yes - what we run |
+| 2.11 | not tested |
+| 2.9 and earlier | no |
 
-If your extension works across different versions you can add the following table:
+`mwlr_datastore` expects [`ckanext-scheming`](https://github.com/ckan/ckanext-scheming) and reads its dataset schema from `ckanext/mwlr_datastore/scheming/dataset.yaml`.
 
-Compatibility with core CKAN versions:
+## Install
 
-| CKAN version    | Compatible?   |
-| --------------- | ------------- |
-| 2.6 and earlier | not tested    |
-| 2.7             | not tested    |
-| 2.8             | not tested    |
-| 2.9             | not tested    |
+```sh
+pip install git+https://github.com/manaakiwhenua/ckanext-mwlr-datastore@v1.0.0
+```
 
-Suggested values:
+Pin a tag, not a branch: two builds of the same tag should give you the same code.
 
-* "yes"
-* "not tested" - I can't think of a reason why it wouldn't work
-* "not yet" - there is an intention to get it working
-* "no"
+Then add the plugins to your CKAN config, and point scheming at the dataset schema:
 
+```ini
+ckan.plugins = ... scheming_datasets mwlr_tracking mwlr_datastore
+scheming.dataset_schemas = ckanext.mwlr_datastore:scheming/dataset.yaml
+```
 
-## Installation
+## Configuration
 
-**TODO:** Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
+| setting | does |
+|---|---|
+| `ckanext.mwlr_datastore.environment` | names a non-production environment (`dev`, `test`, `stage`). The site then shows a coloured corner marker and prefixes the browser tab, so nobody mistakes it for production. Leave it unset in production - the absence of a marker is the signal. |
 
-To install ckanext-mwlr-datastore:
+The version line in the footer is read at runtime from the running CKAN, this package's installed metadata, and the `RELEASE_VERSION`, `BUILD_NUMBER` and `GIT_COMMIT_ID` environment variables that the deploying image sets. Anything absent is omitted rather than guessed.
 
-1. Activate your CKAN virtual environment, for example:
+## Branding
 
-     . /usr/lib/ckan/default/bin/activate
+There is none in this repository, on purpose. The templates reference `/logo.png`, `/favicon-32x32.png` and a couple of background images at the site root; the site that installs this extension supplies them. Ours are served from a directory outside this repository, so publishing the code does not license our logo and photographs along with it.
 
-2. Clone the source and install it on the virtualenv
+If you install this extension and see broken images, that is why - supply your own at those paths.
 
-    git clone https://github.com//ckanext-mwlr-datastore.git
-    cd ckanext-mwlr-datastore
-    pip install -e .
-	pip install -r requirements.txt
+## Development
 
-3. Add `mwlr_datastore` to the `ckan.plugins` setting in your CKAN
-   config file (by default the config file is located at
-   `/etc/ckan/default/ckan.ini`).
+Requires a CKAN development environment. In ours the source is bind-mounted into the CKAN container, so edits reload without a rebuild.
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu:
+```sh
+pip install -e .
+pip install -r dev-requirements.txt
+```
 
-     sudo service apache2 reload
+Run the tests against a real CKAN:
 
+```sh
+pytest --ckan-ini=test.ini ckanext/mwlr_datastore
+```
 
-## Config settings
+## Contributing
 
-None at present
+Pull requests are welcome. Titles follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`) because they drive the version and the changelog. We squash-merge, so the pull request title is the commit that lands.
 
-**TODO:** Document any optional config settings here. For example:
+## History
 
-	# The minimum number of hours to wait before re-checking a resource
-	# (optional, default: 24).
-	ckanext.mwlr_datastore.some_setting = some_default_value
+This code lived at `src/ckanext-mwlr-datastore` inside a private repository holding the whole DataStore deployment, and was extracted with its history rather than restarted, so the reasoning behind the schema survives.
 
+Two things follow from that. Commits before September 2026 were written in the context of the larger repository, so a message may describe work whose other half - a Dockerfile, a pipeline, a Kubernetes manifest - is not here. And "Bitbucket pull request N" in an old message refers to a pull request in that repository, not to anything in this one.
 
-## Developer installation
+## Licence
 
-To install ckanext-mwlr-datastore for development, activate your CKAN virtualenv and
-do:
-
-    git clone https://github.com//ckanext-mwlr-datastore.git
-    cd ckanext-mwlr-datastore
-    pip install -e .
-    pip install -r dev-requirements.txt
-
-
-## Tests
-
-To run the tests, do:
-
-    pytest --ckan-ini=test.ini
-
-
-## Releasing a new version of ckanext-mwlr-datastore
-
-If ckanext-mwlr-datastore should be available on PyPI you can follow these steps to publish a new version:
-
-1. Update the version number in the `pyproject.toml` file. See [PEP 440](http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers) for how to choose version numbers.
-
-2. Make sure you have the latest version of necessary packages:
-
-    pip install --upgrade setuptools wheel twine
-
-3. Create a source and binary distributions of the new version:
-
-       python -m build && twine check dist/*
-
-   Fix any errors you get.
-
-4. Upload the source distribution to PyPI:
-
-       twine upload dist/*
-
-5. Commit any outstanding changes:
-
-       git commit -a
-       git push
-
-6. Tag the new release of the project on GitHub with the version number from
-   the `setup.py` file. For example if the version number in `setup.py` is
-   0.0.1 then do:
-
-       git tag 0.0.1
-       git push --tags
-
-## License
-
-[AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[AGPL-3.0-or-later](LICENSE). Note the AGPL's network clause: if you run a modified version as a public service, you must offer its source to your users.

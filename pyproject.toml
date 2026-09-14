@@ -1,25 +1,25 @@
 [project]
 name = "ckanext-mwlr-datastore"
 version = "0.0.1"
-description = ""
+description = "CKAN extensions behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme and view tracking"
 readme = "README.md"
 authors = [
-    {name = ""}
+    {name = "Bioeconomy Science Institute", email = "DataManager@landcareresearch.co.nz"}
 ]
-license = {text = "AGPL"}
+license = {text = "AGPL-3.0-or-later"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Framework :: CKAN",
 ]
 
 keywords = [ "CKAN", ]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com//ckanext-mwlr-datastore"
+Homepage = "https://github.com/manaakiwhenua/ckanext-mwlr-datastore"
+Issues = "https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues"
 
 [project.entry-points."ckan.plugins"]
 mwlr_datastore = "ckanext.mwlr_datastore.plugin:MwlrDatastorePlugin"
