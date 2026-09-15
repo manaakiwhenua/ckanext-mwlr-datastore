@@ -17,13 +17,20 @@ def _html_lang(app):
 @pytest.mark.ckan_config("ckan.plugins", "mwlr_datastore")
 @pytest.mark.ckan_config("ckan.locale_default", "en_GB")
 @pytest.mark.usefixtures("with_plugins")
-def test_html_lang_is_a_language_tag_not_a_locale(app):
-    """A region must be joined with a hyphen, or browsers and screen readers
-    do not recognise the language. en_GB ships with CKAN; en_NZ behaves the same."""
-    assert _html_lang(app) == "en-GB"
+def test_html_lang_is_one_ckans_javascript_can_load(app):
+    """CKAN's JavaScript takes its locale from <html lang> and loads
+    /api/i18n/<lang>. If the attribute is not a locale CKAN knows - en-GB rather
+    than en_GB - that request fails and no scripted component on the site
+    starts. v1.2.0 broke every table preview this way, and CKAN 2.10.11+ does
+    the same by default (ckan/ckan#9473); the template pins the locale form."""
+    lang = _html_lang(app)
+    assert lang == "en_GB"
+    app.get(f"/api/i18n/{lang}", status=200)
 
 
 @pytest.mark.ckan_config("ckan.plugins", "mwlr_datastore")
 @pytest.mark.usefixtures("with_plugins")
-def test_html_lang_without_a_region_is_unchanged(app):
-    assert _html_lang(app) == "en"
+def test_html_lang_default(app):
+    lang = _html_lang(app)
+    assert lang == "en"
+    app.get(f"/api/i18n/{lang}", status=200)
