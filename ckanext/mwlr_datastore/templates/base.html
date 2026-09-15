@@ -1,12 +1,18 @@
 {% ckan_extends %}
 
-{# MWDS-385: CKAN renders its locale as the lang attribute, and locales use an
-   underscore (en_NZ). A language tag must use a hyphen (en-NZ), otherwise
-   browsers and screen readers do not recognise it. Same markup as CKAN 2.10's
-   base.html with the tag converted; CKAN fixes this upstream (ckan/ckan#8698),
-   after which this block can go. #}
+{# <html lang> must stay CKAN's locale (en_NZ), not the language tag (en-NZ).
+   CKAN's JavaScript reads this attribute as its locale and requests
+   /api/i18n/<lang>, which only accepts configured locales. With en-NZ that
+   returns 400, CKAN's JavaScript modules never start, and every table preview
+   and scripted component on the site breaks.
+
+   v1.2.0 of this extension did that deliberately (MWDS-385). CKAN itself does
+   it from 2.10.11, 2.11.6 and 2.12.0 (ckan/ckan#8698) and breaks the same way
+   for any regional locale - ckan/ckan#9473. So this block pins the locale form
+   on every CKAN version. Remove it once CKAN's JavaScript stops reading its
+   locale from the lang attribute. #}
 {%- block htmltag -%}
-{% set lang = h.lang()|replace('_', '-') %}
+{% set lang = h.lang() %}
 <!--[if IE 9]> <html lang="{{ lang }}" class="ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html lang="{{ lang }}" {% if h.is_rtl_language()  %} dir="rtl" {% endif %} > <!--<![endif]-->
 {%- endblock -%}
