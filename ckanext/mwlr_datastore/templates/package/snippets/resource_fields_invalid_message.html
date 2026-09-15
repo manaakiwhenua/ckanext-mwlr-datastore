@@ -1,0 +1,19 @@
+{% set edit_url = h.url_for('dataset.edit', id=pkg_name) %}
+<div class="error-explanation alert alert-error">
+    <p>The dataset or resource contain some fields with invalid entries. Please check and update the dataset on the
+       <a href="{{ edit_url }}">dataset edit page</a>  as necessary before continuing.</p>
+    {% if error_summary %}
+       <ul>
+           {% for key, error in error_summary.items() %}
+           <li>
+               {% if key.startswith('resource_') %}
+               Resource
+               {% else %}
+               Dataset
+               {% endif %}
+               field <strong>'{{ key }}'</strong>: {{ error }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

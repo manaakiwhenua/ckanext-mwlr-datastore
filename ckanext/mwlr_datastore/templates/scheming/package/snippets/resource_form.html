@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+<!-- Here we're overriding the errors block in the scheming extension's own 'resource_form.html' template, which in turn overrides the CKAN default. Scheming has its own way of displaying errors, which we're not using, as it uses the field name rather than the display name. If we do need to render errors in scheming's style (for more complex fields), the super() method can be added within this block. Please refer to scheming's https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/templates/scheming/snippets/errors.html and https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/templates/scheming/package/snippets/resource_form.html for reference. -->
+{% block errors %}
+    {% if errors %}
+        {% snippet "package/snippets/resource_fields_invalid_message.html", error_summary=error_summary, pkg_name=pkg_name %}
+    {% endif %}
+{% endblock %}
