@@ -1,0 +1,7 @@
+{% ckan_extends %}
+
+{% block errors %}
+    {% if errors %}
+        {% snippet "package/snippets/resource_fields_invalid_message.html", error_summary=error_summary, pkg_name=pkg_name %}
+    {% endif %}
+{% endblock %}
