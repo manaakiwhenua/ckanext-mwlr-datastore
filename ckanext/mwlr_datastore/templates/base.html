@@ -1,5 +1,16 @@
 {% ckan_extends %}
 
+{# MWDS-385: CKAN renders its locale as the lang attribute, and locales use an
+   underscore (en_NZ). A language tag must use a hyphen (en-NZ), otherwise
+   browsers and screen readers do not recognise it. Same markup as CKAN 2.10's
+   base.html with the tag converted; CKAN fixes this upstream (ckan/ckan#8698),
+   after which this block can go. #}
+{%- block htmltag -%}
+{% set lang = h.lang()|replace('_', '-') %}
+<!--[if IE 9]> <html lang="{{ lang }}" class="ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="{{ lang }}" {% if h.is_rtl_language()  %} dir="rtl" {% endif %} > <!--<![endif]-->
+{%- endblock -%}
+
 {# MWDS-360: make a non-production site unmistakable. The environment name
    comes from configuration (ckanext.mwlr_datastore.environment, set per
    environment via CKANEXT__MWLR_DATASTORE__ENVIRONMENT), so one image serves
