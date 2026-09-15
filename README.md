@@ -36,6 +36,8 @@ ckan.plugins = ... scheming_datasets mwlr_tracking mwlr_datastore
 scheming.dataset_schemas = ckanext.mwlr_datastore:scheming/dataset.yaml
 ```
 
+`mwlr_tracking` counts on CKAN's page tracking. On CKAN 2.10 switch it on with `ckan.tracking_enabled = true`. From CKAN 2.11 tracking is the core `tracking` plugin instead: add it to `ckan.plugins` after `mwlr_tracking`, so this extension's templates keep precedence. Core tracking counts page views only; the download counting stays here.
+
 ## Configuration
 
 | setting | does |

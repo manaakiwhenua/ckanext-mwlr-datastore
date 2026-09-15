@@ -44,5 +44,5 @@ jobs:
 
         ckan -c test.ini db init
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --disable-warnings ckanext/mwlr_datastore
+      run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --cov=ckanext.mwlr_tracking --disable-warnings ckanext/mwlr_datastore ckanext/mwlr_tracking
 
