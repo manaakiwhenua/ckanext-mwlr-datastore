@@ -42,7 +42,23 @@ scheming.dataset_schemas = ckanext.mwlr_datastore:scheming/dataset.yaml
 |---|---|
 | `ckanext.mwlr_datastore.environment` | names a non-production environment (`dev`, `test`, `stage`). The site then shows a coloured corner marker and prefixes the browser tab, so nobody mistakes it for production. Leave it unset in production - the absence of a marker is the signal. |
 
+| `ckanext.mwlr_datastore.readiness_path` | where the readiness endpoint is served. Defaults to `/mwlr_datastore/ready`. |
+
 The version line in the footer is read at runtime from the running CKAN, this package's installed metadata, and the `RELEASE_VERSION`, `BUILD_NUMBER` and `GIT_COMMIT_ID` environment variables that the deploying image sets. Anything absent is omitted rather than guessed.
+
+## Readiness
+
+`GET /mwlr_datastore/ready` answers whether this extension finished initialising: the dataset schema is loaded by scheming, the template helpers are registered, and a template renders. It returns `200` with `"ready": true`, or `503` with each failing check named:
+
+```json
+{"ready": false, "checks": {"dataset_schema": "scheming_datasets is not loaded", "template_helpers": "ok", "template_renders": "ok"}}
+```
+
+It is meant for a readiness probe, and the contract is deliberately narrow:
+
+- **In-memory state only.** It never calls the database or the search index, so a dependency blip does not fail readiness. With a single replica, a probe that did would turn that blip into an outage of its own making. Whether dependencies are reachable is a question for monitoring.
+- **Not a check of your configuration.** Files and paths a deployment references are a property of the deployment, not of this extension; check those once at container start, before the web server comes up.
+- **Not a liveness probe.** It needs a web server worker to answer, so under load it can be slow; bind liveness to something that does not queue behind real traffic, such as a TCP connect.
 
 ## Branding
 

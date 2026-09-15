@@ -5,6 +5,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from flask import Blueprint
 
+from ckanext.mwlr_datastore import readiness
 from ckanext.mwlr_datastore.logic import validators
 
 
@@ -27,9 +28,12 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
     def get_blueprint(self):
         """Provides Flask blueprint which sets up a custom
-        `terms_of_use` URL. Uses IBlueprint interface."""
+        `terms_of_use` URL and the readiness endpoint. Uses IBlueprint interface."""
         blueprint = Blueprint('mwlr_datastore', self.__module__)
-        rules = [('/terms_of_use','terms_of_use',terms_of_use),]
+        rules = [
+            ('/terms_of_use', 'terms_of_use', terms_of_use),
+            (readiness.readiness_path(), 'readiness', readiness.ready),
+        ]
         for rule in rules:
             blueprint.add_url_rule(*rule)
         return blueprint

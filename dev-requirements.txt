@@ -1,1 +1,3 @@
 pytest-ckan
+# The readiness tests load the dataset schema; same version as the DataStore base image.
+ckanext-scheming @ git+https://github.com/ckan/ckanext-scheming@release-3.1.0
