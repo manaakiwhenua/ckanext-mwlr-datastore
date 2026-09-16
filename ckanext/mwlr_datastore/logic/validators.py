@@ -1,10 +1,8 @@
-import ckan.plugins.toolkit as tk
 from ckan.plugins.toolkit import Invalid
 from ckan.lib.navl.dictization_functions import Missing
 import sys
 import datetime
 import math
-import logging
 
 def is_missing_or_empty(data,key):
     """Convenience function to see if an element of a data dict is
@@ -168,7 +166,7 @@ def convert_spatial(key, data, errors, context):
 def convert_custom_fields(key, data, errors, context):
     """Validate and convert repeating Custom Fields."""
     ## raise Exception('DEBUG:\n'+'\n'.join([repr(key),repr(data),repr(errors)])) # DEBUG Print args as error string
-    ## 
+    ##
     ## loop through all data and remove custom data where both key and
     ## value are empty strings
     keys_to_pop = []

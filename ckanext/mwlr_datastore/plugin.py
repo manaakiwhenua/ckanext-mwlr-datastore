@@ -22,7 +22,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
     def is_fallback(self):
         return True
-    
+
     def package_types(self):
         return []
 
@@ -97,11 +97,11 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
 
     def get_env_var(self, var_name, default=None):
         """Get environment variable value with optional default.
-        
+
         Args:
             var_name (str): Name of the environment variable
             default (str, optional): Default value if variable not found
-            
+
         Returns:
             str: Environment variable value or default
         """
@@ -172,4 +172,4 @@ def _update_facets(facets_dict):
 
 
 
-    
+

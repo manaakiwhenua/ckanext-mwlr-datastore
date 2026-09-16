@@ -43,3 +43,13 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 "ckanext.mwlr_datastore" = ["scheming/*.yaml"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# Errors and undefined names only to start; style rules can follow once the
+# codebase is clean under them.
+select = ["E", "F", "W"]
+ignore = ["E501"]

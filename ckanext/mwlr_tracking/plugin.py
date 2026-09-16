@@ -1,14 +1,14 @@
 import hashlib
 import re
 
-import sqlalchemy as sa
-
-## use log.debug('...') or log.info('...') to print information
 import logging
-log = logging.getLogger(__name__)
+
+import sqlalchemy as sa
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+
+log = logging.getLogger(__name__)
 
 
 class MwlrTrackingPlugin(plugins.SingletonPlugin):
