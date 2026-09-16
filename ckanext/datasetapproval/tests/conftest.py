@@ -101,9 +101,9 @@ def clean_db(reset_db, migrate_db_for):
 
 
 @pytest.fixture()
-@pytest.mark.ckan_config("ckan.plugins", "dataset_approval")
-def standard_plugins_config(ckan_config):
-    pass
+def standard_plugins_config(ckan_config, monkeypatch):
+    # A mark on a fixture is an error in current pytest; set the config directly.
+    monkeypatch.setitem(ckan_config, "ckan.plugins", "dataset_approval scheming_datasets")
 
 
 @pytest.fixture()

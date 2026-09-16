@@ -64,10 +64,13 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
 
         include_drafts = search_params.get('include_drafts', False)
 
-        if toolkit.c.userobj:
-            user_is_syadmin = toolkit.c.userobj.sysadmin
-        else:
-            user_is_syadmin = False
+        # package_search also runs with no request (CLI, jobs, tests), where
+        # the request-bound user proxy raises rather than being empty.
+        try:
+            userobj = toolkit.c.userobj
+        except (RuntimeError, AttributeError):
+            userobj = None
+        user_is_syadmin = bool(userobj and userobj.sysadmin)
 
         if user_is_syadmin:
             return search_params
