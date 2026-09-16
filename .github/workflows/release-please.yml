@@ -51,9 +51,9 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          number=$(gh pr list --state open --search 'author:app/mwlr-release "chore(main): release"' --json number --jq '.[0].number // empty')
+          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --search 'author:app/mwlr-release "chore(main): release"' --json number --jq '.[0].number // empty')
           [ -n "$number" ] || { echo "no open release pull request"; exit 0; }
-          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          body=$(gh pr view "$number" --json body --jq '.body' | sed '/^<!-- contents -->$/,$d')
+          last=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName')
+          body=$(gh pr view --repo "$GITHUB_REPOSITORY" "$number" --json body --jq '.body' | sed '/^<!-- contents -->$/,$d')
           printf '%s\n\n<!-- contents -->\n---\n**Before it merges**, what this release will contain is everything on `main` since %s: https://github.com/${{ github.repository }}/compare/%s...main (the changelog link above resolves once the tag exists).\n' "$body" "$last" "$last" > body.md
-          gh pr edit "$number" --body-file body.md
+          gh pr edit --repo "$GITHUB_REPOSITORY" "$number" --body-file body.md
