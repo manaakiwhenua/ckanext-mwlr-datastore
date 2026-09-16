@@ -1,0 +1,17 @@
+{% ckan_extends %}
+
+{# MWDS-360: on-page marker for non-production environments - a fixed corner
+   ribbon, coloured per environment so it registers without being read.
+   Rendered after the page so it never shifts the layout.
+
+   It lives here in page.html rather than base.html on purpose (MWDS-439):
+   base.html is also the parent of the small pages CKAN renders inside an
+   iframe for resource views, where a fixed ribbon lands on top of the view's
+   controls. page.html is only used by full pages. #}
+{% block body_extras %}
+  {{ super() }}
+  {% set env = h.mwlr_environment() %}
+  {% if env %}
+    <div class="mwlr-env-marker mwlr-env-{{ env }}" role="note" aria-label="{{ env|upper }} environment">{{ env|upper }}</div>
+  {% endif %}
+{% endblock %}
