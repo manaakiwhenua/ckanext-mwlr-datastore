@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.1...v1.3.2) (2026-09-16)
+
+
+### Fixes
+
+* MWDS-444 wait for the Pipelines status, not any build status, before merging the pin ([#29](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/29)) ([74ec065](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/74ec065b12af9c06834544bebd836555824e4452))
+
 ## [1.3.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.0...v1.3.1) (2026-09-16)
 
 
