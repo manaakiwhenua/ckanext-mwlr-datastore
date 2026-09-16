@@ -4,7 +4,6 @@ Run against a CKAN with this extension installed:
 
     pytest --ckan-ini=test.ini ckanext/mwlr_datastore
 """
-import os
 
 import pytest
 

@@ -49,7 +49,8 @@ def test_middleware_delegates_unknown_attributes_to_the_app():
     mw = tracking.MwlrTrackingMiddleware.__new__(tracking.MwlrTrackingMiddleware)
     mw.app = app
     mw.config = {}
-    hook = lambda response: response
+    def hook(response):
+        return response
     mw.after_request(hook)
     assert app.hooks == [hook]
 
