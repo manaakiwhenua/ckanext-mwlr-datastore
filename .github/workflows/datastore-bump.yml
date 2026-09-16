@@ -104,7 +104,10 @@ jobs:
           hdr=(-H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json')
           for i in $(seq 1 60); do
             sleep 30
-            state=$(curl -sS "${hdr[@]}" "${api}/commit/${SHA}/statuses" | jq -r '[.values[] | select(.type=="build")] | if length==0 then "PENDING" else .[0].state end')
+            # Only the Pipelines status counts (key prs:...); Snyk posts three
+            # "build" statuses within seconds that would otherwise be read as
+            # the build having passed.
+            state=$(curl -sS "${hdr[@]}" "${api}/commit/${SHA}/statuses?pagelen=50" | jq -r '[.values[] | select(.key | startswith("prs:"))] | if length==0 then "PENDING" else .[0].state end')
             echo "attempt $i: build ${state}"
             case "$state" in
               SUCCESSFUL) curl -sS -f "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/merge" -d '{"merge_strategy":"squash","close_source_branch":true}' | jq -r '"merged " + .links.html.href'; exit 0 ;;
