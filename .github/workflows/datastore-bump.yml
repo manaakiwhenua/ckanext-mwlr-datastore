@@ -69,7 +69,7 @@ jobs:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
-          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow; the release notes are at ${{ github.event.release.html_url || 'the workflow_dispatch input' }}."
+          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
           jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
             '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
           | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
