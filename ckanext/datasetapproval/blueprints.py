@@ -3,16 +3,17 @@ from functools import partial
 
 from flask import Blueprint
 
+from typing import Any
+
 from ckan import model
 from ckan.lib import base
 from ckan.plugins import toolkit
-import ckan.lib.base as base
+from ckan.types import Context
 from ckan.views.user import _extra_template_variables
 import ckan.lib.helpers as h
-from ckan.lib.helpers import helper_functions as helpers
 from ckan.authz import users_role_for_group_or_org
 from ckan.lib.mailer import MailerException
-from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors, _compose_email_body_for_editors
+from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
 from ckan.views.dataset import url_with_params
 from typing import Union
 from ckan.types import Response
@@ -74,7 +75,7 @@ def pending_datasets(id: str) -> Union[Response, str]:
         fq_string = f'NOT creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
     else:
         fq_string = f'creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
-    
+
     search_dict = {
         'rows': limit,
         'start': limit * (page - 1),
@@ -84,12 +85,12 @@ def pending_datasets(id: str) -> Union[Response, str]:
 
     in_review_datasets = toolkit.get_action('package_search')(context,
                                                data_dict=search_dict)
-    
+
     extra_vars['user_dict'].update({
         'datasets' : in_review_datasets['results'],
         'total_count': in_review_datasets['count']
         })
-    
+
     extra_vars[u'page'] = h.Page(
         collection = in_review_datasets['results'],
         page = page,
@@ -108,7 +109,7 @@ def _raise_not_authz_or_not_pending(id):
     is_pending = dataset_dict.get('publishing_status') == 'in_review'
 
     if is_pending and (toolkit.c.userobj.sysadmin or permission == 'admin'):
-        return 
+        return
     else :
         raise toolkit.abort(404, 'Dataset "{}" not found'.format(id))
 
@@ -126,7 +127,7 @@ def _make_action(package_id, action : WorkflowActionType, feedback: dict[str, an
             context,
             {'id': package_id}
         )
-    try:        
+    try:
         pkg['publishing_status'] = review_outcome_mapping[action]
         pkg['currently_reviewing'] = True
         if set_private:
@@ -166,7 +167,7 @@ def show_review_history(name):
     workflow_history = toolkit.get_action('workflow_actions_show')(
         {},
         {'id': dataset_id, 'owner_org': toolkit.get_or_bust(dataset_dict, "owner_org")}
-    )    
+    )
     return toolkit.render('package/review_history.html', {
         'id': dataset_id,
         'pkg_dict': dataset_dict,

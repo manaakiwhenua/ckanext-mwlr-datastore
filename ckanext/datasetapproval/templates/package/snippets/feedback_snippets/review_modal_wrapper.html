@@ -9,6 +9,7 @@
       </div>
       <div class="modal-body">
         <form class="review-form" action="/dataset-publish/{{ c.pkg_dict.id }}/submit_feedback" method="post">
+          {{ h.csrf_input() }}
           <div class="mb-3">
             <!-- Details -->
             <fieldset class="mb-3">

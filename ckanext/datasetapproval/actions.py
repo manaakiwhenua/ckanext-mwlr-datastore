@@ -1,6 +1,5 @@
 import logging
 import ckan.authz as authz
-from ckanext.datasetapproval import models
 from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
 from ckan.lib.mailer import MailerException
 import ckan.plugins.toolkit as tk
@@ -9,7 +8,7 @@ import ckan.logic as logic
 from ckan.lib.helpers import helper_functions as h
 from .enums import ReviewType
 
-from ckanext.datasetapproval.mailer import mail_package_review_request_to_admins 
+from ckanext.datasetapproval.mailer import mail_package_review_request_to_admins
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ def publishing_check(context, data_dict):
     ## if the dataset being created/updated is currently under review the status will be either "approved" or "rejected"
     if data_dict.get("currently_reviewing"):
         data_dict.pop("currently_reviewing")
-        data_dict = set_visibility_on_approval_or_rejection(data_dict)      
+        data_dict = set_visibility_on_approval_or_rejection(data_dict)
     ## if the dataset is being created/updated by an admin then should bypass the review and move to "approved"
     elif admin_editing:
         data_dict["publishing_status"] = "approved"
@@ -39,7 +38,7 @@ def publishing_check(context, data_dict):
     ## if the dataset is being created/updated by an editor then status must be set to "in_review" unless they are saving as a draft or only changing visibility
     elif is_user_editor_of_org(org_id, user_id):
         # need this check here still to ensure it stays approved
-        if bypass_review == True:
+        if bypass_review == True:  # noqa: E712 - keep the original comparison; a move, not a behaviour change
             data_dict = set_visibility_on_approval_or_rejection(data_dict)
         else:
             context.update({'send_request': submit_review})
@@ -97,8 +96,8 @@ def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
     if not dataset_id or not isinstance(dataset_id, str):
         log.warning("Dataset ID is missing or invalid when trying to retrieve workflow actions")
         return []
-    
-    tk.check_access('workflow_history_show', context, data_dict)    
+
+    tk.check_access('workflow_history_show', context, data_dict)
     actions : list[WorkflowAction] = WorkflowAction.get_actions_for_dataset(dataset_id)
     comments : list[ReviewComment] = ReviewComment.get_comments_for_dataset(dataset_id)
 
@@ -108,8 +107,8 @@ def workflow_actions_show(context, data_dict) -> list[WorkflowHistoryEntry]:
         review_comment : ReviewComment | None = next((c for c in comments if c.workflow_action_id == action.id), None)
         workflow_actions_with_comments.append(WorkflowHistoryEntry(action, review_comment))
     return workflow_actions_with_comments
-  
-@tk.side_effect_free    
+
+@tk.side_effect_free
 def latest_workflow_action_show(context, data_dict) -> WorkflowHistoryEntry | None:
     '''
     Get only the most recent workflow action for a given dataset. Doesn't require permissions check or workflow action comments.
@@ -138,11 +137,11 @@ def package_update(up_func, context, data_dict):
 def package_patch(up_func, context, data_dict):
     return _wrap_publish_review(up_func, context, data_dict, action_name="package_patch")
 
-@p.toolkit.chained_action   
+@p.toolkit.chained_action
 def resource_create(up_func,context, data_dict):
     return _wrap_publish_review(up_func, context, data_dict, action_name="resource_create")
 
-@p.toolkit.chained_action   
+@p.toolkit.chained_action
 def resource_update(up_func,context, data_dict):
     return _wrap_publish_review(up_func, context, data_dict, action_name="resource_update")
 
@@ -158,7 +157,7 @@ def check_user_admin(*args):
 def retrieve_rejection_reasons(*args):
     review_types : list[str] = tk.request.args.get("review_types").split(",")
     only_metadata_review = len(review_types) == 1 and review_types[0] == ReviewType.metadata_documentation.name
-        
+
     rejection_reasons = h.get_vocab_group("rejection_reasons")
     if only_metadata_review:
         rejection_reasons.pop("data_quality", None)
@@ -176,5 +175,5 @@ def retrieve_publishing_status(*args):
         raise tk.ValidationError({
             'message': "publishing status not found on dataset."
         })
-    
+
     return publishing_status

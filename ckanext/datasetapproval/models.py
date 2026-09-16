@@ -4,7 +4,7 @@ from ckan.plugins import toolkit
 import ckan.model.meta as meta
 import datetime as dt
 import uuid
-from ckanext.datasetapproval.enums import ReviewType, WorkflowActionType, ReviewerType
+from ckanext.datasetapproval.enums import WorkflowActionType, ReviewerType
 import logging as log
 log = log.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class WorkflowAction(toolkit.BaseModel):
     workflow_action = Column(UnicodeText)  # 'approve' or 'reject'. Possibility of future actions like 'recommend for approval' or 'request changes'
     reviewer_name = Column(UnicodeText)
     reviewer_email = Column(UnicodeText)
-    review_date = Column(DateTime)    
+    review_date = Column(DateTime)
     reviewer_type = Column(UnicodeText) # 'for now this will just be 'reviewer' - allows for the possibility of different types of reviewers in the future
     submitted_date = Column(DateTime(timezone=True))
     submitted_by_user_id = Column(UnicodeText, ForeignKey('user.id'), nullable=False)
@@ -32,19 +32,19 @@ class WorkflowAction(toolkit.BaseModel):
             'submitted_date': self.submitted_date,
             'submitted_by_user_id': self.submitted_by_user_id,
         }
-    
+
     @classmethod
     def get_actions_for_dataset(cls, dataset_id: str) -> list['WorkflowAction']:
-        try: 
+        try:
             actions = meta.Session.query(cls).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).all()
             return actions
         except Exception as e:
             log.error(f"Error retrieving workflow actions for dataset {dataset_id}: {e}")
             return []
-        
+
     @classmethod
     def get_latest_action_for_dataset(cls, dataset_id: str) -> 'WorkflowAction':
-        try:         
+        try:
             action = meta.Session.query(cls).filter_by(dataset_id=dataset_id).order_by(WorkflowAction.submitted_date.desc()).first()
             return action
         except Exception as e:
@@ -79,7 +79,7 @@ class ReviewComment(toolkit.BaseModel):
             'approval_conditions_comments': self.approval_conditions_comments,
             'condition_expiry_date': self.condition_expiry_date,
         }
-    
+
     @classmethod
     def get_comments_for_dataset(cls, dataset_id: str) -> list['ReviewComment']:
         try:
@@ -90,7 +90,7 @@ class ReviewComment(toolkit.BaseModel):
             return []
 
 class WorkflowHistoryEntry:
-    def __init__(self, action: WorkflowAction, comment: ReviewComment | None):       
+    def __init__(self, action: WorkflowAction, comment: ReviewComment | None):
 # This is a helper class to combine workflow actions and their associated comments for easier retrieval and display in the UI. SQLAlchemy models need to be converted to dictionaries before they can be used in html templates
         self.action = action.as_dict() if action else None
         self.comment = comment.as_dict() if comment else None
@@ -102,10 +102,10 @@ class ReviewRequest:
     def __init__(self, review_type_display_name : str, review_type : str, review_request_comments: str | None = None):
         self.review_type_display_name = review_type_display_name
         self.review_type = review_type
-        self.review_request_comments = review_request_comments          
+        self.review_request_comments = review_request_comments
 
 def save_workflow_action_and_comments(dataset_id, feedback : dict[str, any], workflow_action_type : WorkflowActionType):
-    try:        
+    try:
         workflow_action = create_workflow_action(dataset_id, feedback, workflow_action_type)
         review_comment = create_review_comment(dataset_id, feedback, workflow_action.id)
         meta.Session.add(workflow_action)
@@ -125,7 +125,7 @@ def create_workflow_action(dataset_id, feedback : dict[str, any], workflow_actio
         id = uuid.uuid4(),
         dataset_id=dataset_id,
         reviewer_name=reviewer_name,
-        reviewer_email=reviewer_email,  
+        reviewer_email=reviewer_email,
         workflow_action=workflow_action_type.value,
         reviewer_type = ReviewerType.REVIEWER.value,
         submitted_date= dt.datetime.now(dt.timezone.utc),

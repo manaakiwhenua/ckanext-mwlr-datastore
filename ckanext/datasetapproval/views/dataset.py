@@ -15,7 +15,7 @@ from ckan.lib.search import (
 import ckan.lib.base as base
 from ckan.types import Context
 import ckan.logic as logic
-from ckan.common import _, request
+from ckan.common import _
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ ValidationError = logic.ValidationError
 class CreateView(BaseCreateView):
     def __init__(self):
         super().__init__()
-    
+
     def _prepare(self) -> Context:  # noqa
         log.debug("dataset self in createview _prepare: %r", self)
         context = super()._prepare()
@@ -45,7 +45,7 @@ class CreateView(BaseCreateView):
 class EditView(BaseEditView):
     def __init__(self):
         super().__init__()
-    
+
     def _prepare(self) -> Context:
         log.debug("dataset self in editview _prepare: %r", self)
         context = super()._prepare()
@@ -81,7 +81,7 @@ class EditView(BaseEditView):
                 return base.abort(403, _(u'Unauthorized to read package %s') % id)
             except NotFound:
                 return base.abort(404, _(u'Dataset not found'))
-            except SearchIndexError as e:
+            except SearchIndexError:
                 log.exception('SearchIndexError on package_patch')
                 return base.abort(
                     500,
@@ -94,7 +94,7 @@ class EditView(BaseEditView):
 
 
         return super().post(package_type, id)
-    
+
 dataset.add_url_rule("/new", view_func=CreateView.as_view(str("new")))
 dataset.add_url_rule("/edit/<id>", view_func=EditView.as_view(str("edit")))
 

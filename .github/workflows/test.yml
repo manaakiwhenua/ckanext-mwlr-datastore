@@ -16,9 +16,9 @@ jobs:
         # until production has moved (MWDS-359).
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore mwlr_tracking tracking"
+            plugins: "mwlr_datastore mwlr_tracking tracking dataset_approval scheming_datasets"
           - ckan: "2.10"
-            plugins: "mwlr_datastore mwlr_tracking"
+            plugins: "mwlr_datastore mwlr_tracking dataset_approval scheming_datasets"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
       # The 2.11+ dev images end on USER ckan; the runner's checkout and state
@@ -55,7 +55,7 @@ jobs:
           sed -i -e 's/^ckan.plugins = .*/ckan.plugins = ${{ matrix.plugins }}/' test.ini
           ckan -c test.ini db init
       - name: Run the tests
-        run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --cov=ckanext.mwlr_tracking --cov-report=term-missing --disable-warnings ckanext/mwlr_datastore ckanext/mwlr_tracking
+        run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --cov=ckanext.mwlr_tracking --cov=ckanext.datasetapproval --cov-report=term-missing --disable-warnings ckanext/mwlr_datastore ckanext/mwlr_tracking ckanext/datasetapproval
 
   lint:
     name: lint (ruff)

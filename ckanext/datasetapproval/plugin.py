@@ -3,11 +3,10 @@ import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultPermissionLabels
 from ckanext.datasetapproval import actions, blueprints, helpers, views, workflow_action_helpers, auth
 import logging as log
-from ckan.common import _, c
 
 log = log.getLogger(__name__)
 
-class DatasetapprovalPlugin(plugins.SingletonPlugin, 
+class DatasetapprovalPlugin(plugins.SingletonPlugin,
         DefaultPermissionLabels, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
@@ -57,7 +56,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
         helper_functions.update(workflow_action_helpers.get_helpers())
         return helper_functions
 
-    def before_search(self, search_params):
+    def before_dataset_search(self, search_params):
         include_in_review = search_params.get('include_in_review', False)
 
         if include_in_review:
@@ -65,18 +64,21 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
 
         include_drafts = search_params.get('include_drafts', False)
 
-        if toolkit.c.userobj:
-            user_is_syadmin = toolkit.c.userobj.sysadmin
-        else:
-            user_is_syadmin = False
-            
+        # package_search also runs with no request (CLI, jobs, tests), where
+        # the request-bound user proxy raises rather than being empty.
+        try:
+            userobj = toolkit.c.userobj
+        except (RuntimeError, AttributeError):
+            userobj = None
+        user_is_syadmin = bool(userobj and userobj.sysadmin)
+
         if user_is_syadmin:
             return search_params
         elif include_in_review:
             return search_params
         elif include_drafts:
             return search_params
-        else:   
+        else:
             search_params.update({
                 'fq': '!(publishing_status:(in_progress OR in_review OR rejected))' + search_params.get('fq', '')
             })
@@ -121,7 +123,7 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             pkg_dict['latest_workflow_action'] = latest_workflow_action
             pkg_dict['additional_reviews_requested'] = helpers.get_review_types_for_display(pkg_dict)
         return pkg_dict
-        
+
     # IAuthFunctions
     def get_auth_functions(self):
         return auth.get_auth_functions()

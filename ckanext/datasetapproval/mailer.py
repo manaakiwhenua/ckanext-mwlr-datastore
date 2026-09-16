@@ -4,7 +4,6 @@ from ckan import model
 from ckan.common import config
 from ckan.plugins import toolkit
 from ckan.lib.mailer import mail_user
-from ckan.lib.base import render
 from ckan.logic.action.get import member_list as core_member_list
 from ckan.lib.helpers import helper_functions as h
 from ckanext.datasetapproval import workflow_action_helpers
@@ -24,9 +23,9 @@ def mail_package_review_request_to_admins(context, data_dict, _type='new'):
 
     sysadmins = model.Session.query(model.User.id).filter(
             model.User.state != model.State.DELETED,
-            model.User.sysadmin == True
+            model.User.sysadmin.is_(True)
             ).all()
-    # Merged org admin and sysadmin so that sysadmin also gets the email. 
+    # Merged org admin and sysadmin so that sysadmin also gets the email.
     admins = list(set( org_admin + [admin[0] for admin in sysadmins]))
     for admin_id in admins :
         user = model.User.get(admin_id)
@@ -66,7 +65,7 @@ def _compose_email_subj_for_admins(_type):
 def _compose_email_subj_for_editors(state):
     if state == 'approved':
         return 'Dataset approved and published'
-    else: 
+    else:
         return 'Dataset rejected'
 
 
@@ -74,7 +73,7 @@ def _get_editor_name(context, id):
     try:
         user_dict = toolkit.get_action('user_show')(context, {'id': id})
         return user_dict.get('display_name')
-    except toolkit.ObjectNotFound as e:
+    except toolkit.ObjectNotFound:
         return 'None'
 
 def _compose_email_body_for_admins(context, data_dict, user, _type):
@@ -87,7 +86,7 @@ def _compose_email_body_for_admins(context, data_dict, user, _type):
     package_url = pkg_link
     package_dict = toolkit.get_action('package_show')(context, {'id': data_dict['id']})
     creator_user_id = package_dict.get('creator_user_id')
-    editor_name = _get_editor_name(context, creator_user_id)    
+    editor_name = _get_editor_name(context, creator_user_id)
     additional_reviews = get_additional_review_details(package_dict)
     guidelines_paragraph = get_reviewer_guidelines()
 
@@ -136,7 +135,7 @@ def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
         else:
             # if exists in vocab, otherwise just use raw value
             label_value = h.vocab_label(key, value)
-        # don't add into email if not present 
+        # don't add into email if not present
         if label_value:
             formatted_feedback += (
                 f"- {key.replace('_', ' ').title()}: {label_value}\n"
@@ -147,7 +146,7 @@ def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
         f"Your dataset \"{package_title}\" has been reviewed and rejected by the reviewer. "
         f"You can update the dataset and resubmit it for further review.\n\n"
     )
-    
+
     email_body = (
         f"Dear {editor_name.title()},\n\n"
         f"{approval_paragraph if state == 'approved' else rejection_paragraph}\n\n"

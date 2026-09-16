@@ -1,5 +1,4 @@
-from ckanext.datasetapproval import models
-from ckanext.datasetapproval.models import WorkflowAction, ReviewComment, WorkflowHistoryEntry
+from ckanext.datasetapproval.models import ReviewComment, WorkflowHistoryEntry
 from .enums import review_outcome_mapping, WorkflowActionType, VOCAB_ENUMS
 import logging
 
@@ -11,7 +10,7 @@ def format_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> 
     '''
     if not historical_action or not hasattr(historical_action, 'action'):
         log.warning("Workflow action is missing or does not have an 'action' attribute")
-        return '' 
+        return ''
 
     action_type : str = historical_action.action.get('workflow_action', '').lower()
     comment : ReviewComment | None = historical_action.comment
@@ -25,15 +24,15 @@ def format_workflow_action_comment(historical_action : WorkflowHistoryEntry) -> 
         approval_outcome : str = getattr(VOCAB_ENUMS.approval_outcome, comment.get('approval_outcome', ''), '') or ''
         approval_outcome_comments : str = comment.get('approval_outcome_comments', '') or ''
         approval_conditions_comments : str = comment.get('approval_conditions_comments', '') or ''
-        
+
         display_comment = [approval_outcome.capitalize(), approval_outcome_comments.capitalize(), approval_conditions_comments.capitalize()]
-        display_comment = '. '.join([c for c in display_comment if c != '']) 
+        display_comment = '. '.join([c for c in display_comment if c != ''])
 
     return display_comment
 
 def map_workflow_action_to_decision_type(workflow_action : WorkflowHistoryEntry) -> str:
     '''
-    Map a workflow action to a user readable decision type. E.g. if the workflow action is 'approve' then the decision type would be 'approved'. 
+    Map a workflow action to a user readable decision type. E.g. if the workflow action is 'approve' then the decision type would be 'approved'.
     '''
 
     if not workflow_action or not hasattr(workflow_action, 'action'):
@@ -62,7 +61,7 @@ def format_rejection_reasons(rejection_reasons: list[str]) -> str:
 def format_review_types(workflow_action : WorkflowHistoryEntry) -> str:
     if workflow_action.comment is None:
         return ''
-    
+
     review_types_for_display = []
     review_types = workflow_action.comment.get('review_types', '')
 
