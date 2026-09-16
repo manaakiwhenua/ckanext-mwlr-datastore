@@ -87,6 +87,10 @@ pytest --ckan-ini=test.ini ckanext/mwlr_datastore
 
 Pull requests are welcome. Titles follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`) because they drive the version and the changelog. We squash-merge, so the pull request title is the commit that lands.
 
+### Releasing
+
+Every merge to `main` regenerates one open release pull request, opened by the `mwlr-release` App and titled for the next version. **Approving that pull request is the release decision**: it is set to merge itself the moment it is approved, and merging it tags the version, publishes the GitHub release with the changelog, and opens a pull request on the DataStore repository that moves the image's pin to the new tag and merges itself once its build passes, so dev and the approvals environment pick the release up on their own. Approve it when what it lists should ship; leave it while more changes are landing, because each new merge on `main` regenerates it and dismisses any earlier approval. Do not edit it by hand.
+
 ## History
 
 This code lived at `src/ckanext-mwlr-datastore` inside a private repository holding the whole DataStore deployment, and was extracted with its history rather than restarted, so the reasoning behind the schema survives.
