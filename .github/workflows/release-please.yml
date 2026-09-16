@@ -46,12 +46,13 @@ jobs:
         # request is open, a reviewer wants vLAST...main, so append that as a
         # footer. release-please rewrites the body on every regeneration; this
         # runs after it each time, so the footer is always present and current.
-        if: steps.release.outputs.prs_created == 'true'
+        # prs_created is false when a merge leaves the release pull request
+        # unchanged (a ci: or chore: commit), so look the open one up instead.
         env:
           GH_TOKEN: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
-          PR_JSON: ${{ steps.release.outputs.pr }}
         run: |
-          number=$(jq -r '.number' <<< "$PR_JSON")
+          number=$(gh pr list --state open --search 'author:app/mwlr-release "chore(main): release"' --json number --jq '.[0].number // empty')
+          [ -n "$number" ] || { echo "no open release pull request"; exit 0; }
           last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
           body=$(gh pr view "$number" --json body --jq '.body' | sed '/^<!-- contents -->$/,$d')
           printf '%s\n\n<!-- contents -->\n---\n**Before it merges**, what this release will contain is everything on `main` since %s: https://github.com/${{ github.repository }}/compare/%s...main (the changelog link above resolves once the tag exists).\n' "$body" "$last" "$last" > body.md
