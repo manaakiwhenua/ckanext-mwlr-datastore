@@ -21,6 +21,9 @@ jobs:
             plugins: "mwlr_datastore mwlr_tracking"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
+      # The 2.11+ dev images end on USER ckan; the runner's checkout and state
+      # files need root inside the container.
+      options: --user root
     services:
       solr:
         image: ckan/ckan-solr:${{ matrix.ckan }}-solr9
