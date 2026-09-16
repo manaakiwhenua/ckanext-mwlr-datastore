@@ -1,6 +1,7 @@
 import logging
 
 import ckan.plugins.toolkit as tk
+import ckan.tests.factories as factories
 import pytest
 
 logger = logging.getLogger(__name__)
