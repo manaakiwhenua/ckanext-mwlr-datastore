@@ -1,7 +1,6 @@
 
 from ckan import model
 import ckan.authz as authz
-from ckan.logic.auth import get_package_object
 import ckan.plugins.toolkit as tk
 import logging
 
@@ -22,14 +21,14 @@ def workflow_history_show(context, data_dict) -> dict:
     user_obj = model.User.get(user_name) if user_name else None
 
     is_sysadmin = user_obj and user_obj.sysadmin
-    admin_permission = user_name and authz.users_role_for_group_or_org(owner_org, user_name) == 'admin'  
-        
+    admin_permission = user_name and authz.users_role_for_group_or_org(owner_org, user_name) == 'admin'
+
     return {"success": admin_permission or is_sysadmin}
 
 @tk.auth_allow_anonymous_access
 def retrieve_publishing_status(context, data_dict):
     return {"success": True}
-    
+
 
 def get_auth_functions():
     return {

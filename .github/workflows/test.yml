@@ -16,9 +16,9 @@ jobs:
         # until production has moved (MWDS-359).
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore mwlr_tracking tracking"
+            plugins: "mwlr_datastore mwlr_tracking tracking dataset_approval scheming_datasets"
           - ckan: "2.10"
-            plugins: "mwlr_datastore mwlr_tracking"
+            plugins: "mwlr_datastore mwlr_tracking dataset_approval scheming_datasets"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
       # The 2.11+ dev images end on USER ckan; the runner's checkout and state

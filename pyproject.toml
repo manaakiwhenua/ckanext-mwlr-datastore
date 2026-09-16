@@ -24,6 +24,7 @@ Issues = "https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues"
 [project.entry-points."ckan.plugins"]
 mwlr_datastore = "ckanext.mwlr_datastore.plugin:MwlrDatastorePlugin"
 mwlr_tracking = "ckanext.mwlr_tracking.plugin:MwlrTrackingPlugin"
+dataset_approval = "ckanext.datasetapproval.plugin:DatasetapprovalPlugin"
 
 
 [build-system]
@@ -47,9 +48,6 @@ include-package-data = true
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-# The imported approval plugin is linted once it is ported (MWDS-448); until
-# then its history lands as it was written.
-exclude = ["ckanext/datasetapproval"]
 
 [tool.ruff.lint]
 # Errors and undefined names only to start; style rules can follow once the

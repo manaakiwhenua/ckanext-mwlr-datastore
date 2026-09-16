@@ -1,12 +1,9 @@
-# probably need to import a bunch of stuff that is needed
-from typing import Any
-import ckan.tests.helpers as test_helpers
-import ckan.tests.factories as factories
-import ckan.plugins.toolkit as tk
-
 import logging
-logger = logging.getLogger(__name__)
+
+import ckan.plugins.toolkit as tk
 import pytest
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -38,7 +35,7 @@ def test_editor_saves_in_progress(app, make_dataset, org_with_editor):
     )
 
     assert updated_dataset.get('publishing_status', None) == 'in_progress'
-    assert updated_dataset.get('private', True) == True
+    assert updated_dataset.get('private', True) is True
 
 
 @pytest.mark.usefixtures("standard_plugins")
@@ -54,7 +51,7 @@ def test_editor_submits_for_review(app, make_dataset, org_with_editor):
     env = {"REMOTE_USER": editor["name"]}
 
     # save and submit the dataset as "submit-review"
-    form_data["save"] = "submit-review" 
+    form_data["save"] = "submit-review"
     response = app.post(
         f"/dataset/edit/{form_data['name']}",
         data=form_data,
@@ -70,7 +67,7 @@ def test_editor_submits_for_review(app, make_dataset, org_with_editor):
     )
 
     assert updated_dataset.get('publishing_status', None) == 'in_review'
-    assert updated_dataset.get('private', True) == True
+    assert updated_dataset.get('private', True) is True
 
 
 @pytest.mark.usefixtures("standard_plugins")
@@ -86,7 +83,7 @@ def test_editor_bypass_review(app, make_dataset, org_with_editor):
     env = {"REMOTE_USER": editor["name"]}
 
     # save and submit the dataset as "bypass-review"
-    form_data["save"] = "bypass-review" 
+    form_data["save"] = "bypass-review"
     response = app.post(
         f"/dataset/edit/{form_data['name']}",
         data=form_data,
@@ -121,7 +118,7 @@ def test_admin_update_approved_dataset(app, make_dataset, org_with_admin):
     env = {"REMOTE_USER": admin["name"]}
 
     # admin should only send submit-review
-    form_data["save"] = "submit-review" 
+    form_data["save"] = "submit-review"
     admin_chosen_visibility = "false"
     form_data["private"] = admin_chosen_visibility # update the visibility as an admin
     response = app.post(

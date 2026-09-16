@@ -3,13 +3,13 @@ import uuid
 from ckan.model import Repository
 import ckan.model.meta as meta
 import sqlalchemy as sa
-from sqlalchemy import MetaData, Table, inspect
+from sqlalchemy import MetaData
 from sqlalchemy.orm import close_all_sessions
 from ckan.tests import factories
 import ckan.plugins.toolkit as tk
 
 import logging
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any
 import warnings
 
 logger = logging.getLogger(__name__)
@@ -157,11 +157,11 @@ def org_with_admin():
 # creates a basic dataset (with chosen visibility of "false"(public)) given whether user is an admin or editor
 def make_dataset(make_basic_data_dict):
     def _make_dataset(org_id, user, submit_review=False, admin_editing=False, **overrides):
-        
+
         data = make_basic_data_dict(org_id)
 
         data.update(overrides)
-        
+
 
         # editor simply creating dataset, so not submitting for review
         context = {

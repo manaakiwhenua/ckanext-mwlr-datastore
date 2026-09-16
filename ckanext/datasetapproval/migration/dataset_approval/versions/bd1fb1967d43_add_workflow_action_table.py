@@ -1,7 +1,7 @@
 """Add workflow action table
 
 Revision ID: bd1fb1967d43
-Revises: 
+Revises:
 Create Date: 2026-03-26 20:50:21.823437
 
 """
@@ -15,7 +15,7 @@ revision = 'bd1fb1967d43'
 down_revision = None
 branch_labels = None
 depends_on = None
-    
+
 def upgrade():
     op.create_table('workflow_action',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),

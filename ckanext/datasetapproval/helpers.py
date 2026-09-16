@@ -75,10 +75,10 @@ def retrieve_reviewer_guidelines_link():
 def get_review_types_for_display(pkg_dict=None) -> list[ReviewRequest]:
     if not pkg_dict:
         return []
-    
+
     review_types = VOCAB_ENUMS.review_types
     additional_reviews_requested = []
-    review_required_keys = [k for k in pkg_dict.keys() if k.endswith('_review_required') and pkg_dict.get(k) == True]
+    review_required_keys = [k for k in pkg_dict.keys() if k.endswith('_review_required') and pkg_dict.get(k) == True]  # noqa: E712 - keep the original comparison
 
     for review_required_key in review_required_keys:
         review_type_key = review_required_key.replace('_review_required', '')
