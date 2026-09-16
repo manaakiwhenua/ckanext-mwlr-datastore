@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.3...v1.3.0) (2026-09-16)
+
+
+### Features
+
+* MWDS-448 port the dataset approval workflow to this extension and CKAN 2.11+ ([#20](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/20)) ([e16d688](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/e16d688e88152a3c91e9d4d55a793782a8fe874a))
+
+
+### Documentation
+
+* MWDS-450 attribution for the dataset approval plugin ([#21](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/21)) ([f470037](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/f470037d97774a902401ab393337077d0f6173bb))
+
 ## [1.2.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.2...v1.2.3) (2026-09-16)
 
 
