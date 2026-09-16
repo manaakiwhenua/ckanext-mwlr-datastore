@@ -266,6 +266,7 @@ line-height:120%;
 .mwlr-env-dev   { background: #1e7e34; }
 .mwlr-env-test  { background: #b8860b; }
 .mwlr-env-stage { background: #c0392b; }
+.mwlr-env-approvals { background: #6f42c1; }
 
 /* MWDS-357: version line in the footer. */
 .mwlr-versions { font-size: 0.85em; opacity: 0.85; }
