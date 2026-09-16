@@ -5,12 +5,11 @@ name: Bump the DataStore image to this release
 # the new tag. The datastore pipeline then builds the image and deploys dev in
 # its normal way, instead of someone editing the pin by hand (MWDS-444).
 #
-# Needs two repository secrets, declared by bitbucket-config (CICD-ADR-011):
-#   BITBUCKET_RELEASE_EMAIL  the Atlassian account email the token belongs to
-#   BITBUCKET_RELEASE_TOKEN  a scoped API token with repository:write and
-#                            pullrequest:write on landcareresearch/datastore
-# Without them the job explains itself and exits 0, so a release never fails
-# because of this step.
+# Needs one repository secret: BITBUCKET_RELEASE_TOKEN, a Bitbucket
+# *repository access token* on landcareresearch/datastore with Repositories:
+# Write and Pull requests: Write (not a personal token - it belongs to the
+# repository, not to a person). Without it the job explains itself and exits
+# 0, so a release never fails because of this step.
 
 on:
   release:
@@ -34,11 +33,10 @@ jobs:
       - name: Check the credentials are there
         id: creds
         env:
-          BB_EMAIL: ${{ secrets.BITBUCKET_RELEASE_EMAIL }}
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
         run: |
-          if [ -z "$BB_EMAIL" ] || [ -z "$BB_TOKEN" ]; then
-            echo "BITBUCKET_RELEASE_EMAIL / BITBUCKET_RELEASE_TOKEN are not set; no DataStore pull request for $TAG."
+          if [ -z "$BB_TOKEN" ]; then
+            echo "BITBUCKET_RELEASE_TOKEN is not set; no DataStore pull request for $TAG."
             echo "have=false" >> "$GITHUB_OUTPUT"
           else
             echo "have=true" >> "$GITHUB_OUTPUT"
@@ -46,10 +44,9 @@ jobs:
       - name: Clone the DataStore repository
         if: steps.creds.outputs.have == 'true'
         env:
-          BB_EMAIL: ${{ secrets.BITBUCKET_RELEASE_EMAIL }}
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
         run: |
-          git clone --depth 1 --branch main "https://${BB_EMAIL}:${BB_TOKEN}@bitbucket.org/${BB_REPO}.git" datastore
+          git clone --depth 1 --branch main "https://x-token-auth:${BB_TOKEN}@bitbucket.org/${BB_REPO}.git" datastore
       - name: Move the pin and push a branch
         if: steps.creds.outputs.have == 'true'
         id: branch
@@ -69,13 +66,12 @@ jobs:
       - name: Open the pull request
         if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
         env:
-          BB_EMAIL: ${{ secrets.BITBUCKET_RELEASE_EMAIL }}
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
           body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow; the release notes are at ${{ github.event.release.html_url || 'the workflow_dispatch input' }}."
           jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
             '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
-          | curl -sS -f -u "${BB_EMAIL}:${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
+          | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
               "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- \
           | jq -r '"opened " + .links.html.href'
