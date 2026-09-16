@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.3...v1.2.4) (2026-09-16)
+
+
+### Fixes
+
+* remove references to mnc_data ([316341c](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/316341c2075245b0f3ef58194e346c80e62a30e7))
+
 ## [1.2.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.2...v1.2.3) (2026-09-16)
 
 
