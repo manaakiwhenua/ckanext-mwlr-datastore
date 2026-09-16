@@ -25,9 +25,14 @@ def workflow_history_show(context, data_dict) -> dict:
     admin_permission = user_name and authz.users_role_for_group_or_org(owner_org, user_name) == 'admin'  
         
     return {"success": admin_permission or is_sysadmin}
+
+@tk.auth_allow_anonymous_access
+def retrieve_publishing_status(context, data_dict):
+    return {"success": True}
     
 
 def get_auth_functions():
     return {
-        "workflow_history_show": workflow_history_show
+        "workflow_history_show": workflow_history_show,
+        "retrieve_publishing_status": retrieve_publishing_status
     }

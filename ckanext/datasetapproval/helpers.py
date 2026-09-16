@@ -98,4 +98,5 @@ def get_helpers():
         'convert_utc_to_local_time_string': convert_utc_to_local_time_string,
         'retrieve_data_management_email': retrieve_data_management_email,
         'retrieve_reviewer_guidelines_link': retrieve_reviewer_guidelines_link,
+        'get_review_types_for_display': get_review_types_for_display
     }

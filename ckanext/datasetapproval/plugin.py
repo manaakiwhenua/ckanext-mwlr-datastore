@@ -37,7 +37,8 @@ class DatasetapprovalPlugin(plugins.SingletonPlugin,
             'check_user_admin': actions.check_user_admin,
             'retrieve_rejection_reasons': actions.retrieve_rejection_reasons,
             'workflow_actions_show': actions.workflow_actions_show,
-            'latest_workflow_action_show': actions.latest_workflow_action_show
+            'latest_workflow_action_show': actions.latest_workflow_action_show,
+            'retrieve_publishing_status': actions.retrieve_publishing_status
         }
 
     def is_fallback(self):
