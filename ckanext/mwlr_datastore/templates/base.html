@@ -42,17 +42,6 @@
   <link rel="shortcut icon" href="/favicon-32x32.png" />
 {% endblock %}
 
-{# On-page marker - a fixed corner ribbon, coloured per environment so it
-   registers without being read. Rendered after the page so it never shifts
-   the layout. #}
-{% block body_extras %}
-  {{ super() }}
-  {% set env = h.mwlr_environment() %}
-  {% if env %}
-    <div class="mwlr-env-marker mwlr-env-{{ env }}" role="note" aria-label="{{ env|upper }} environment">{{ env|upper }}</div>
-  {% endif %}
-{% endblock %}
-
 {% block scripts %}
   {{ super() }}
 
