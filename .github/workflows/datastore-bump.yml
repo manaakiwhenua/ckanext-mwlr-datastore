@@ -62,10 +62,8 @@ jobs:
           git checkout -b "$branch"
           sed -i -E "s/^ARG MWLR_DATASTORE_REF=.*$/ARG MWLR_DATASTORE_REF=${TAG}/" ckan/Dockerfile
           git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
-            commit -am "chore: ckanext-mwlr-datastore ${TAG}
-
-Pinned by the extension's release workflow. Release notes:
-${{ github.event.release.html_url }}"
+            commit -am "chore: ckanext-mwlr-datastore ${TAG}" \
+            -m "Pinned by the extension's release workflow. Release notes: ${{ github.event.release.html_url }}"
           git push -u origin "$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"; echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Open the pull request
