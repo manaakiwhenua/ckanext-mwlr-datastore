@@ -55,7 +55,7 @@ jobs:
           sed -i -e 's/^ckan.plugins = .*/ckan.plugins = ${{ matrix.plugins }}/' test.ini
           ckan -c test.ini db init
       - name: Run the tests
-        run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --cov=ckanext.mwlr_tracking --cov-report=term-missing --disable-warnings ckanext/mwlr_datastore ckanext/mwlr_tracking
+        run: pytest --ckan-ini=test.ini --cov=ckanext.mwlr_datastore --cov=ckanext.mwlr_tracking --cov=ckanext.datasetapproval --cov-report=term-missing --disable-warnings ckanext/mwlr_datastore ckanext/mwlr_tracking ckanext/datasetapproval
 
   lint:
     name: lint (ruff)
