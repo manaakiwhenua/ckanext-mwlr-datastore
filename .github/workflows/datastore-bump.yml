@@ -1,0 +1,87 @@
+name: Bump the DataStore image to this release
+
+# When a release is published here, open a pull request against the DataStore
+# repository on Bitbucket that moves ARG MWLR_DATASTORE_REF in ckan/Dockerfile to
+# the new tag. The datastore pipeline then builds the image and deploys dev in
+# its normal way, instead of someone editing the pin by hand (MWDS-444).
+#
+# Needs one repository secret: BITBUCKET_RELEASE_TOKEN, a Bitbucket
+# *repository access token* on landcareresearch/datastore with Repositories:
+# Write and Pull requests: Write (not a personal token - it belongs to the
+# repository, not to a person). Without it the job explains itself and exits
+# 0, so a release never fails because of this step.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Extension tag to pin (e.g. v1.3.0)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      BB_REPO: landcareresearch/datastore
+    steps:
+      - name: Check the credentials are there
+        id: creds
+        env:
+          BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
+        run: |
+          if [ -z "$BB_TOKEN" ]; then
+            echo "BITBUCKET_RELEASE_TOKEN is not set; no DataStore pull request for $TAG."
+            echo "have=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Clone the DataStore repository
+        if: steps.creds.outputs.have == 'true'
+        env:
+          BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
+        run: |
+          git clone --depth 1 --branch main "https://x-token-auth:${BB_TOKEN}@bitbucket.org/${BB_REPO}.git" datastore
+      - name: Move the pin and push a branch
+        if: steps.creds.outputs.have == 'true'
+        id: branch
+        working-directory: datastore
+        run: |
+          current=$(sed -nE 's/^ARG MWLR_DATASTORE_REF=(.*)$/\1/p' ckan/Dockerfile)
+          echo "current pin: $current -> $TAG"
+          if [ "$current" = "$TAG" ]; then echo "already pinned"; echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          branch="chore/mwlr-datastore-${TAG}"
+          git checkout -b "$branch"
+          sed -i -E "s/^ARG MWLR_DATASTORE_REF=.*$/ARG MWLR_DATASTORE_REF=${TAG}/" ckan/Dockerfile
+          git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
+            commit -am "chore: ckanext-mwlr-datastore ${TAG}" \
+            -m "Pinned by the extension's release workflow. Release notes: ${{ github.event.release.html_url }}"
+          git push -u origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"; echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Open the pull request
+        if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        env:
+          BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+        run: |
+          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
+          jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
+            '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
+          | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
+              "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- \
+          | jq -r '"opened " + .links.html.href'
+      - name: Nudge the pull request pipeline
+        # Bitbucket only starts a pull request pipeline on a push made while
+        # the pull request is open; the branch push above happened before it
+        # existed, so an empty commit now gives it a build.
+        if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        working-directory: datastore
+        run: |
+          git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
+            commit --allow-empty -m "ci: trigger the pull request build"
+          git push origin HEAD

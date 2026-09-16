@@ -1,5 +1,22 @@
 {% ckan_extends %}
 
+{# <html lang> must stay CKAN's locale (en_NZ), not the language tag (en-NZ).
+   CKAN's JavaScript reads this attribute as its locale and requests
+   /api/i18n/<lang>, which only accepts configured locales. With en-NZ that
+   returns 400, CKAN's JavaScript modules never start, and every table preview
+   and scripted component on the site breaks.
+
+   v1.2.0 of this extension did that deliberately (MWDS-385). CKAN itself does
+   it from 2.10.11, 2.11.6 and 2.12.0 (ckan/ckan#8698) and breaks the same way
+   for any regional locale - ckan/ckan#9473. So this block pins the locale form
+   on every CKAN version. Remove it once CKAN's JavaScript stops reading its
+   locale from the lang attribute. #}
+{%- block htmltag -%}
+{% set lang = h.lang() %}
+<!--[if IE 9]> <html lang="{{ lang }}" class="ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="{{ lang }}" {% if h.is_rtl_language()  %} dir="rtl" {% endif %} > <!--<![endif]-->
+{%- endblock -%}
+
 {# MWDS-360: make a non-production site unmistakable. The environment name
    comes from configuration (ckanext.mwlr_datastore.environment, set per
    environment via CKANEXT__MWLR_DATASTORE__ENVIRONMENT), so one image serves
@@ -23,17 +40,6 @@
 {# install favicon #}
 {% block links %}
   <link rel="shortcut icon" href="/favicon-32x32.png" />
-{% endblock %}
-
-{# On-page marker - a fixed corner ribbon, coloured per environment so it
-   registers without being read. Rendered after the page so it never shifts
-   the layout. #}
-{% block body_extras %}
-  {{ super() }}
-  {% set env = h.mwlr_environment() %}
-  {% if env %}
-    <div class="mwlr-env-marker mwlr-env-{{ env }}" role="note" aria-label="{{ env|upper }} environment">{{ env|upper }}</div>
-  {% endif %}
 {% endblock %}
 
 {% block scripts %}

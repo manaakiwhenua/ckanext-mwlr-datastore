@@ -1,0 +1,180 @@
+import logging
+from functools import partial
+
+from flask import Blueprint
+
+from typing import Any
+
+from ckan import model
+from ckan.lib import base
+from ckan.plugins import toolkit
+from ckan.types import Context
+from ckan.views.user import _extra_template_variables
+import ckan.lib.helpers as h
+from ckan.authz import users_role_for_group_or_org
+from ckan.lib.mailer import MailerException
+from ckanext.datasetapproval.mailer import mail_package_approve_reject_notification_to_editors
+from ckan.views.dataset import url_with_params
+from typing import Union
+from ckan.types import Response
+from ckanext.datasetapproval import models
+from ckanext.datasetapproval.enums import WorkflowActionType, review_outcome_mapping
+
+log = logging.getLogger(__name__)
+
+
+approveBlueprint = Blueprint('approval', __name__,)
+
+
+def _pager_url(params_nopage, package_type, q=None, page=None):
+    params = list(params_nopage)
+    params.append((u'page', page))
+    return search_url(params, package_type)
+
+
+def search_url(params, package_type=None):
+    url = h.url_for('approval.dataset_review', id=toolkit.c.user)
+    return url_with_params(url, params)
+
+def submit_feedback(id):
+    feedback = toolkit.request.form.to_dict()
+    rejection_reasons = toolkit.request.form.getlist('rejection_reasons')
+    feedback['rejection_reasons'] = rejection_reasons if rejection_reasons else None
+    review_types = toolkit.request.form.getlist('review_types')
+    feedback['review_types'] = review_types if review_types else None
+    action = toolkit.request.form.get('action')
+    feedback.pop('action', None)  # Remove action from feedback to avoid confusion
+    return _make_action(id, WorkflowActionType(action), feedback=feedback)
+
+def pending_datasets(id: str) -> Union[Response, str]:
+    if toolkit.request.endpoint.endswith('dataset_review'):
+        review_context = "admin_review"
+    else:
+        review_context = "editor_requests"
+    context: Context = {
+        u'user': toolkit.c.user,
+        u'auth_user_obj': toolkit.c.userobj,
+        u'for_view': True
+    }
+    data_dict: dict[str, Any] = {
+        u'id': id,
+        u'user_obj': toolkit.c.userobj,
+        u'include_datasets': True,
+        u'include_num_followers': True
+    }
+
+    extra_vars = _extra_template_variables(context, data_dict)
+
+    params_nopage = [(k, v) for k, v in toolkit.request.args.items(multi=True)
+                     if k != u'page']
+    limit = 20
+    page = h.get_page_number(toolkit.request.args)
+    pager_url = partial(_pager_url, params_nopage, 'dataset')
+
+    if review_context == "admin_review":
+        fq_string = f'NOT creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
+    else:
+        fq_string = f'creator_user_id:{toolkit.c.userobj.id} AND publishing_status:in_review'
+
+    search_dict = {
+        'rows': limit,
+        'start': limit * (page - 1),
+        'fq': fq_string,
+        'include_private': True
+        }
+
+    in_review_datasets = toolkit.get_action('package_search')(context,
+                                               data_dict=search_dict)
+
+    extra_vars['user_dict'].update({
+        'datasets' : in_review_datasets['results'],
+        'total_count': in_review_datasets['count']
+        })
+
+    extra_vars[u'page'] = h.Page(
+        collection = in_review_datasets['results'],
+        page = page,
+        url = pager_url,
+        item_count = in_review_datasets['count'],
+        items_per_page = limit
+    )
+    extra_vars[u'page'].items = in_review_datasets['results']
+    return base.render(f'user/{review_context}.html', extra_vars)
+
+
+def _raise_not_authz_or_not_pending(id):
+    dataset_dict = toolkit.get_action('package_show') \
+                    ({u'ignore_auth': True}, {'id': id})
+    permission = users_role_for_group_or_org(dataset_dict.get('owner_org'), toolkit.c.userobj.name)
+    is_pending = dataset_dict.get('publishing_status') == 'in_review'
+
+    if is_pending and (toolkit.c.userobj.sysadmin or permission == 'admin'):
+        return
+    else :
+        raise toolkit.abort(404, 'Dataset "{}" not found'.format(id))
+
+def _make_action(package_id, action : WorkflowActionType, feedback: dict[str, any]=None):
+    set_private = action == WorkflowActionType.REJECT
+    context = {
+        'model': model,
+        'user': toolkit.c.user,
+        'ignore_auth': True,
+        'feedback': feedback
+    }
+    # check access and state
+    _raise_not_authz_or_not_pending(package_id)
+    pkg = toolkit.get_action('package_show')(
+            context,
+            {'id': package_id}
+        )
+    try:
+        pkg['publishing_status'] = review_outcome_mapping[action]
+        pkg['currently_reviewing'] = True
+        if set_private:
+            pkg['private'] = True
+        toolkit.get_action('package_update')(
+            context,
+            pkg
+        )
+    except Exception as e:
+        log.error('Error approving dataset %s: %s', package_id, str(e))
+        h.flash_error("Unable to update publishing status of dataset. Ensure that the dataset metadata is valid via the \"Manage\" button.")
+        return h.redirect_to(u'{}.read'.format('dataset'),
+                             id=package_id)
+    try:
+        models.save_workflow_action_and_comments(package_id, feedback, action)
+    except Exception as e:
+        log.error(f"Error saving reviewer action and comments for dataset {package_id}: {e}")
+        h.flash_error("Unable to save review feedback. Please contact the datastore administrator.")
+        return h.redirect_to(u'{}.read'.format('dataset'),
+                             id=package_id)
+
+    try:
+        mail_package_approve_reject_notification_to_editors(package_id, pkg.get("publishing_status"), feedback)
+        toolkit.h.flash_success("Review response sent to dataset creator.")
+    except MailerException as e:
+        log.error(f"Failed to send review request email: {e}")
+        toolkit.h.flash_error("Unable to send review response email to dataset creator. Please contact the datastore administrator.")
+    return toolkit.redirect_to(controller='dataset', action='read', id=package_id)
+
+def show_review_history(name):
+    '''
+    Show the review history page for a given dataset, which includes all workflow actions and comments left by reviewers. Only accessible to org admins and sysadmins.
+    '''
+    dataset_dict = toolkit.get_action('package_show')({'ignore_auth': True}, {'id': name})
+    dataset_id = toolkit.get_or_bust(dataset_dict, "id") # Get the dataset ID from the dataset_dict since the workflow actions are linked to the dataset ID, not the name.
+
+    workflow_history = toolkit.get_action('workflow_actions_show')(
+        {},
+        {'id': dataset_id, 'owner_org': toolkit.get_or_bust(dataset_dict, "owner_org")}
+    )
+    return toolkit.render('package/review_history.html', {
+        'id': dataset_id,
+        'pkg_dict': dataset_dict,
+        'workflow_history': workflow_history
+    })
+
+approveBlueprint.add_url_rule('/dataset-publish/<id>/submit_feedback', view_func=submit_feedback, methods=['POST'])
+approveBlueprint.add_url_rule(u'/user/<id>/dataset_review', view_func=pending_datasets, endpoint='dataset_review')
+approveBlueprint.add_url_rule(u'/user/<id>/my_requests', view_func=pending_datasets, endpoint='my_requests')
+approveBlueprint.add_url_rule('/dataset/review_history/<string:name>', view_func=show_review_history, endpoint='review_history')

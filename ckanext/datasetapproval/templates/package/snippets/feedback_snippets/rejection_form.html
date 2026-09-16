@@ -1,0 +1,51 @@
+<!-- Rejection Details -->
+<fieldset class="mb-3">
+  <legend>Rejection Decision</legend>
+    <label class="form-label">Select reason(s) for rejection</label>
+  <div id="rejection_reason_checkbox_parent">
+    {% for key, label in h.get_vocab_group("rejection_reasons").items() %}
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="rejection_reasons"
+            id="rejection_reasons_{{ key }}"
+            value="{{ key }}"
+            aria-describedby="rejection-reasons-help"
+        >
+          <label class="form-check-label multi-select-reasons" for="rejection_reasons_{{ key }}">
+            {{ _(label) }}
+          </label>
+        </div>
+        {% endfor %}
+  </div>
+    <div name="rejection-reasons-help" class="info-block">
+      <i class="fa fa-info-circle"></i> {% trans %}If you have selected Other, provide a description in the box below.{% endtrans %}
+    </div>
+
+  <div class="review-form form-group control-medium">
+    <label for="rejection_reason_comments" class="form-label mt-2">Add any comments regarding the review(s) or rejection (max 1000 characters)</label>
+    <textarea 
+      id="rejection_reason_comments" 
+      name="rejection_reason_comments" 
+      class="form-control" 
+      rows="3" 
+      maxlength="1000" 
+      required
+      ondrop="return false;"
+      placeholder="{% trans %}Include any key points or issues leading to the rejection decision.{% endtrans %}"></textarea>
+  </div>
+</fieldset>
+
+<!-- Resubmission -->
+<fieldset class="mb-3">
+  <legend>Resubmission</legend>
+  <label for="resubmission_comments" class="form-label mt-2">Describe actions required to be undertaken before resubmission (max 1000 characters)</label>
+  <textarea 
+    id="resubmission_comments" 
+    name="resubmission_comments" 
+    class="form-control" 
+    rows="4" 
+    maxlength="1000" 
+    required></textarea>
+</fieldset>

@@ -1,0 +1,43 @@
+from enum import Enum
+
+class RejectionReason(str, Enum):
+    data_quality = "Data quality issues"
+    documentation = "Incomplete or inadequate documentation"
+    legal = "Legal / contractual restrictions"
+    cultural = "Cultural / ethical concerns"
+    privacy = "Privacy / sensitivity issues"
+    ip = "IP / commercial risk"
+    sop = "Non-compliance with SOP"
+    other = "Other"
+
+class ApprovalOutcome(str, Enum):
+    approved = "Approved for Public Release"
+    conditional = "Approved with Conditions"
+    # restricted = "Approved for Restricted Access" # removed until restricted functionality implemented
+
+class ReviewType(str, Enum):
+    metadata_documentation = "Metadata and Documentation Only Review"
+    scientific_technical = "Scientific and Technical Review"
+    te_ao_māori = "Te Ao Māori Review"
+    ethics_security_risk = "Ethics and Security Risk Review"
+    intellectual_property = "Intellectual Property Review"
+
+class VOCAB_ENUMS:
+    rejection_reasons = RejectionReason
+    approval_outcome = ApprovalOutcome
+    review_types = ReviewType
+
+class WorkflowActionType(Enum):
+    # Currently only approve and reject actions are supported. Possible future actions include 'recommend for approval'.
+    APPROVE = 'approve'
+    REJECT = 'reject'
+
+class ReviewerType(Enum):
+    # Allowing for possibility of multiple reviewer types. Currently only one reviewer type is supported. Suggested future types include 'approver'.
+    REVIEWER = 'reviewer'
+
+# Mapping of reviewer actions to the publishing status of the dataset after review. These are for user facing labels
+review_outcome_mapping : dict[WorkflowActionType, str] = {
+        WorkflowActionType.REJECT: 'rejected',
+        WorkflowActionType.APPROVE: 'approved'
+    }

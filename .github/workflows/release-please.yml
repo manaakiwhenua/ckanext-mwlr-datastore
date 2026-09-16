@@ -1,0 +1,41 @@
+name: Release pull request
+
+# The release pull request model (CICD-ADR-010) on GitHub. Every merge to main
+# updates one open pull request titled for the next version, computed from the
+# conventional commits since the last release. Merging that pull request IS the
+# release: it writes the version to pyproject.toml and CHANGELOG.md, tags
+# vX.Y.Z and publishes the GitHub release. Nothing is ever pushed to main
+# directly, so branch protection is untouched.
+#
+# Identity: a GitHub App owned by the organisation (not a person's token), so
+# the release pull request triggers the test workflow and nothing expires with
+# a staff member. Two settings on the repository:
+#   variable RELEASE_APP_ID          the App's numeric id
+#   secret   RELEASE_APP_PRIVATE_KEY the App's private key (PEM)
+# Until they exist the job falls back to GITHUB_TOKEN, which still opens the
+# release pull request but cannot make it run the checks.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint an App token
+        id: app
+        if: vars.RELEASE_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

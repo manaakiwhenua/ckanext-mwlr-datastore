@@ -1,0 +1,29 @@
+{% ckan_extends %}
+
+{% block heading_meta %}
+    {% if package.get('publishing_status', '').startswith('in_progress') %}
+        <span class="badge bg-secondary">{{ _('In Progress') }}</span>
+    {% endif %}
+
+    {% if package.get('publishing_status', '').startswith('in_review') and in_review %}
+        <span class="badge bg-warning">{{ _('Review requested') }}</span>
+    {% elif package.get('publishing_status', '').startswith('in_review') %}
+        <span class="badge bg-warning">{{ _('Review Pending') }}</span>
+    {% endif %}
+
+    {% if package.get('publishing_status', '').startswith('approved') %}
+        <span class="badge bg-success">{{ _('Approved') }}</span>
+    {% endif %}
+
+    {% if package.get('publishing_status', '').startswith('rejected') %}
+        <span class="badge bg-danger">{{ _('Rejected') }}</span>
+    {% endif %}
+
+    {% if package.get('state', '').startswith('deleted') %}
+        <span class="badge bg-danger">{{ _('Deleted') }}</span>
+    {% endif %}
+
+    {% if package.tracking_summary %}
+        {{ h.popular('recent views', package.tracking_summary.recent, min=10) }}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,161 @@
+import logging
+
+from ckan import model
+from ckan.common import config
+from ckan.plugins import toolkit
+from ckan.lib.mailer import mail_user
+from ckan.logic.action.get import member_list as core_member_list
+from ckan.lib.helpers import helper_functions as h
+from ckanext.datasetapproval import workflow_action_helpers
+
+log = logging.getLogger(__name__)
+
+
+def mail_package_review_request_to_admins(context, data_dict, _type='new'):
+    if config.get('ckanext.approval.turn_on_email_notifications', 'true') == 'false':
+        log.debug('Email notifications are turned off, not sending approve/reject notification email.')
+        return
+    members = core_member_list(
+        context=context,
+        data_dict={'id': data_dict.get('owner_org')}
+    )
+    org_admin = [i[0] for i in members if i[2] == 'Admin']
+
+    sysadmins = model.Session.query(model.User.id).filter(
+            model.User.state != model.State.DELETED,
+            model.User.sysadmin.is_(True)
+            ).all()
+    # Merged org admin and sysadmin so that sysadmin also gets the email.
+    admins = list(set( org_admin + [admin[0] for admin in sysadmins]))
+    for admin_id in admins :
+        user = model.User.get(admin_id)
+        if user.email:
+            subj = _compose_email_subj_for_admins(_type)
+            body = _compose_email_body_for_admins(context, data_dict, user, _type)
+            try:
+                mail_user(user, subj, body)
+            except Exception as e:
+                log.error(f'[email] Failed to send dataset review request email to {user.name}: {e}')
+            else:
+                log.debug('[email] Dataset review request email sent to {0}'.format(user.name))
+
+
+
+def mail_package_approve_reject_notification_to_editors(package_id, publishing_status, feedback=None):
+    if config.get('ckanext.approval.turn_on_email_notifications', 'true') == 'false':
+        log.debug('Email notifications are turned off, not sending approve/reject notification email.')
+        return
+    package_dict = toolkit.get_action('package_show' )({'ignore_auth': True}, {'id':package_id })
+    editor = model.User.get(package_dict.get('creator_user_id'))
+    if editor.email:
+        subj = _compose_email_subj_for_editors(publishing_status)
+        body = _compose_email_body_for_editors(editor, package_dict, publishing_status, feedback)
+        try:
+            mail_user(editor, subj, body)
+        except Exception as e:
+            log.error(f'[email] Failed to send dataset approved/rejected notification email to {editor.name}: {e}')
+        else:
+            log.debug('[email] Dataset approved/rejected notification email sent to {0}'.format(editor.name))
+
+
+def _compose_email_subj_for_admins(_type):
+    return 'Dataset submitted for review'
+
+
+def _compose_email_subj_for_editors(state):
+    if state == 'approved':
+        return 'Dataset approved and published'
+    else:
+        return 'Dataset rejected'
+
+
+def _get_editor_name(context, id):
+    try:
+        user_dict = toolkit.get_action('user_show')(context, {'id': id})
+        return user_dict.get('display_name')
+    except toolkit.ObjectNotFound:
+        return 'None'
+
+def _compose_email_body_for_admins(context, data_dict, user, _type):
+    pkg_link = toolkit.url_for('dataset.read', id=data_dict['name'], qualified=True)
+    admin_name = user.fullname or user.name
+    site_title = config.get('ckan.site_title')
+    site_url = config.get('ckan.site_url')
+    package_title = data_dict.get('title')
+    package_description = data_dict.get('notes', '')
+    package_url = pkg_link
+    package_dict = toolkit.get_action('package_show')(context, {'id': data_dict['id']})
+    creator_user_id = package_dict.get('creator_user_id')
+    editor_name = _get_editor_name(context, creator_user_id)
+    additional_reviews = get_additional_review_details(package_dict)
+    guidelines_paragraph = get_reviewer_guidelines()
+
+    email_body = (
+        f"Dear {admin_name},\n\n"
+        f"{'An' if _type == 'updated' else 'A'} {_type} dataset has been submitted for review by user {editor_name.title()}.\n\n"
+        f"Dataset title:\n{package_title}\n\n"
+        f"Submission note:\n{package_description}\n\n"
+        f"{additional_reviews}"
+        f"To approve or reject the request, please visit the following page (while logged in as an admin):\n\n"
+        f"{package_url}\n\n"
+        f"{guidelines_paragraph}"
+        f"---\n"
+        f"Message sent by {site_title} ({site_url})\n"
+        f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
+    )
+    return email_body
+
+def get_additional_review_details(package_dict):
+    additional_reviews = h.get_review_types_for_display(package_dict)
+    if additional_reviews:
+        additional_review_types = [review.review_type for review in additional_reviews]
+    additional_reviews_paragraph = f"Additional review types requested:\n{', '.join(additional_review_types) if additional_reviews else 'None'}\n\n"
+    return additional_reviews_paragraph
+
+def get_reviewer_guidelines():
+    link_to_reviewer_guidelines = h.retrieve_reviewer_guidelines_link()
+    if link_to_reviewer_guidelines:
+        guidelines_paragraph = f"For information on how to review a dataset, please refer to the reviewer guidelines: {link_to_reviewer_guidelines}\n\n"
+    else:
+        guidelines_paragraph = ""
+    return guidelines_paragraph
+
+
+def _compose_email_body_for_editors(user, package_dict, state, feedback=None):
+    pkg_link = toolkit.url_for('dataset.read', id=package_dict['name'], qualified=True)
+    editor_name = user.fullname or user.name
+    site_title = config.get('ckan.site_title')
+    site_url = config.get('ckan.site_url')
+    package_title = package_dict.get('title')
+    package_url = pkg_link
+    formatted_feedback = ""
+    for key, value in feedback.items():
+        if key == "rejection_reasons":
+            label_value = workflow_action_helpers.format_rejection_reasons(value)
+        else:
+            # if exists in vocab, otherwise just use raw value
+            label_value = h.vocab_label(key, value)
+        # don't add into email if not present
+        if label_value:
+            formatted_feedback += (
+                f"- {key.replace('_', ' ').title()}: {label_value}\n"
+            )
+
+    approval_paragraph = f"Your dataset \"{package_title}\" has been approved and published."
+    rejection_paragraph = (
+        f"Your dataset \"{package_title}\" has been reviewed and rejected by the reviewer. "
+        f"You can update the dataset and resubmit it for further review.\n\n"
+    )
+
+    email_body = (
+        f"Dear {editor_name.title()},\n\n"
+        f"{approval_paragraph if state == 'approved' else rejection_paragraph}\n\n"
+        f"Please refer to the following comments.\n\n"
+        f"{formatted_feedback}\n"
+        f"You can view the dataset at the following link:\n\n"
+        f"{package_url}\n\n"
+        f"--\n"
+        f"Message sent by {site_title} ({site_url})\n"
+        f"This is an automated message. Please do not reply to this email. If you have any questions, please contact the site administrator."
+    )
+    return email_body

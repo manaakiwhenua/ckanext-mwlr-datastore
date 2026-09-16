@@ -1,0 +1,37 @@
+datasetapproval_css:
+  filter: cssrewrite
+  output: ckanext-datasetapproval/%(version)s-approval.css
+  contents:
+    - css/approval.css
+
+datasetapproval_org_js:
+  output: ckanext-datasetapproval/%(version)s-approvalworkflow-org.js
+  contents:
+    - js/org_monitoring_helper.js
+  extra:
+    preload:
+      - base/main
+
+feedback_form_helpers_js:
+  output: ckanext-datasetapproval/%(version)s-feedback_form_helpers.js
+  contents:
+    - js/feedback_form_helpers.js
+  extra:
+    preload:
+      - base/main
+
+package_form_helpers_js:
+  output: ckanext-datasetapproval/%(version)s-package_form_helpers.js
+  contents:
+    - js/package_form_helpers.js
+  extra:
+    preload:
+      - base/main
+
+field_visibility_helper_js:
+  output: ckanext-datasetapproval/%(version)s-field_visibility_helper.js
+  contents:
+    - js/field_visibility_helper.js
+  extra:
+    preload:
+      - base/main

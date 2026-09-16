@@ -36,6 +36,8 @@ ckan.plugins = ... scheming_datasets mwlr_tracking mwlr_datastore
 scheming.dataset_schemas = ckanext.mwlr_datastore:scheming/dataset.yaml
 ```
 
+`mwlr_tracking` counts on CKAN's page tracking. On CKAN 2.10 switch it on with `ckan.tracking_enabled = true`. From CKAN 2.11 tracking is the core `tracking` plugin instead: add it to `ckan.plugins` after `mwlr_tracking`, so this extension's templates keep precedence. Core tracking counts page views only; the download counting stays here.
+
 ## Configuration
 
 | setting | does |
@@ -90,6 +92,8 @@ Pull requests are welcome. Titles follow [Conventional Commits](https://www.conv
 This code lived at `src/ckanext-mwlr-datastore` inside a private repository holding the whole DataStore deployment, and was extracted with its history rather than restarted, so the reasoning behind the schema survives.
 
 Two things follow from that. Commits before September 2026 were written in the context of the larger repository, so a message may describe work whose other half - a Dockerfile, a pipeline, a Kubernetes manifest - is not here. And "Bitbucket pull request N" in an old message refers to a pull request in that repository, not to anything in this one.
+
+On 17 September 2026 the dataset approval workflow joined as the third plugin, `dataset_approval`. It came from [manaakiwhenua/ckanext-datasetapproval](https://github.com/manaakiwhenua/ckanext-datasetapproval), itself a fork of Datopian's [ckanext-datasetapproval](https://github.com/datopian/ckanext-datasetapproval), and arrived with its history: one commit standing in for the upstream work with its authors credited, then every Manaaki Whenua commit with its original author and date. The plugin's own [README](ckanext/datasetapproval/README.md) records the origin, the commit taken and what has changed since.
 
 ## Licence
 

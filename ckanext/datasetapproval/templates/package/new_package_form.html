@@ -1,0 +1,13 @@
+{% extends 'package/snippets/package_form.html' %}
+
+{% block cancel_button %}
+  {% if form_style != 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block delete_button %}
+  {% if form_style == 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}

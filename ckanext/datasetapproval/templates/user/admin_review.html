@@ -1,0 +1,15 @@
+{% extends "user/pending_datasets.html" %}
+{% block request_context %}
+<div class="alert alert-primary review-guidelines-banner">
+    <div class="review-message">
+        <i class="fa fa-info-circle"></i>
+        Please follow the <strong>Reviewer Guidelines</strong> when reviewing datasets.
+    </div>
+  {% set reviewer_guidelines = h.retrieve_reviewer_guidelines_link() %}
+    <a href="{{ reviewer_guidelines }}" class="btn btn-primary btn-sm" target="_blank">
+        <i class="fa fa-external-link"></i>
+        Open Guidelines
+    </a>
+</div>
+{% endblock %}
+

@@ -1,0 +1,15 @@
+Dear {{ admin_name }},
+
+A new dataset has been submitted for review by {{ publisher_name }}:
+
+    {{ package_title }}
+
+    {{ package_description}}
+
+To approve or reject the dataset, please visit the following page:
+
+    {{ package_url }}
+
+--
+Message sent by {{ site_title }} ({{ site_url }})
+This is an automated message, please don't respond to this address.

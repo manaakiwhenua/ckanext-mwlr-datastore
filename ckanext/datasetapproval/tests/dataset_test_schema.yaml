@@ -1,0 +1,323 @@
+scheming_version: 2
+dataset_type: dataset
+
+dataset_fields:
+
+- field_name: title
+  label: Title
+  preset: title
+  form_snippet     : text_no_autocomplete.html
+  required         : true
+  form_placeholder : 'Enter the dataset title'
+  validators       : scheming_required if_empty_same_as("name") unicode_safe strip_value
+
+- field_name       : name
+  label            : URL
+  preset           : dataset_slug
+  form_placeholder : autofills, leave blank
+  required         : true
+  validators       : scheming_required unicode_safe name_validator package_name_validator strip_value
+
+- field_name       : notes
+  label            : Description
+  form_placeholder : 'A short description of the dataset'
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
+  preset           : markdown
+
+# Don't add scheming_required or not_empty validator to tags as it causes issues with the tag_string_convert validator
+- field_name       : tag_string
+  label            : Tags
+  preset           : tag_string_autocomplete
+  help_text        : 'eg. vegetation, soil carbon, possums'
+  validators       : ignore_empty tag_string_convert
+
+- field_name       : license_id
+  label            : License
+  form_snippet     : license.html
+  help_text        : 'License definitions and additional information can be found at http://creativecommons.org/licenses'
+  validators       : ignore_empty unicode_safe
+
+- field_name       : owner_org
+  label            : Collection
+  preset           : dataset_organization
+  validators       : owner_org_validator unicode_safe
+
+# True is 'Private', False is 'Public'
+- field_name       : chosen_visibility
+  label            : Visibility after review
+  form_snippet     : visibility.html
+  display_snippet  : null
+  help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
+  validators       : scheming_required unicode_safe
+  default          : true
+
+- field_name       : publisher
+  label            : Publisher
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
+  default          : "Default Publisher"
+
+- field_name       : publication_year
+  label            : Publication Year
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'The year the data will be or was made publicly available. If the dataset will remain private, provide the year it was completed.'
+  form_placeholder : 'YYYY'
+  required         : true
+  validators       : scheming_required unicode_safe strip_value
+
+- field_name       : author
+  label            : Authors
+  required         : true
+  help_text        : 'Please provide as Family Name, First Name'
+  preset           : multiple_text
+  validators       : scheming_required scheming_multiple_text
+
+- field_name       : conditions_of_release
+  label            : Conditions of Release
+  required         : false
+  help_text        : 'Document here any conditions associated with the release.'
+  validators       : scheming_required unicode_safe strip_value
+
+- field_name: maintainer
+  label: Maintainer
+  form_placeholder : Maintainer Name
+  display_property : dc:contributor
+  display_snippet  : maintainer_display.html
+  display_email_field : maintainer_email
+  required         : true
+  help_text       : 'The person responsible for uploading and maintaining the dataset in Datastore.'
+  validators       : scheming_required unicode_safe strip_value
+
+- field_name: maintainer_email
+  label: Maintainer Email
+  form_placeholder: user@example.com
+  display_property: dc:contributor
+  display_snippet: null
+  display_email_name_field: maintainer
+  required         : true
+  help_text       : 'The email address of the person responsible for uploading and maintaining the dataset in Datastore.'
+  validators       : scheming_required unicode_safe strip_value email_validator
+
+- field_name       : start_date
+  label            : 'Start Date'
+  help_text        : 'The start date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty unicode_safe strip_value 
+
+- field_name       : end_date
+  label            : 'End Date'
+  help_text        : 'The end date the data was collected/created.'
+  form_placeholder : 'YYYY, YYYY-MM, or YYYY-MM-DD'
+  validators       : ignore_empty strip_value
+  form_snippet     : text_no_autocomplete.html
+
+- field_name       : url
+  label            : 'Source'
+  form_placeholder : 'http://example.com/dataset.json'
+  form_snippet     : text_no_autocomplete.html
+  display_snippet  : link.html
+  validators       : ignore_empty strip_value unicode_safe
+
+- field_name       : version
+  label            : 'Version'
+  form_placeholder : '1.0'
+  form_snippet     : text_no_autocomplete.html
+  validators       : ignore_empty strip_value unicode_safe package_version_validator
+
+- field_name       : doi
+  label            : 'DOI'
+  form_placeholder : 'e.g. https://doi.org/10.7931/J2PK0D34'
+  form_snippet     : text_no_autocomplete.html
+  help_text        : 'Provide a Digital Object Identifier (DOI) for the dataset if available.'
+  validators       : ignore_empty unicode_safe strip_value unicode_safe
+  
+- field_name       : te_ao_māori_review_required
+  label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
+
+- field_name : te_ao_māori_review_notes
+  label      : Please describe why a te ao Māori review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: te_ao_māori_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the te ao Māori data review process. This may include details about the relevance of the dataset to Māori people, communities, taonga species, mātauranga Māori, or Māori interests, as well as any potential risks or considerations for Māori data sovereignty.'
+  validators : ignore_empty unicode_safe strip_value
+
+- field_name       : scientific_technical_review_required
+  label            : 'Does this dataset require review for scientific or technical aspects?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
+
+- field_name : scientific_technical_review_notes
+  label      : Please describe why a scientific or technical review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: scientific_technical_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the scientific or technical review process. This may include details about the data collection methods, data quality, potential limitations, or any specific aspects that require attention during the review.'
+  validators : ignore_empty unicode_safe strip_value
+
+- field_name       : ethics_security_risk_review_required
+  label            : 'Does this dataset require review for ethics, security, or risk?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
+
+- field_name : ethics_security_risk_review_notes
+  label      : Please describe why an ethics, security, or risk review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: ethics_security_risk_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the ethics, security, or risk review process. This may include details about the sensitivity of the data, potential ethical considerations, security measures in place, or any specific risks associated with the dataset that require attention during the review.'
+  validators : ignore_empty unicode_safe strip_value
+
+- field_name       : intellectual_property_review_required
+  label            : 'Does this dataset require review for intellectual property or contractual issues?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
+
+- field_name       : intellectual_property_review_notes
+  label            : Please describe why an intellectual property or contractual review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: intellectual_property_review_required
+    data-conditional-visibility-value: true
+  help_text        : 'Provide any relevant information about the dataset that will assist with the intellectual property review process. This may include details about licensing, contractual obligations, or any other considerations related to intellectual property.'
+  validators       : ignore_empty unicode_safe strip_value
+
+- field_name       : publishing_status
+  label            : 'Publishing Status'
+  form_snippet     : null
+  display_snippet  : null
+  validators       : ignore_missing
+
+resource_fields:
+
+- field_name: url
+  label: URL
+  preset: resource_url_upload
+  validators: ignore_empty unicode_safe strip_value
+
+- field_name: name
+  label: Name
+  form_placeholder: eg. January 2011 Gold Prices
+  validators: unicode_safe strip_value
+
+- field_name: description
+  label: Description
+  form_snippet: markdown.html
+  form_placeholder: Some useful notes about the data
+  validators: unicode_safe strip_value
+
+- field_name : resource_type
+  label      : Resource Type
+  preset: select
+  help_text  : 'Select the type of resource being uploaded.'
+  validators : unicode_safe
+  default    : dataset
+  sorted_choices : true 
+  choices   :
+    - value: audiovisual
+      label: Audiovisual
+    - value: book
+      label: Book
+    - value: book chapter
+      label: Book Chapter
+    - value: collection
+      label: Collection   
+    - value: computational notebook
+      label: Computational Notebook
+    - value: conference paper
+      label: Conference Paper
+    - value: conference proceeding
+      label: Conference Proceeding
+    - value: data paper
+      label: Data Paper
+    - value: dataset
+      label: Dataset
+    - value: dissertation
+      label: Dissertation
+    - value: event
+      label: Event
+    - value: image
+      label: Image
+    - value: instrument
+      label: Instrument
+    - value: interactive resource
+      label: Interactive Resource
+    - value: journal
+      label: Journal
+    - value: journal article
+      label: Journal Article
+    - value: model
+      label: Model
+    - value: output management plan
+      label: Output Management Plan
+    - value: peer review
+      label: Peer Review
+    - value: physical object
+      label: Physical Object
+    - value: preprint
+      label: Preprint
+    - value: report
+      label: Report
+    - value: service
+      label: Service
+    - value: software
+      label: Software
+    - value: sound
+      label: Sound
+    - value: standard
+      label: Standard
+    - value: study registration
+      label: Study Registration
+    - value: text
+      label: Text
+    - value: workflow
+      label: Workflow
+    - value: other
+      label: Other
+
+- field_name       : version
+  label            : Version
+  form_placeholder : 1.0
+  form_snippet     : text_no_autocomplete.html  
+  validators       : ignore_empty strip_value unicode_safe
+
+- field_name: format
+  label: Format
+  preset: resource_format_autocomplete
+  validators: if_empty_guess_format ignore_empty strip_value clean_format unicode_safe
+

@@ -1,0 +1,120 @@
+{% extends "package/read_base.html" %}
+
+{% block primary_content_inner %}
+  {{ super() }}
+
+  {% if c.pkg_dict.publishing_status  == 'in_review' %}
+    <div class="alert alert-warning" role="alert">
+      <p>{% trans %}This dataset is waiting for approval.{% endtrans %}</p>
+      {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
+        {% if c.pkg_dict.additional_reviews_requested %}
+          <p>This dataset requires
+            <b>
+              {% for review_request in c.pkg_dict.additional_reviews_requested %}
+                {{ review_request.review_type_display_name }}{% if not loop.last %}, {% endif %}{% if loop.last%}.{% endif %}
+              {% endfor %}
+            </b>
+          </p>       
+        {% for review_request in c.pkg_dict.additional_reviews_requested %}
+        <div class="alert alert-light" role="alert">
+            <p><b>{{ review_request.review_type_display_name }} Request Comments</b></p>
+            {% if review_request.review_request_comments %}
+             <p>{{ review_request.review_request_comments[:2000] }}</p>
+             {% if review_request.review_request_comments|length > 2000 %}
+              <i>... (truncated)</i>
+             {% endif %}
+            {% else %}
+              <i>No comments were provided by the submitter for this review request.</i>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {# TODO: remove style #}
+        <div style="margin-top: 10px">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approveReasonModal">
+            {% trans %}Approve Dataset{% endtrans %}
+          </button>
+          <!-- Rejection feedback{ trigger button -->
+          <button class="btn" style="background-color:#C5432F;color:white;" data-bs-toggle="modal" data-bs-target="#rejectReasonModal">
+            {% trans %}Reject Dataset{% endtrans %}
+          </button>
+          {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
+            modal_id="approveReasonModal",
+            review_type="approve",
+            additional_reviews_requested=c.pkg_dict.additional_reviews_requested
+          %}
+          {% snippet "package/snippets/feedback_snippets/review_modal_wrapper.html",
+            modal_id="rejectReasonModal",
+            review_type="reject",
+            additional_reviews_requested=c.pkg_dict.additional_reviews_requested
+          %}
+          </div>
+        </div>
+
+      {% endif %}
+    </div>
+  {% elif c.pkg_dict.publishing_status  == 'rejected' %}
+    {% if h.is_admin(c.user, c.pkg_dict.owner_org) %}
+    <div class="alert alert-danger" role="alert">
+      <p>{% trans %}Dataset was rejected. The editor of the dataset has been notified by email.{% endtrans %}</p>
+    </div>
+    {% endif %}
+    {% if not h.is_admin(c.user, c.pkg_dict.owner_org)%}
+    <div class="alert alert-danger" role="alert">
+      <p>{% trans %}Dataset was rejected by the reviewer. Please update the dataset according to the feedback you received by email and resubmit for review.{% endtrans %}</p>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    {% block package_description %}
+    <div class="dataset-status-label">
+      {% if pkg.private %}
+      <span class="dataset-private label label-inverse pull-right px-2">
+        <i class="fa fa-lock"></i>
+        {{ _('Private') }}
+      </span>
+    {% endif %}
+      {% if pkg.get('state', '').startswith('draft') %}
+      <span class="badge badge bg-secondary">{{ _('Draft') }}</span>
+    {% elif pkg.get('publishing_status', '').startswith('in_progress') %}
+      <span class="badge badge bg-secondary">{{ _('In Progress') }}</span>
+    {% elif pkg.get('state', '').startswith('deleted') %}
+      <span class="badge badge bg-danger">{{ _('Deleted') }}</span>
+    {% endif %}
+    </div>
+      <h1>
+        {% block page_heading %}
+          {{ h.dataset_display_name(pkg) }}
+          {% if pkg.state.startswith('draft') %}
+            [{{ _('Draft') }}]
+          {% endif %}
+          {% if pkg.state == 'deleted' %}
+            [{{ _('Deleted') }}]
+          {% endif %}
+        {% endblock %}
+      </h1>
+      {% block package_notes %}
+        {% if pkg.notes %}
+          <div class="notes embedded-content">
+            {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+          </div>
+        {% endif %}
+      {% endblock %}
+    {% endblock %}
+    {% block package_resources %}
+      {% snippet "package/snippets/resources_list.html", pkg=pkg, resources=pkg.resources %}
+    {% endblock %}
+
+    {% block package_tags %}
+      {% snippet "package/snippets/tags.html", tags=pkg.tags %}
+    {% endblock %}
+
+    {% block package_additional_info %}
+      {% snippet "package/snippets/additional_info.html", pkg_dict=pkg %}
+    {% endblock %}
+
+    {% if c.pkg_dict.get('latest_workflow_action') and c.pkg_dict.get('latest_workflow_action').action != None %}
+        {% set latest_workflow_action = c.pkg_dict.get('latest_workflow_action') %}
+        {% snippet "package/snippets/reviewer_details.html", latest_workflow_action=latest_workflow_action, decision=h.map_workflow_action_to_decision_type(latest_workflow_action) %}
+    {% endif %}
+{% endblock %}

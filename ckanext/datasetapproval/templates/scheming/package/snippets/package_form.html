@@ -1,0 +1,74 @@
+{% asset "datasetapproval/package_form_helpers_js" %}
+{% asset "datasetapproval/field_visibility_helper_js" %}
+{% ckan_extends %}
+
+{% block basic_fields %}
+    {{ super() }}
+    <div id="package-meta" data-package-id="{{ data.id }}"></div>
+    <input id="field-publishing_status" type="hidden" name="publishing_status" value="{{data.publishing_status}}" placeholder=""
+                class="form-control">
+    <input type="hidden" name="bypass_review" value="false" id="bypass-review-flag">
+{% endblock %}
+
+{% block stages %}
+  {% if not h.is_admin(c.user) %}
+    {% snippet "snippets/dataset_approval_alert_note.html" %}
+  {% endif %}
+  {% if form_style != 'edit' %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block save_button %}
+  {% asset 'datasetapproval/datasetapproval_org_js' %}
+    <!-- button that is for saving in progress - available on both create and edit -->
+  {% if form_style == 'edit' %}
+      <!-- save buttons -->
+      <button class="btn btn-secondary" type="submit" name="save" id="saveButton" hidden>{{ _('Save as in progress') }}</button>
+      <button class="btn btn-primary" type="submit" name="save" value="submit-review" hidden id="updateButton">
+        {{ h.humanize_entity_type('package', pkg_dict.type, 'update label') or _('Update Dataset') }}
+      </button> 
+
+      <!-- submit button -->
+      {% set publishing_status = pkg_dict.get('publishing_status') %}
+      {% if publishing_status in ['approved'] %}
+        <button class="btn btn-primary" name="submit_check" type="button" data-bs-toggle="modal" data-bs-target="#submitReview" hidden id="submitButton">
+          {{ _('Submit for Review') }}
+        </button>
+      {% else %}
+        <button class="btn btn-primary" type="submit" name="save" value="submit-review" hidden id="submitButton">{{ _('Submit for Review') }}</button>
+      {% endif %} 
+  {% else %}
+    <button class="btn btn-primary" type="submit" name="save" >{{ _('Next: Add Data') }}</button>
+  {% endif %}
+  <div class="modal" tabindex="-1" id="submitReview">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span id="review-title">Submitting for review</span>
+            <span id="bypass-title" class="d-none">Updating dataset visibility</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="review-text" class="text-start">
+            This dataset has previously been approved, are you sure you wish to submit this for review again?
+          </p>
+          <p id="visibility-text" class="text-start d-none">
+            You are about to make this approved dataset <span id="visibility-value"></span>, are you sure you wish to proceed?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="modalSubmitButton" class="btn btn-primary" type="submit" name="save" value="submit-review">
+            Submit
+          </button>
+          <button class="btn btn-primary d-none" type="submit" name="save" value="bypass-review">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
