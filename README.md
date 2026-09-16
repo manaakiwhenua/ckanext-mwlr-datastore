@@ -93,6 +93,8 @@ This code lived at `src/ckanext-mwlr-datastore` inside a private repository hold
 
 Two things follow from that. Commits before September 2026 were written in the context of the larger repository, so a message may describe work whose other half - a Dockerfile, a pipeline, a Kubernetes manifest - is not here. And "Bitbucket pull request N" in an old message refers to a pull request in that repository, not to anything in this one.
 
+On 17 September 2026 the dataset approval workflow joined as the third plugin, `dataset_approval`. It came from [manaakiwhenua/ckanext-datasetapproval](https://github.com/manaakiwhenua/ckanext-datasetapproval), itself a fork of Datopian's [ckanext-datasetapproval](https://github.com/datopian/ckanext-datasetapproval), and arrived with its history: one commit standing in for the upstream work with its authors credited, then every Manaaki Whenua commit with its original author and date. The plugin's own [README](ckanext/datasetapproval/README.md) records the origin, the commit taken and what has changed since.
+
 ## Licence
 
 [AGPL-3.0-or-later](LICENSE). Note the AGPL's network clause: if you run a modified version as a public service, you must offer its source to your users.
