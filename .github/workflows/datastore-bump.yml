@@ -75,3 +75,13 @@ jobs:
           | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
               "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- \
           | jq -r '"opened " + .links.html.href'
+      - name: Nudge the pull request pipeline
+        # Bitbucket only starts a pull request pipeline on a push made while
+        # the pull request is open; the branch push above happened before it
+        # existed, so an empty commit now gives it a build.
+        if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        working-directory: datastore
+        run: |
+          git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
+            commit --allow-empty -m "ci: trigger the pull request build"
+          git push origin HEAD
