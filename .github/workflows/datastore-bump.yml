@@ -69,9 +69,19 @@ jobs:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
-          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow; the release notes are at ${{ github.event.release.html_url || 'the workflow_dispatch input' }}."
+          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
           jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
             '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
           | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
               "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- \
           | jq -r '"opened " + .links.html.href'
+      - name: Nudge the pull request pipeline
+        # Bitbucket only starts a pull request pipeline on a push made while
+        # the pull request is open; the branch push above happened before it
+        # existed, so an empty commit now gives it a build.
+        if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        working-directory: datastore
+        run: |
+          git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
+            commit --allow-empty -m "ci: trigger the pull request build"
+          git push origin HEAD
