@@ -1,0 +1,32 @@
+{% ckan_extends %}
+{% asset 'mwlr_datastore/mwlr_datastore_css' %}
+
+{# Here we're overriding the errors block in the scheming extension's own 'resource_form.html' template, which in turn overrides the CKAN default. Scheming has its own way of displaying errors, which we're calling with super() (note that the Scheming way uses the field name rather than the display name). Please refer to scheming's https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/templates/scheming/snippets/errors.html and https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/templates/scheming/package/snippets/resource_form.html for reference. #}
+
+{% block errors %}
+  {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
+  {%- set resource_field_names = schema.resource_fields | map(attribute='field_name') | list -%}
+  {%- set dataset_errors = [] -%}
+  {%- for key in errors if key not in resource_field_names and key != 'resources' -%}
+      {%- set field = h.scheming_field_by_name(schema.dataset_fields, key) -%}
+      {%- do dataset_errors.append(h.scheming_language_text(field.label) if field else key) -%}
+  {%- endfor -%}
+  <div>
+    <p>Error logging</p>
+    <p> schema {{ schema }} </p>
+    <p> dataset_errors {{ dataset_errors }} </p>
+    <p> errors {{ errors }} </p>
+    <p> pkg_name {{ pkg_name }} </p>
+    <p> resource_field_names {{ resource_field_names }} </p>
+    <p> dataset_type {{ dataset_type }} </p>
+  </div>
+  {%- if dataset_errors -%}
+  <div class="error-explanation alert alert-danger">
+          <p>{{ _('The dataset is missing the following required metadata:') }}
+            <strong>{{ dataset_errors | join(', ') }}</strong>. {{ _('This resource cannot be saved until the dataset metadata is complete.') }}
+            <a href="{{ h.url_for('dataset.edit', id=pkg_name) }}">{{ _('Edit the dataset') }}</a>
+            {{ _('to validate these fields, then come back to this resource.') }}</p>
+  </div>
+  {%- endif -%}
+    {{ super() }}
+{% endblock %}
