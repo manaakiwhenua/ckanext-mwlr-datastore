@@ -8,8 +8,8 @@ metadata:
   title: ckanext-mwlr-datastore
   description: >-
     The CKAN extension behind DataStore: the dataset schema and validators, the
-    theme, view tracking and the dataset approval workflow, as separately
-    enabled CKAN plugins in one package.
+    theme, view and download counts, and the dataset approval workflow, as
+    separately enabled CKAN plugins in one package.
   annotations:
     backstage.io/techdocs-ref: dir:.
     backstage.io/source-location: url:https://github.com/manaakiwhenua/ckanext-mwlr-datastore/tree/main/

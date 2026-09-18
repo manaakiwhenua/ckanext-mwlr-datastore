@@ -3,7 +3,7 @@
 # component's Docs tab. Same theme and extensions as the DataStore and platform
 # docs so the pages look like the rest of the estate's documentation.
 site_name: ckanext-mwlr-datastore
-site_description: The CKAN extension behind DataStore - schema, theme, tracking and the dataset approval workflow
+site_description: The CKAN extension behind DataStore - schema, theme, view counts and the dataset approval workflow
 repo_url: https://github.com/manaakiwhenua/ckanext-mwlr-datastore
 edit_uri: edit/main/docs/
 docs_dir: docs
