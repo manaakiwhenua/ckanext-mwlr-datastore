@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.4](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.3...v1.2.4) (2026-09-18)
+
+Maintenance release on the 1.2 line (branch maint/1.2) for sites still on CKAN 2.10.
+
+### Fixes
+
+* MWDS-477 a CSRF exemption lasts only for the request that made it (GHSA-mcvf-jxcw-vj73, for CKAN before 2.10.11)
+
 ## [1.2.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.2.2...v1.2.3) (2026-09-16)
 
 
