@@ -5,7 +5,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from flask import Blueprint
 
-from ckanext.mwlr_datastore import readiness
+from ckanext.mwlr_datastore import csrf_scope, readiness
 from ckanext.mwlr_datastore.logic import validators
 
 
@@ -19,12 +19,20 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IMiddleware, inherit=True)
 
     def is_fallback(self):
         return True
 
     def package_types(self):
         return []
+
+    def make_middleware(self, app, config):
+        """Scope CSRF exemptions to their request (MWDS-477, see csrf_scope)."""
+        if hasattr(app, "teardown_request"):
+            from ckan.config.middleware.flask_app import csrf
+            csrf_scope.install(app, csrf)
+        return app
 
     def get_blueprint(self):
         """Provides Flask blueprint which sets up a custom
