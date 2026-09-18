@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.0.0...v2.0.1) (2026-09-18)
+
+
+### Documentation
+
+* merging the release pull request is the release, not approving it ([#36](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/36)) ([f0b31f8](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/f0b31f84e3b8837dc9fd56b3230ae074df3027a6))
+
 ## [2.0.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.2...v2.0.0) (2026-09-18)
 
 
