@@ -1,0 +1,41 @@
+# Tech docs for the ckanext-mwlr-datastore library. Backstage builds this (see
+# catalog-info.yaml: backstage.io/techdocs-ref) and serves it under the
+# component's Docs tab. Same theme and extensions as the DataStore and platform
+# docs so the pages look like the rest of the estate's documentation.
+site_name: ckanext-mwlr-datastore
+site_description: The CKAN extension behind DataStore - schema, theme, tracking and the dataset approval workflow
+repo_url: https://github.com/manaakiwhenua/ckanext-mwlr-datastore
+edit_uri: edit/main/docs/
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - techdocs-core
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+
+nav:
+  - Overview: index.md
+  - Dataset approval: dataset-approval.md
+  - Decisions:
+    - About these decisions: decisions/index.md
+    - 0001 Plugin composition: decisions/0001-plugin-composition.md
