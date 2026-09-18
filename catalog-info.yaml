@@ -1,0 +1,31 @@
+# Backstage catalogue entity for this extension. Registered centrally by a
+# Location in k8s-apps-config/catalog-info.yaml (curated-locations model) that
+# points at this file on main. The DataStore component depends on it.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ckanext-mwlr-datastore
+  title: ckanext-mwlr-datastore
+  description: >-
+    The CKAN extension behind DataStore: the dataset schema and validators, the
+    theme, view tracking and the dataset approval workflow, as separately
+    enabled CKAN plugins in one package.
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/source-location: url:https://github.com/manaakiwhenua/ckanext-mwlr-datastore/tree/main/
+    github.com/project-slug: manaakiwhenua/ckanext-mwlr-datastore
+  links:
+    - url: https://github.com/manaakiwhenua/ckanext-mwlr-datastore/releases
+      title: Releases
+      icon: code
+    - url: https://manaakiwhenua.atlassian.net/browse/MWDS
+      title: MWDS project
+      icon: help
+  tags:
+    - ckan
+    - ckan-extension
+    - python
+spec:
+  type: library
+  lifecycle: production
+  owner: platform-engineering

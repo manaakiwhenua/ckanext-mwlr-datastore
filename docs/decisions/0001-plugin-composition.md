@@ -1,0 +1,80 @@
+# 0001 - Plugin composition
+
+**Status:** Proposed · **Date:** 2026-09-18 · **Jira:** [MWDS-469](https://manaakiwhenua.atlassian.net/browse/MWDS-469)
+
+Proposed until the restricted resources design settles; the rules below are written so dataset approval can be tested against them now.
+
+## Context
+
+This extension ships several CKAN plugins from one package: `mwlr_datastore`, `mwlr_tracking` and, since v1.3.0, `dataset_approval`. A restricted resources feature is being planned ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and will most likely arrive as another plugin here.
+
+Keeping them as separate plugins in one package is deliberate: one release train and one test suite, but each capability switched on per environment by listing it in `ckan.plugins`. `dataset_approval` is off everywhere except the approvals environment, and its database migration only runs when it is listed.
+
+Separate plugins still share CKAN's extension points, and dataset approval and restricted resources both change **who can see what**. Some of those extension points combine plugins in order, and one of them silently ignores all but the first plugin. Without agreed rules, the second of the two to be written can quietly undo the first.
+
+### How CKAN combines plugins
+
+Checked against the CKAN 2.12.0 source.
+
+| Extension point | How several plugins combine | Source |
+|---|---|---|
+| Template overrides | The plugin listed **first** in `ckan.plugins` is searched first. With `{% ckan_extends %}` each override extends the next plugin's copy, so overrides of different blocks all apply. | `IConfigurer` iterates in reverse and `add_template_directory` prepends (`ckan/plugins/interfaces.py`, `ckan/plugins/toolkit.py`) |
+| Chained actions (`@chained_action`) | Every plugin's function wraps the next; the plugin listed **first** is the **outermost** wrapper and sees the final result. | `get_action` in `ckan/logic/__init__.py` |
+| Plain (unchained) action overrides | Two plugins overriding the same action raise `NameConflict` at startup. | same |
+| `IPackageController` hooks | Run in list order; each sees the previous plugin's output. | `PluginImplementations` in `ckan/plugins/core.py` |
+| Template helpers | Same name in two plugins: the plugin listed **first** wins, silently. | `ITemplateHelpers` iterates in reverse |
+| **`IPermissionLabels`** | **Only the first plugin implementing it is used. Any other is ignored without an error.** | `get_permission_labels` in `ckan/lib/plugins.py` |
+
+Permission labels are also **dataset-level only**: CKAN stores them on the dataset in the search index and filters searches and `package_show` by them. They cannot express "this resource is restricted but its dataset is not".
+
+### Where the plugins overlap today
+
+- **Permission labels:** `dataset_approval` implements `IPermissionLabels`; nothing else does.
+- **Chained actions:** `dataset_approval` chains `package_create`, `package_update`, `package_show` (a pass-through), `resource_create` and `resource_update`.
+- **Templates:** `package/read_base.html`, `package/search.html` and `page.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so order does not change what renders.
+- **Helpers:** no name collisions.
+- **Plugin order differs:** the approvals environment lists `mwlr_tracking tracking mwlr_datastore dataset_approval ...`; the DataStore repository's `.env.example` says to add `dataset_approval` at the start.
+
+## Decision
+
+1. **One plugin order, recorded here and used everywhere.** Access control first, then workflow, then presentation:
+
+    ```text
+    mwlr_tracking tracking <restricted resources> dataset_approval mwlr_datastore ... scheming_datasets ...
+    ```
+
+    `mwlr_tracking` before core `tracking` is an existing requirement (its templates must take precedence). Restricted resources goes before `dataset_approval` so its chained actions are the outermost: nothing another plugin does to a dataset or resource can reach a user without passing its check last. Environments that do not enable a plugin simply omit it; the relative order of the rest does not change.
+
+2. **Exactly one `IPermissionLabels` implementation among our plugins.** Today that is `dataset_approval`. Restricted resources does not implement `IPermissionLabels`: labels cannot express resource-level restriction anyway. If a later feature needs dataset-level labels as well, the label logic moves into one implementation that combines the rules, rather than a second plugin implementing the interface.
+
+3. **Resource-level access control uses chained auth functions and chained actions**, not permission labels: `resource_show`, `resource_view_show` and `resource_view_list` auth, the resource download route, and whatever `package_show` must hide from the resource list. This is also the approach of the main community extension, [ckanext-restricted](https://github.com/EnviDat/ckanext-restricted), although it replaces `package_show` and `resource_view_list` outright rather than chaining them, so it could not be adopted unmodified under rule 4.
+
+4. **Every override of a core action or auth function is chained** (`@toolkit.chained_action`, `@toolkit.chained_auth_function`), never a plain replacement. Two plain replacements of the same action fail at startup, and a plain replacement discards core's implementation, so it has to reimplement it and keep up with every CKAN upgrade that changes it.
+
+5. **Template overrides use `{% ckan_extends %}` and the narrowest block available.** Two plugins overriding the same block is a bug to fix, not a precedence to rely on.
+
+6. **The test suite runs our plugins together, in this order.** Each plugin's own tests pass in isolation and cannot catch an interaction. `test.ini` today loads only `mwlr_datastore`; a combined configuration gets tests for the combined behaviour: a dataset in review stays hidden, a restricted resource on an approved public dataset stays restricted, and so on.
+
+## Alternatives considered
+
+**Merge everything into `mwlr_datastore`.** One plugin removes ordering from the picture entirely. Rejected: switching the approval workflow off would need a feature flag of our own, where listing the plugin already does that for free, and the approval code, which carries Datopian's history and AGPL attribution, would lose its clear boundary. The composition problems do not go away either; they move inside one class where they are harder to see.
+
+**No fixed order, each plugin defensive about the others.** Rejected: permission labels cannot be made defensive - the ignored plugin never runs - and chained actions give different results in a different order by design.
+
+**Restricted resources as a separate package.** Possible, and nothing here prevents it later. Rejected for now for the same reason approval moved into this extension ([MWDS-400](https://manaakiwhenua.atlassian.net/browse/MWDS-400)): one release train and one place for the tests that exercise the combination.
+
+## Consequences
+
+- The approvals environment's order already fits rule 1. The DataStore `.env.example` comment ("add dataset_approval to the start") needs correcting.
+- Restricted resources has its integration points decided before its design starts: chained auth functions and actions, no permission labels, listed before `dataset_approval`.
+- `dataset_approval` gets checked against these rules before it goes to testing ([dataset approval](../dataset-approval.md) lists what that check found).
+- `test.ini` and CI grow a combined-plugins configuration.
+
+## Open questions
+
+- **Where plugin-owned schema fields live.** Scheming allows one schema per dataset type, and the approval fields (`publishing_status`, `chosen_visibility`, the review fields) sit commented out in `mwlr_datastore`'s schema. The options are: uncomment them for every environment and have them do nothing when the plugin is off; a second schema file that approval environments point `scheming.dataset_schemas` at; or keep workflow state out of the dataset dictionary altogether, in the plugin's own tables, and index it with `before_dataset_index`. Restricted resources will face the same question for its resource fields.
+- **Blueprint precedence.** `dataset_approval` registers its own `/dataset/new` and `/dataset/edit/<id>` views, which scheming and core also register. Which one serves the request depends on registration order, not on this ADR's plugin order alone. Confirm on the approvals environment and record the answer here.
+
+## Revisit if
+
+The restricted resources design needs dataset-level labels, a plugin moves out to its own package, or a CKAN upgrade changes how any extension point in the table above combines plugins.

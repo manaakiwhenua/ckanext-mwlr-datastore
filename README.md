@@ -2,12 +2,14 @@
 
 The CKAN extension behind [DataStore](https://datastore.landcareresearch.co.nz), the research data catalogue run by the Bioeconomy Science Institute (formerly Manaaki Whenua – Landcare Research).
 
-One extension, providing two plugins:
+One extension, providing three plugins:
 
 | plugin | what it does |
 |---|---|
 | `mwlr_datastore` | the dataset schema, its validators, the theme templates, view and download counts on dataset and resource pages, and helpers that report which environment and which build is running |
 | `dataset_approval` | the dataset approval workflow: datasets stay private until an organisation admin approves them |
+
+How the plugins fit together, and the order to list them in, is in the [docs](docs/index.md#plugin-composition).
 
 It is written for our catalogue rather than as a general-purpose extension, and it is published because the work is publicly funded and because the CKAN community benefits from seeing how other people solved the same problems. You are welcome to use it, fork it, or lift a single validator out of it.
 
