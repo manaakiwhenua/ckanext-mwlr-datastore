@@ -65,17 +65,20 @@ jobs:
           echo "branch=$branch" >> "$GITHUB_OUTPUT"; echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Open the pull request
         if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        id: pr
         env:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
-          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
+          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow and merged by it once the build passes. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
           jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
             '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
           | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
-              "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- \
-          | jq -r '"opened " + .links.html.href'
+              "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- > pr.json
+          jq -r '"opened " + .links.html.href' pr.json
+          echo "id=$(jq -r .id pr.json)" >> "$GITHUB_OUTPUT"
       - name: Nudge the pull request pipeline
+        id: nudge
         # Bitbucket only starts a pull request pipeline on a push made while
         # the pull request is open; the branch push above happened before it
         # existed, so an empty commit now gives it a build.
@@ -85,3 +88,30 @@ jobs:
           git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
             commit --allow-empty -m "ci: trigger the pull request build"
           git push origin HEAD
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Merge when the build is green
+        # The review that matters happened on the extension release; this pull
+        # request is one pinned line. main requires a passing build to merge, so
+        # wait for the pipeline on the nudge commit and merge on success; on
+        # failure say so on the pull request and leave it open.
+        if: steps.creds.outputs.have == 'true' && steps.branch.outputs.changed == 'true'
+        env:
+          BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
+          PR_ID: ${{ steps.pr.outputs.id }}
+          SHA: ${{ steps.nudge.outputs.sha }}
+        run: |
+          api="https://api.bitbucket.org/2.0/repositories/${BB_REPO}"
+          hdr=(-H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json')
+          for i in $(seq 1 60); do
+            sleep 30
+            # Only the Pipelines status counts (key prs:...); Snyk posts three
+            # "build" statuses within seconds that would otherwise be read as
+            # the build having passed.
+            state=$(curl -sS "${hdr[@]}" "${api}/commit/${SHA}/statuses?pagelen=50" | jq -r '[.values[] | select(.key | startswith("prs:"))] | if length==0 then "PENDING" else .[0].state end')
+            echo "attempt $i: build ${state}"
+            case "$state" in
+              SUCCESSFUL) curl -sS -f "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/merge" -d '{"merge_strategy":"squash","close_source_branch":true}' | jq -r '"merged " + .links.html.href'; exit 0 ;;
+              FAILED|STOPPED) jq -n --arg m "The pull request build did not pass, so this was not merged automatically. Fix or re-run and merge by hand." '{content:{raw:$m}}' | curl -sS "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/comments" -d @- > /dev/null; echo "build ${state}: left open"; exit 1 ;;
+            esac
+          done
+          echo "build still running after 30 minutes: left open"; exit 1

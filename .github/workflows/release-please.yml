@@ -35,7 +35,25 @@ jobs:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+      - name: Point the release pull request at what it contains
+        # The changelog's compare link (vLAST...vNEXT) is the permanent form and
+        # only resolves once the tag exists, i.e. after the merge. While the pull
+        # request is open, a reviewer wants vLAST...main, so append that as a
+        # footer. release-please rewrites the body on every regeneration; this
+        # runs after it each time, so the footer is always present and current.
+        # prs_created is false when a merge leaves the release pull request
+        # unchanged (a ci: or chore: commit), so look the open one up instead.
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --search 'author:app/mwlr-release "chore(main): release"' --json number --jq '.[0].number // empty')
+          [ -n "$number" ] || { echo "no open release pull request"; exit 0; }
+          last=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName')
+          body=$(gh pr view --repo "$GITHUB_REPOSITORY" "$number" --json body --jq '.body' | sed '/^<!-- contents -->$/,$d')
+          printf '%s\n\n<!-- contents -->\n---\n**Before it merges**, what this release will contain is everything on `main` since %s: https://github.com/${{ github.repository }}/compare/%s...main (the changelog link above resolves once the tag exists).\n' "$body" "$last" "$last" > body.md
+          gh pr edit --repo "$GITHUB_REPOSITORY" "$number" --body-file body.md
