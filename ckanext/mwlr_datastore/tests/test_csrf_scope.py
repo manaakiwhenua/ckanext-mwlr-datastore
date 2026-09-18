@@ -41,6 +41,18 @@ def test_a_request_does_not_remove_a_start_up_exemption_it_repeats():
     assert "ckan.views.api.action" in csrf._exempt_views
 
 
+def test_every_app_sharing_the_csrf_object_cleans_up():
+    """CKAN's csrf is module-level; the test suite builds an app per test."""
+    csrf = CSRFProtect()
+    for _ in range(2):
+        app = Flask(__name__)
+        csrf_scope.install(app, csrf)
+        app.before_request(lambda: csrf.exempt("ckan.views.dataset.new"))
+        app.add_url_rule("/form", "form", lambda: "", methods=["POST"])
+        app.test_client().post("/form")
+        assert "ckan.views.dataset.new" not in csrf._exempt_views
+
+
 def test_nothing_to_do_where_ckan_already_exempts_per_request():
     class PerRequest(CSRFProtect):
         def exempt_this_request(self):
