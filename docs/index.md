@@ -6,21 +6,20 @@ The DataStore deployment itself - the image, the environments, the pipeline - is
 
 ## Plugins
 
-One package, several CKAN plugins. Each is switched on by listing it in `ckan.plugins`, so an environment gets exactly the capabilities it lists.
+One package, more than one CKAN plugin. Each is switched on by listing it in `ckan.plugins`, so an environment gets exactly the capabilities it lists.
 
 | Plugin | What it does | Enabled |
 |---|---|---|
-| `mwlr_datastore` | the dataset schema and its validators, the theme templates, facets, environment and build helpers, the readiness endpoint | every environment |
-| `mwlr_tracking` | page and resource view counts on dataset and resource pages | every environment |
+| `mwlr_datastore` | the dataset schema and its validators, the theme templates, facets, view and download counts, environment and build helpers, the readiness endpoint | every environment |
 | `dataset_approval` | the [dataset approval](dataset-approval.md) workflow | the approvals environment only |
 
 Restricted resources is being designed ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and is expected to arrive as another plugin here.
 
 ## Plugin composition
 
-Several of CKAN's extension points combine plugins in the order they appear in `ckan.plugins`, and one - permission labels - uses only the first plugin that implements it. Dataset approval and restricted resources both change who can see what, so the order and the division of responsibilities are fixed in [decision 0001](decisions/0001-plugin-composition.md). In short:
+Several of CKAN's extension points combine plugins - ours and CKAN's own - in the order they appear in `ckan.plugins`, and one - permission labels - uses only the first plugin that implements it. Dataset approval and restricted resources both change who can see what, so the order and the division of responsibilities are fixed in [decision 0001](decisions/0001-plugin-composition.md). In short:
 
-- one order everywhere: access control, then workflow, then presentation - `mwlr_tracking tracking <restricted resources> dataset_approval mwlr_datastore ...`;
+- one order everywhere - `mwlr_datastore <restricted resources> dataset_approval tracking ...` - so access control wraps the workflow, and the workflow's templates win over core tracking's;
 - exactly one of our plugins implements `IPermissionLabels`;
 - resource-level access control uses chained auth functions and actions, not permission labels;
 - every override of a core action or auth function is chained;

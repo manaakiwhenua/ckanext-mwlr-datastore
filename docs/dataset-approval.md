@@ -8,10 +8,10 @@ How this plugin must fit with the others in this extension is set by [decision 0
 
 ## Turning it on
 
-The plugin is off unless an environment lists it in `ckan.plugins`. Today only the approvals environment does, in the order `decision 0001` sets:
+The plugin is off unless an environment lists it in `ckan.plugins`. Today only the approvals environment does. Decision 0001 sets the order:
 
 ```text
-mwlr_tracking tracking mwlr_datastore dataset_approval ... scheming_datasets ...
+mwlr_datastore dataset_approval tracking ... scheming_datasets ...
 ```
 
 When it is listed, the DataStore image runs `ckan db upgrade -p dataset_approval` at start-up, creating its two tables. Environments that do not list it never get the tables.
@@ -68,3 +68,4 @@ Found reading the code for [MWDS-469](https://manaakiwhenua.atlassian.net/browse
 6. **Review requests go to every sysadmin**, as well as the organisation's admins. Confirm that is wanted at production volumes.
 7. **An "approved for restricted access" outcome is waiting on restricted resources.** It is commented out of the approval outcomes "until restricted functionality implemented". That is the first concrete point where the two features meet, and belongs in the restricted resources design.
 8. **The testing plan predates CKAN 2.12 and the move.** The [testing plan](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/16651878401) was last updated in December 2025 and needs revising once the points above are settled.
+9. **Core `tracking` hides the workflow's search options, and the search form still has CKAN 2.10 names.** From CKAN 2.11 page tracking is the core `tracking` plugin, and it replaces the same search-form block the plugin does. The approvals environment lists `tracking` first, so the sysadmin sort options (In progress, Rejected, Review pending) never appear, and a popular dataset shows its "recent views" badge twice in listings. Decision 0001 puts `dataset_approval` first. Once it is, the plugin's search form renders, and it still uses `g.tracking_enabled` and `request.params`, neither of which exists on 2.12: the Popular sort option disappears and the form's show-empty behaviour stops working.

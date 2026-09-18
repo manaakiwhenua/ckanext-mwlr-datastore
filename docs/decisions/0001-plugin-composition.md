@@ -6,11 +6,11 @@ Proposed until the restricted resources design settles; the rules below are writ
 
 ## Context
 
-This extension ships several CKAN plugins from one package: `mwlr_datastore`, `mwlr_tracking` and, since v1.3.0, `dataset_approval`. A restricted resources feature is being planned ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and will most likely arrive as another plugin here.
+This extension ships CKAN plugins from one package: `mwlr_datastore` and, since v1.3.0, `dataset_approval`. A restricted resources feature is being planned ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and will most likely arrive as another plugin here.
 
 Keeping them as separate plugins in one package is deliberate: one release train and one test suite, but each capability switched on per environment by listing it in `ckan.plugins`. `dataset_approval` is off everywhere except the approvals environment, and its database migration only runs when it is listed.
 
-Separate plugins still share CKAN's extension points, and dataset approval and restricted resources both change **who can see what**. Some of those extension points combine plugins in order, and one of them silently ignores all but the first plugin. Without agreed rules, the second of the two to be written can quietly undo the first.
+Separate plugins still share CKAN's extension points with each other and with CKAN's own plugins, and dataset approval and restricted resources both change **who can see what**. Some of those extension points combine plugins in order, and one of them silently ignores all but the first plugin. Without agreed rules, the second of the two to be written can quietly undo the first.
 
 ### How CKAN combines plugins
 
@@ -31,19 +31,26 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 - **Permission labels:** `dataset_approval` implements `IPermissionLabels`; nothing else does.
 - **Chained actions:** `dataset_approval` chains `package_create`, `package_update`, `package_show` (a pass-through), `resource_create` and `resource_update`.
-- **Templates:** `package/read_base.html`, `package/search.html` and `page.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so order does not change what renders.
+- **Templates, between our plugins:** `package/read_base.html`, `package/search.html` and `page.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders.
+- **Templates, with core `tracking`:** CKAN's own `tracking` plugin (2.11 onwards) and `dataset_approval` both replace the same block in two templates, and neither calls `super()`:
+    - `package/search.html`, block `form`: whichever is listed first supplies the search form. On the approvals environment `tracking` comes first, so the sysadmin-only sort options `dataset_approval` adds (In progress, Rejected, Review pending) do not appear.
+    - `snippets/package_item.html`, block `heading_meta`: `dataset_approval`'s version replaces the base and already includes the "recent views" badge. `tracking`'s version calls `super()` and adds the badge again, so with `tracking` first a popular dataset shows it twice.
 - **Helpers:** no name collisions.
-- **Plugin order differs:** the approvals environment lists `mwlr_tracking tracking mwlr_datastore dataset_approval ...`; the DataStore repository's `.env.example` says to add `dataset_approval` at the start.
+- **Plugin order differs:** the approvals environment and CI list `tracking` before `dataset_approval`; the DataStore repository's `.env.example` says to add `dataset_approval` at the start.
 
 ## Decision
 
-1. **One plugin order, recorded here and used everywhere.** Access control first, then workflow, then presentation:
+1. **One plugin order, recorded here and used everywhere:**
 
     ```text
-    mwlr_tracking tracking <restricted resources> dataset_approval mwlr_datastore ... scheming_datasets ...
+    mwlr_datastore <restricted resources> dataset_approval tracking ... scheming_datasets ...
     ```
 
-    `mwlr_tracking` before core `tracking` is an existing requirement (its templates must take precedence). Restricted resources goes before `dataset_approval` so its chained actions are the outermost: nothing another plugin does to a dataset or resource can reach a user without passing its check last. Environments that do not enable a plugin simply omit it; the relative order of the rest does not change.
+    Two constraints set it; the rest is today's order kept:
+    - restricted resources before `dataset_approval`, so its chained actions are the outermost: nothing another plugin does to a dataset or resource reaches a user without passing its check last;
+    - `dataset_approval` before core `tracking`, so the workflow's search form and listing badges are the ones that render.
+
+    `mwlr_datastore` overlaps with neither on anything that depends on order, so it stays first. Environments that do not enable a plugin omit it; the relative order of the rest does not change.
 
 2. **Exactly one `IPermissionLabels` implementation among our plugins.** Today that is `dataset_approval`. Restricted resources does not implement `IPermissionLabels`: labels cannot express resource-level restriction anyway. If a later feature needs dataset-level labels as well, the label logic moves into one implementation that combines the rules, rather than a second plugin implementing the interface.
 
@@ -51,9 +58,9 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 4. **Every override of a core action or auth function is chained** (`@toolkit.chained_action`, `@toolkit.chained_auth_function`), never a plain replacement. Two plain replacements of the same action fail at startup, and a plain replacement discards core's implementation, so it has to reimplement it and keep up with every CKAN upgrade that changes it.
 
-5. **Template overrides use `{% ckan_extends %}` and the narrowest block available.** Two plugins overriding the same block is a bug to fix, not a precedence to rely on.
+5. **Template overrides use `{% ckan_extends %}` and the narrowest block available, and call `super()` where they add to a block rather than replace it.** Two plugins replacing the same block is a bug to fix, not a precedence to rely on - including when the other plugin is one of CKAN's own. Where replacing is unavoidable, as with `dataset_approval`'s search form, rule 1 decides the winner and the replacing template carries what the other one would have added.
 
-6. **The test suite runs our plugins together, in this order.** Each plugin's own tests pass in isolation and cannot catch an interaction. `test.ini` today loads only `mwlr_datastore`; a combined configuration gets tests for the combined behaviour: a dataset in review stays hidden, a restricted resource on an approved public dataset stays restricted, and so on.
+6. **The test suite runs the plugins together, in this order, and tests what they do together.** CI already loads them together on each CKAN version it tests, with `tracking` before `dataset_approval`; it moves to rule 1's order. What it lacks are tests of the combined behaviour: a dataset in review stays out of search, the workflow's sort options appear for a sysadmin, a restricted resource on an approved public dataset stays restricted.
 
 ## Alternatives considered
 
@@ -65,10 +72,10 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ## Consequences
 
-- The approvals environment's order already fits rule 1. The DataStore `.env.example` comment ("add dataset_approval to the start") needs correcting.
+- The approvals environment and CI move `tracking` after `dataset_approval`. That brings back the workflow's sort options, and also shows two CKAN 2.10 leftovers in the workflow's search form (see [dataset approval](../dataset-approval.md#open-questions), question 9). The DataStore `.env.example` comment ("add dataset_approval to the start") changes to match.
 - Restricted resources has its integration points decided before its design starts: chained auth functions and actions, no permission labels, listed before `dataset_approval`.
 - `dataset_approval` gets checked against these rules before it goes to testing ([dataset approval](../dataset-approval.md) lists what that check found).
-- `test.ini` and CI grow a combined-plugins configuration.
+- CI grows tests of the combined behaviour.
 
 ## Open questions
 
