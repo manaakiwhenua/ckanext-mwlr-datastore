@@ -72,7 +72,12 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ## Open questions
 
-- **Where plugin-owned schema fields live.** Scheming allows one schema per dataset type, and the approval fields (`publishing_status`, `chosen_visibility`, the review fields) sit commented out in `mwlr_datastore`'s schema. The options are: uncomment them for every environment and have them do nothing when the plugin is off; a second schema file that approval environments point `scheming.dataset_schemas` at; or keep workflow state out of the dataset dictionary altogether, in the plugin's own tables, and index it with `before_dataset_index`. Restricted resources will face the same question for its resource fields.
+- **Where a plugin's fields live.** The approval fields (`publishing_status`, `chosen_visibility`, the review questions, conditions of release) sit commented out in `mwlr_datastore`'s schema, so the workflow cannot store its state (see [dataset approval](../dataset-approval.md#open-questions), question 1). The aim is that switching a plugin off hides its fields and switching it back on restores them. Constraints any answer has to meet:
+    - scheming holds one schema per dataset type; a second file for the same type replaces the first, and there is no include or merge;
+    - CKAN drops fields the schema does not declare, without an error, so removing a field from the schema loses its stored values the next time each dataset is edited;
+    - some of these fields may describe the dataset rather than the workflow (whether a dataset needs te ao Māori review, for instance), and those may be worth keeping whether the workflow runs or not. That is for the data owners to say.
+
+    To be proposed by the approval workflow's maintainers (Mary O'Leary, Justine Waterson), who know why each field exists. Restricted resources will face the same question for its resource fields, so the answer becomes a rule here.
 - **Blueprint precedence.** `dataset_approval` registers its own `/dataset/new` and `/dataset/edit/<id>` views, which scheming and core also register. Which one serves the request depends on registration order, not on this ADR's plugin order alone. Confirm on the approvals environment and record the answer here.
 
 ## Revisit if
