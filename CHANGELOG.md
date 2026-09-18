@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.2...v2.0.0) (2026-09-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* the mwlr_tracking plugin no longer exists. Remove it from ckan.plugins before upgrading, or CKAN will not start.
+
+### Features
+
+* MWDS-389 retire mwlr_tracking and use CKAN's own tracking ([0ec2fe3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/0ec2fe3a77b6d11a476e86eb9f2b13ae55a01c9f))
+
 ## [1.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.1...v1.3.2) (2026-09-16)
 
 
