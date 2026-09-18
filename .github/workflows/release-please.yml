@@ -47,11 +47,15 @@ jobs:
         # footer. release-please rewrites the body on every regeneration; this
         # runs after it each time, so the footer is always present and current.
         # prs_created is false when a merge leaves the release pull request
-        # unchanged (a ci: or chore: commit), so look the open one up instead.
+        # unchanged (a ci: or chore: commit), so look the open one up instead -
+        # by its branch, not with --search or --author: those go through GitHub's
+        # search index, which does not yet know a pull request release-please
+        # opened a second earlier, so the footer was skipped whenever this run
+        # was the one that created it (release 2.0.0).
         env:
           GH_TOKEN: ${{ steps.app.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
-          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --search 'author:app/mwlr-release "chore(main): release"' --json number --jq '.[0].number // empty')
+          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --head release-please--branches--main--components--ckanext-mwlr-datastore --json number --jq '.[0].number // empty')
           [ -n "$number" ] || { echo "no open release pull request"; exit 0; }
           last=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName')
           body=$(gh pr view --repo "$GITHUB_REPOSITORY" "$number" --json body --jq '.body' | sed '/^<!-- contents -->$/,$d')
