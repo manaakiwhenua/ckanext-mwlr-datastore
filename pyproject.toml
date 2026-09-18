@@ -1,7 +1,7 @@
 [project]
 name = "ckanext-mwlr-datastore"
 version = "1.3.2"
-description = "The CKAN extension behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme and view tracking"
+description = "The CKAN extension behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme, view counts and dataset approval"
 readme = "README.md"
 authors = [
     {name = "Bioeconomy Science Institute", email = "DataManager@landcareresearch.co.nz"}
@@ -23,7 +23,6 @@ Issues = "https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues"
 
 [project.entry-points."ckan.plugins"]
 mwlr_datastore = "ckanext.mwlr_datastore.plugin:MwlrDatastorePlugin"
-mwlr_tracking = "ckanext.mwlr_tracking.plugin:MwlrTrackingPlugin"
 dataset_approval = "ckanext.datasetapproval.plugin:DatasetapprovalPlugin"
 
 

@@ -5,7 +5,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from flask import Blueprint
 
-from ckanext.mwlr_datastore import readiness
+from ckanext.mwlr_datastore import readiness, tracking
 from ckanext.mwlr_datastore.logic import validators
 
 
@@ -54,6 +54,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
             'get_env_var': self.get_env_var,
             'mwlr_environment': self.mwlr_environment,
             'mwlr_versions': self.mwlr_versions,
+            **tracking.get_helpers(),
         }
 
     def mwlr_environment(self):
