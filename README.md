@@ -85,7 +85,9 @@ pytest --ckan-ini=test.ini ckanext/mwlr_datastore
 
 ## Contributing
 
-Pull requests are welcome. Titles follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`) because they drive the version and the changelog. We squash-merge, so the pull request title is the commit that lands.
+[CONTRIBUTING.md](CONTRIBUTING.md) says how: issues are welcome from anyone, a pull request from outside our organisation is best started as an issue first, and titles follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`) because they drive the version and the changelog. We squash-merge, so the pull request title is the commit that lands.
+
+Found a security problem? Do not open an issue - [SECURITY.md](SECURITY.md) has the private reporting channel.
 
 ### Releasing
 
