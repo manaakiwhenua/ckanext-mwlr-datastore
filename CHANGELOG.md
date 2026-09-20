@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.0.0...v2.1.0) (2026-09-20)
+
+
+### Features
+
+* MWDS-438 disallow the faceted-search URL space in robots.txt ([#40](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/40)) ([644f413](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/644f4135acb2e05fd5bab13fee2b5a138f3d934a))
+
+
+### Documentation
+
+* add contributing and security policies ([#39](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/39)) ([27ecc8e](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/27ecc8e050ed557ce51e581ba48ca9177762a1f4))
+* merging the release pull request is the release, not approving it ([#36](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/36)) ([f0b31f8](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/f0b31f84e3b8837dc9fd56b3230ae074df3027a6))
+
 ## [2.0.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.2...v2.0.0) (2026-09-18)
 
 

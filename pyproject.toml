@@ -1,6 +1,6 @@
 [project]
 name = "ckanext-mwlr-datastore"
-version = "2.0.0"
+version = "2.1.0"
 description = "The CKAN extension behind the Bioeconomy Science Institute research data catalogue: dataset schema, validators, theme, view counts and dataset approval"
 readme = "README.md"
 authors = [
