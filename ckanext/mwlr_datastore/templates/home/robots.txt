@@ -1,0 +1,37 @@
+{% ckan_extends %}
+{#
+  MWDS-438: keep crawlers out of the faceted-search space.
+
+  Every dataset and resource page stays crawlable, and so does plain paging
+  (/dataset?page=2), which is how a crawler reaches all of the catalogue -
+  CKAN publishes no sitemap, so disallowing paging would leave the datasets
+  allowed but unreachable.
+
+  What is disallowed is any URL carrying a facet parameter: the five in
+  `search.facets` (organization, groups, tags, res_format, license_id) plus
+  vocab_author, which this extension adds, and `sort`. Those combine with each
+  other and with paging, so the crawlable space they open is effectively
+  unbounded - the walk behind PE-600 came from there.
+
+  The patterns are path-agnostic on purpose: the same parameters appear on
+  /dataset, /organization/<name> and /group/<name>, and one line each covers
+  all three.
+
+  `*` and `$` in a Disallow are extensions that Google, Bing and the other
+  major crawlers honour but the original standard does not. This file is
+  advisory either way: enforcement is the in-flight limit at the edge
+  (PE-600), and Cloudflare's rules once MWDS-399 lands. A crawler that ignores
+  this file was never going to be stopped by it.
+#}
+{% block all_user_agents %}
+{{ super() }}
+
+# Faceted search: unbounded combinations, no new content (MWDS-438)
+Disallow: /*?*organization=
+Disallow: /*?*groups=
+Disallow: /*?*tags=
+Disallow: /*?*res_format=
+Disallow: /*?*license_id=
+Disallow: /*?*vocab_author=
+Disallow: /*?*sort=
+{% endblock %}
