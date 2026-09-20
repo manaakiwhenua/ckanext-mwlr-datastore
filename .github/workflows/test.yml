@@ -102,7 +102,10 @@ jobs:
               base = src / "ckanext" / plugin
               for sub in ("templates", "public"):
                   for path in sorted((base / sub).rglob("*")):
-                      if path.is_file() and not path.name.endswith(".pyc"):
+                      # Dotfiles are repository housekeeping (a .gitignore
+                      # keeping compiled assets out of git) and are meant
+                      # not to ship.
+                      if path.is_file() and not path.name.startswith(".") and not path.name.endswith(".pyc"):
                           rel = path.relative_to(base)
                           if not (pkg / str(rel)).is_file():
                               missing.append(f"{plugin}/{rel}")
