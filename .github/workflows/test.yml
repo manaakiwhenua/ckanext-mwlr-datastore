@@ -78,15 +78,34 @@ jobs:
         run: |
           pip install build
           python -m build
-      - name: Install the sdist into a clean environment and import both plugins' modules
-        # Catches files missing from MANIFEST.in: templates, assets, migrations.
+      - name: Install the sdist into a clean environment and check every template and asset shipped
+        # Catches files missing from MANIFEST.in. It compares the whole of
+        # templates/ and public/ in the checkout against what the installed
+        # package actually has, rather than a hand-kept list: MWDS-438 added
+        # templates/home/robots.txt, the mwlr_datastore include line had no
+        # *.txt, and the old three-file check passed while the file never
+        # reached an environment.
+        #
+        # It runs from /tmp on purpose. With the repository as the working
+        # directory, `ckanext` imports from the source tree and the check
+        # inspects the very files it is meant to be verifying were installed.
         run: |
           python -m venv /tmp/v && . /tmp/v/bin/activate
           pip install dist/*.tar.gz
-          python - <<'PY'
-          import importlib.resources as r, sys
-          pkg = r.files("ckanext.mwlr_datastore")
-          missing = [p for p in ("templates/base.html", "templates/header.html", "public/main.css") if not (pkg / p).is_file()]
-          print("packaged files check:", "ok" if not missing else missing)
+          SRC="$PWD" python - <<'PY'
+          import importlib.resources as r, os, pathlib, sys
+          os.chdir("/tmp")
+          src = pathlib.Path(os.environ["SRC"])
+          missing = []
+          for plugin in ("mwlr_datastore", "datasetapproval"):
+              pkg = r.files(f"ckanext.{plugin}")
+              base = src / "ckanext" / plugin
+              for sub in ("templates", "public"):
+                  for path in sorted((base / sub).rglob("*")):
+                      if path.is_file() and not path.name.endswith(".pyc"):
+                          rel = path.relative_to(base)
+                          if not (pkg / str(rel)).is_file():
+                              missing.append(f"{plugin}/{rel}")
+          print(f"packaged files check: {'ok' if not missing else missing}")
           sys.exit(1 if missing else 0)
           PY
