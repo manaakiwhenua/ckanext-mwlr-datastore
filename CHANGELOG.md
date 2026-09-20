@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.0...v2.1.1) (2026-09-20)
+
+
+### Fixes
+
+* MWDS-438 ship the robots.txt template, and check every template is packaged ([#41](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/41)) ([58b14d2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/58b14d20bb163d9be797f0bcc42b84074d4113f7))
+
 ## [2.1.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.0.0...v2.1.0) (2026-09-20)
 
 
