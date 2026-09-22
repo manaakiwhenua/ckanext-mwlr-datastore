@@ -25,3 +25,18 @@ def test_dataset_page_shows_view_counts_without_tracking(app):
     body = app.get(f"/dataset/{dataset['name']}", status=200).body
     assert "Recent views" in body
     assert "Total views" in body
+
+
+@pytest.mark.ckan_config("ckan.plugins", "mwlr_datastore scheming_datasets")
+@pytest.mark.usefixtures("clean_db", "with_plugins")
+def test_resource_page_has_no_raw_tracking_summary_row(app):
+    """CKAN 2.12 lists tracking_summary among a resource's extra fields; the
+    counts are shown as Recent and Total downloads, so the raw dict must not
+    appear beside them (MWDS-488)."""
+    from ckan.tests import factories
+
+    dataset = factories.Dataset()
+    resource = factories.Resource(package_id=dataset["id"], tracking_summary={"total": 3, "recent": 1})
+    body = app.get(f"/dataset/{dataset['name']}/resource/{resource['id']}", status=200).body
+    assert "Total downloads" in body
+    assert "Tracking summary" not in body
