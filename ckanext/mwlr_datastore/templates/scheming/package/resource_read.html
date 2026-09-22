@@ -22,15 +22,3 @@ sets this to True.#}
     <td>{{ h.datastore_get_resource_tracking_total(res.id) }}</td>  
   </tr>  
 {% endblock %} 
-
-{# MWDS-488: CKAN 2.12 no longer leaves tracking_summary out of the "more
-   items" rows (2.10's format_resource_items did), so the raw dict appeared
-   under the download counts above and read as if tracking were broken. Same
-   block as scheming's, with that key taken out first. #}
-{%- block resource_more_items -%}
-  {% for key, value in h.format_resource_items(res.items() | rejectattr('0', 'equalto', 'tracking_summary') | list) %}
-    {% if key not in ('created', 'metadata modified', 'last modified', 'format') %}
-      <tr class="toggle-more"><th scope="row">{{ key | capitalize }}</th><td>{{ value }}</td></tr>
-    {% endif %}
-  {% endfor %}
-{%- endblock -%}
