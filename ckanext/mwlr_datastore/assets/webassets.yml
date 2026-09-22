@@ -11,5 +11,5 @@ mwlr_datastore_css:
   filter: cssrewrite
   output: ckanext-mwlr_datastore/%(version)s-mwlr_datastore.css
   contents:
-    - css/CKAN_2.10_compatible.css
+    - css/alert-error-compatible.css
     # Add additional CSS files here if needed

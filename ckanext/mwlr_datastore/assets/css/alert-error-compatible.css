@@ -1,0 +1,11 @@
+/* Scheming and Datapusher+ backwards compatible styling, allows correct display of 'alert-error', which has been replaced by 'alert-danger' in CKAN 2.12 due to updated Bootstrap. Include this css file until ckanext-scheming and ckanext-datapusher+ update their css. See MWDS-476 and MWDS-493 for details on the upstream pull requests.  
+
+Remove this file once the extensions update their css.
+
+*/
+
+.alert-error {
+  color: var(--bs-danger-text-emphasis);
+  background-color: var(--bs-danger-bg-subtle);
+  border-color: var(--bs-danger-border-subtle); 
+}
