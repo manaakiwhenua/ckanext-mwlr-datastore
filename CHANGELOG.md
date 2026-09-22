@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.1...v2.1.2) (2026-09-22)
+
+
+### Fixes
+
+* MWDS-353 tell the user which dataset fields are missing when a resource fails to save, with a link to the dataset form ([68a6c86](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/68a6c86eb429fd937f80d4a855f40e0fc5fb1404))
+* MWDS-476 add fix for scheming css ([#45](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/45)) ([d44434e](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/d44434e96165d864d548dbe55c616d5f2f68c6e3))
+* MWDS-483 keep the js class on &lt;html&gt; so CKAN's scripted styles apply on 2.12 ([40c37d0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/40c37d033b659025c213bf32b89f1ea82d4d81bf))
+* MWDS-488 stop showing the raw tracking summary on resource pages ([33bebb8](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/33bebb87bb070c83812068ec264c68888ef059a5))
+
 ## [2.1.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.0...v2.1.1) (2026-09-20)
 
 
