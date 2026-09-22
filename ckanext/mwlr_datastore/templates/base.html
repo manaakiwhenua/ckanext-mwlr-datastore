@@ -31,6 +31,12 @@
 {%- endblock %}
 
 {# load css #}
+
+{% block styles %}
+    {{ super() }}
+    {% asset 'mwlr_datastore/mwlr_datastore_css' %}
+{% endblock %}
+
 {% block custom_styles %}
   {{ super() }}
 
