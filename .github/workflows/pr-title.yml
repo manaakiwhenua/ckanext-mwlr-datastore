@@ -18,7 +18,7 @@ jobs:
   title:
     runs-on: ubuntu-latest
     steps:
-      - name: Title is "type(scope)!: description"
+      - name: Title is in type(scope) form
         env:
           # Through the environment, never interpolated into the script - a
           # title is untrusted input.
