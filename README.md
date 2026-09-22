@@ -70,6 +70,8 @@ If you install this extension and see broken images, that is why - supply your o
 
 ## Development
 
+How the plugins fit together, the order to list them in and why, is in the [docs](docs/index.md#plugin-composition), with this extension's [decisions](docs/decisions/index.md).
+
 Requires a CKAN development environment. In ours the source is bind-mounted into the CKAN container, so edits reload without a rebuild.
 
 ```sh
