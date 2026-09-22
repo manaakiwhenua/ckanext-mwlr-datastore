@@ -10,11 +10,16 @@
    it from 2.10.11, 2.11.6 and 2.12.0 (ckan/ckan#8698) and breaks the same way
    for any regional locale - ckan/ckan#9473. So this block pins the locale form
    on every CKAN version. Remove it once CKAN's JavaScript stops reading its
-   locale from the lang attribute. #}
+   locale from the lang attribute.
+
+   The tag also carries class="js" (MWDS-483). CKAN 2.10's JavaScript added it
+   at runtime; 2.12 writes it into this tag instead, so a copy without it loses
+   every ".js ..." style rule - the stats page sections, js-hide, the image
+   upload field and the table show-more toggles among them. #}
 {%- block htmltag -%}
 {% set lang = h.lang() %}
-<!--[if IE 9]> <html lang="{{ lang }}" class="ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="{{ lang }}" {% if h.is_rtl_language()  %} dir="rtl" {% endif %} > <!--<![endif]-->
+<!--[if IE 9]> <html lang="{{ lang }}" class="ie9 js"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="{{ lang }}" {% if h.is_rtl_language()  %} dir="rtl" {% endif %} class="js"> <!--<![endif]-->
 {%- endblock -%}
 
 {# MWDS-360: make a non-production site unmistakable. The environment name
