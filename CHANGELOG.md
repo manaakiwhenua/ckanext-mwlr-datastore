@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.1.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.0...v2.1.1) (2026-09-20)
+
+
+### Fixes
+
+* MWDS-438 ship the robots.txt template, and check every template is packaged ([#41](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/41)) ([58b14d2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/58b14d20bb163d9be797f0bcc42b84074d4113f7))
+
+## [2.1.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.0.0...v2.1.0) (2026-09-20)
+
+
+### Features
+
+* MWDS-438 disallow the faceted-search URL space in robots.txt ([#40](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/40)) ([644f413](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/644f4135acb2e05fd5bab13fee2b5a138f3d934a))
+
+
+### Documentation
+
+* add contributing and security policies ([#39](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/39)) ([27ecc8e](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/27ecc8e050ed557ce51e581ba48ca9177762a1f4))
+* merging the release pull request is the release, not approving it ([#36](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/36)) ([f0b31f8](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/f0b31f84e3b8837dc9fd56b3230ae074df3027a6))
+
+## [2.0.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.2...v2.0.0) (2026-09-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* the mwlr_tracking plugin no longer exists. Remove it from ckan.plugins before upgrading, or CKAN will not start.
+
+### Features
+
+* MWDS-389 retire mwlr_tracking and use CKAN's own tracking ([0ec2fe3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/0ec2fe3a77b6d11a476e86eb9f2b13ae55a01c9f))
+
 ## [1.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v1.3.1...v1.3.2) (2026-09-16)
 
 

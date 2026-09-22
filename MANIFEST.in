@@ -1,11 +1,8 @@
 include README.rst
 include LICENSE
 include requirements.txt
-recursive-include ckanext/mwlr_datastore *.html *.json *.js *.less *.css *.mo *.yml
+recursive-include ckanext/mwlr_datastore *.html *.json *.js *.less *.css *.mo *.yml *.txt
 recursive-include ckanext/mwlr_datastore/migration *.ini *.py *.mako
 recursive-include ckanext/mwlr_datastore/public *.*
-recursive-include ckanext/mwlr_tracking *.html *.json *.js *.less *.css *.mo *.yml
-recursive-include ckanext/mwlr_tracking/migration *.ini *.py *.mako
-recursive-include ckanext/mwlr_tracking/public *.*
 recursive-include ckanext/datasetapproval *.html *.json *.js *.less *.css *.mo *.yml *.yaml *.txt
 recursive-include ckanext/datasetapproval/migration *.ini *.py *.mako
