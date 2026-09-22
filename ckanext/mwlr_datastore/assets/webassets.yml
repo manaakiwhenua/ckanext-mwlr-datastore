@@ -7,8 +7,9 @@
 #     preload:
 #       - base/main
 
-# mwlr_datastore-css:
-#   filter: cssrewrite
-#   output: ckanext-mwlr_datastore/%(version)s-mwlr_datastore.css
-#   contents:
-#     - css/mwlr_datastore.css
+mwlr_datastore_css:
+  filter: cssrewrite
+  output: ckanext-mwlr_datastore/%(version)s-mwlr_datastore.css
+  contents:
+    - css/alert-error-compatible.css
+    # Add additional CSS files here if needed
