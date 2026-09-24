@@ -392,6 +392,6 @@ resource_fields:
   help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
   choices:
     - value: public
-      label: Files will be public (when the dataset is public)
+      label: Public (resource will be public when the dataset is public)
     - value: by_request
-      label: Files will be accessible by approved request
+      label: Accessible by approved request (resource will only be accessible by approved request)

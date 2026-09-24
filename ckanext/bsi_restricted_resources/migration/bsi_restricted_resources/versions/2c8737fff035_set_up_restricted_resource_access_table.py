@@ -21,13 +21,12 @@ def upgrade():
     op.create_table(
         'restricted_resource_access',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column('resource_id', sa.UnicodeText(), sa.ForeignKey('resource.id'), nullable=False, index=True),
-        sa.Column('user_id', sa.UnicodeText(), sa.ForeignKey('user.id'), nullable=False),
+        sa.Column('resource_id', sa.UnicodeText(), sa.ForeignKey('resource.id', ondelete='CASCADE'), nullable=False),
+        sa.Column('user_id', sa.UnicodeText(), sa.ForeignKey('user.id', ondelete='CASCADE'), nullable=False, index=True),
         sa.Column('granted_by_user_id', sa.UnicodeText(), sa.ForeignKey('user.id'), nullable=False),
-        sa.Column('created_at', sa.DateTime(timezone=True), nullable=False)        
+        sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+        sa.UniqueConstraint('resource_id', 'user_id', name='uq_resource_user')        
     )
-    op.create_unique_constraint('uq_resource_user', 'restricted_resource_access', ['resource_id', 'user_id'])
-
 
 def downgrade():
     op.drop_table('restricted_resource_access')
