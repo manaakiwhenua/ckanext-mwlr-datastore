@@ -45,13 +45,13 @@ dataset_fields:
 
 ## Chosen visibility field is used as part of the dataset_approval workflow.
 ## True is 'Private', False is 'Public'
-# - field_name       : chosen_visibility
-#   label            : Visibility after review
-#   form_snippet     : visibility.html
-#   display_snippet  : null
-#   help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
-#   validators       : scheming_required unicode_safe
-#   default          : true
+- field_name       : chosen_visibility
+  label            : Visibility after review
+  form_snippet     : visibility.html
+  display_snippet  : null
+  help_text        : 'Select whether the dataset will be made public or remain private after review. During review, the dataset will be private.'
+  validators       : scheming_required unicode_safe
+  default          : true
 
 - field_name       : publisher
   label            : Publisher
@@ -74,11 +74,11 @@ dataset_fields:
   preset           : multiple_text
   validators       : scheming_required scheming_multiple_text
 
-# - field_name       : conditions_of_release
-#   label            : Conditions of Release
-#   required         : false
-#   help_text        : 'Document here any conditions associated with the release.'
-#   validators       : scheming_required unicode_safe strip_value
+- field_name       : conditions_of_release
+  label            : Conditions of Release
+  required         : false
+  help_text        : 'Document here any conditions associated with the release.'
+  validators       : scheming_required unicode_safe strip_value
 
 - field_name: maintainer
   label: Maintainer
@@ -192,96 +192,97 @@ dataset_fields:
 # Dataset approval workflow fields 
 # NOTE: These are not currently used in production.
 
-# - field_name       : te_ao_māori_review_required
-#   label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
-#   preset           : radio
-#   choices          :
-#     - value: true
-#       label: "Yes"
-#     - value: false
-#       label: "No"
-#   required         : true
-#   validators       : scheming_required boolean_validator
-#   output_validators: boolean_validator
+- field_name       : te_ao_māori_review_required
+  label            : 'Does this dataset relate to Māori people, communities, taonga species, mātauranga Māori, or Māori interests?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
 
-# - field_name : te_ao_māori_review_notes
-#   label      : Please describe why a te ao Māori review is required
-#   form_snippet     : textarea.html
-#   form_attrs:
-#     data-conditional-visibility-controller: te_ao_māori_review_required
-#     data-conditional-visibility-value: true
-#   help_text  : 'Provide any relevant information about the dataset that will assist with the te ao Māori data review process. This may include details about the relevance of the dataset to Māori people, communities, taonga species, mātauranga Māori, or Māori interests, as well as any potential risks or considerations for Māori data sovereignty.'
-#   validators : ignore_empty unicode_safe strip_value
+- field_name : te_ao_māori_review_notes
+  label      : Please describe why a te ao Māori review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: te_ao_māori_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the te ao Māori data review process. This may include details about the relevance of the dataset to Māori people, communities, taonga species, mātauranga Māori, or Māori interests, as well as any potential risks or considerations for Māori data sovereignty.'
+  validators : ignore_empty unicode_safe strip_value
 
-# - field_name       : scientific_technical_review_required
-#   label            : 'Does this dataset require review for scientific or technical aspects?'
-#   preset           : radio
-#   choices          :
-#     - value: true
-#       label: "Yes"
-#     - value: false
-#       label: "No"
-#   required         : true
-#   validators       : scheming_required boolean_validator
-#   output_validators: boolean_validator
+- field_name       : scientific_technical_review_required
+  label            : 'Does this dataset require review for scientific or technical aspects?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
 
-# - field_name : scientific_technical_review_notes
-#   label      : Please describe why a scientific or technical review is required
-#   form_snippet     : textarea.html
-#   form_attrs:
-#     data-conditional-visibility-controller: scientific_technical_review_required
-#     data-conditional-visibility-value: true
-#   help_text  : 'Provide any relevant information about the dataset that will assist with the scientific or technical review process. This may include details about the data collection methods, data quality, potential limitations, or any specific aspects that require attention during the review.'
-#   validators : ignore_empty unicode_safe strip_value
+- field_name : scientific_technical_review_notes
+  label      : Please describe why a scientific or technical review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: scientific_technical_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the scientific or technical review process. This may include details about the data collection methods, data quality, potential limitations, or any specific aspects that require attention during the review.'
+  validators : ignore_empty unicode_safe strip_value
 
-# - field_name       : ethics_security_risk_review_required
-#   label            : 'Does this dataset require review for ethics, security, or risk?'
-#   preset           : radio
-#   choices          :
-#     - value: true
-#       label: "Yes"
-#     - value: false
-#       label: "No"
-#   required         : true
-#   validators       : scheming_required boolean_validator
-#   output_validators: boolean_validator
+- field_name       : ethics_security_risk_review_required
+  label            : 'Does this dataset require review for ethics, security, or risk?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
 
-# - field_name : ethics_security_risk_review_notes
-#   label      : Please describe why an ethics, security, or risk review is required
-#   form_snippet     : textarea.html
-#   form_attrs:
-#     data-conditional-visibility-controller: ethics_security_risk_review_required
-#     data-conditional-visibility-value: true
-#   help_text  : 'Provide any relevant information about the dataset that will assist with the ethics, security, or risk review process. This may include details about the sensitivity of the data, potential ethical considerations, security measures in place, or any specific risks associated with the dataset that require attention during the review.'
-#   validators : ignore_empty unicode_safe strip_value
+- field_name : ethics_security_risk_review_notes
+  label      : Please describe why an ethics, security, or risk review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: ethics_security_risk_review_required
+    data-conditional-visibility-value: true
+  help_text  : 'Provide any relevant information about the dataset that will assist with the ethics, security, or risk review process. This may include details about the sensitivity of the data, potential ethical considerations, security measures in place, or any specific risks associated with the dataset that require attention during the review.'
+  validators : ignore_empty unicode_safe strip_value
 
-# - field_name       : intellectual_property_review_required
-#   label            : 'Does this dataset require review for intellectual property or contractual issues?'
-#   preset           : radio
-#   choices          :
-#     - value: true
-#       label: "Yes"
-#     - value: false
-#       label: "No"
-#   required         : true
-#   validators       : scheming_required boolean_validator
-#   output_validators: boolean_validator
+- field_name       : intellectual_property_review_required
+  label            : 'Does this dataset require review for intellectual property or contractual issues?'
+  preset           : radio
+  choices          :
+    - value: true
+      label: "Yes"
+    - value: false
+      label: "No"
+  required         : true
+  validators       : scheming_required boolean_validator
+  output_validators: boolean_validator
 
-# - field_name       : intellectual_property_review_notes
-#   label            : Please describe why an intellectual property or contractual review is required
-#   form_snippet     : textarea.html
-#   form_attrs:
-#     data-conditional-visibility-controller: intellectual_property_review_required
-#     data-conditional-visibility-value: true
-#   help_text        : 'Provide any relevant information about the dataset that will assist with the intellectual property review process. This may include details about licensing, contractual obligations, or any other considerations related to intellectual property.'
-#   validators       : ignore_empty unicode_safe strip_value
+- field_name       : intellectual_property_review_notes
+  label            : Please describe why an intellectual property or contractual review is required
+  form_snippet     : textarea.html
+  form_attrs:
+    data-conditional-visibility-controller: intellectual_property_review_required
+    data-conditional-visibility-value: true
+  help_text        : 'Provide any relevant information about the dataset that will assist with the intellectual property review process. This may include details about licensing, contractual obligations, or any other considerations related to intellectual property.'
+  validators       : ignore_empty unicode_safe strip_value
 
-# - field_name       : publishing_status
-#   label            : 'Publishing Status'
-#   form_snippet     : null
-#   display_snippet  : null
-#   validators       : ignore_missing
+- field_name       : publishing_status
+  label            : 'Publishing Status'
+  form_snippet     : null
+  display_snippet  : null
+  validators       : ignore_missing
 
+# End Dataset approval workflow fields
 # -------------------------------------------------------------------
 
 resource_fields:
@@ -382,15 +383,15 @@ resource_fields:
   preset: resource_format_autocomplete
   validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_datastore_remove_leading_dot_if_present clean_format unicode_safe
 
-# - field_name: resource_access_level
-#   label: Resource access level
-#   preset: select
-#   required: true
-#   default: by_request
-#   validators: scheming_required unicode_safe
-#   help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
-#   choices:
-#     - value: public
-#       label: Files will be public (when the dataset is public)
-#     - value: by_request
-#       label: Files will be accessible by approved request
+- field_name: resource_access_level
+  label: Resource access level
+  preset: select
+  required: true
+  default: by_request
+  validators: scheming_required unicode_safe
+  help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
+  choices:
+    - value: public
+      label: Files will be public (when the dataset is public)
+    - value: by_request
+      label: Files will be accessible by approved request
