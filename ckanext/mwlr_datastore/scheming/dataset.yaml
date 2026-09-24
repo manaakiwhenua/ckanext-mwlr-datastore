@@ -381,16 +381,3 @@ resource_fields:
   label: Format
   preset: resource_format_autocomplete
   validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_datastore_remove_leading_dot_if_present clean_format unicode_safe
-
-# - field_name: resource_access_level
-#   label: Resource access level
-#   preset: select
-#   required: true
-#   default: by_request
-#   validators: scheming_required unicode_safe
-#   help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
-#   choices:
-#     - value: public
-#       label: Files will be public (when the dataset is public)
-#     - value: by_request
-#       label: Files will be accessible by approved request
