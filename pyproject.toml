@@ -24,6 +24,7 @@ Issues = "https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues"
 [project.entry-points."ckan.plugins"]
 mwlr_datastore = "ckanext.mwlr_datastore.plugin:MwlrDatastorePlugin"
 dataset_approval = "ckanext.datasetapproval.plugin:DatasetapprovalPlugin"
+bsi_restricted_resources = "ckanext.bsi_restricted_resources.plugin:BsiRestrictedResourcesPlugin"
 
 
 [build-system]
