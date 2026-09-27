@@ -1,0 +1,34 @@
+{% ckan_extends "package/snippets/resource_item.html" %}
+{% set can_edit = h.check_access('package_update', {'id':pkg.id })%}
+{% set authorised_to_view_resources = can_edit or c.userobj and h.resource_user_has_download_access(c, pkg) or not
+h.resource_requires_request_to_access(res) %}
+{% set resource_masked_title = res.mimetype | default('Unknown type', true) + ' resource' %}
+
+{% block resource_item_title %}
+    {% if authorised_to_view_resources %}
+    {{ super() }}
+    {% else %}
+    <div>
+        <div class="heading">{{ resource_masked_title }}</div>
+        <span class="format-label" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}
+        </span>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block resource_item_description %}
+    {% if authorised_to_view_resources %}
+    {{ super() }}
+    {% endif %}
+{% endblock %}
+
+{% block resource_item_explore %}
+    {% if authorised_to_view_resources %}
+    {{ super() }}
+    {% else %}
+    <div class="d-flex flex-row align-items-center justify-content-between" title="You must be logged in to request access">
+        <p class="text-muted">To view this resource, please log in and request access.</p>
+        <button type="button" class="btn btn-primary btn-disabled" disabled>Request Access</button>
+    </div>
+    {% endif %}
+{% endblock %}
