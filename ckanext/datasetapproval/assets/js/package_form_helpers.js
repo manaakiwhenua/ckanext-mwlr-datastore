@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    const form = document.querySelector("form.dataset-form")
-    if (!form) return;
+    const form = document.getElementById("dataset-edit")
+    if (!form) {
+        console.warn("Dataset edit form not found.");
+        return;
+    }
 
     const publishingStatus = await retrieve_publishing_status();
     const submitButton = form.querySelector("#submitButton");

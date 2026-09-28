@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector("form.dataset-form")
-  if (!form) return;
+  const form = document.getElementById("dataset-edit")
+  if (!form) {
+      console.warn("Dataset edit form not found.");
+      return;
+  }
 
   function syncVisibility(controller, field, group) {
     if (controller.type === "radio" && controller.checked == false || controller.type === "checkbox" && controller.checked == false) return; // For radio buttons and checkboxes, only proceed if the controller is checked (i.e. active)
