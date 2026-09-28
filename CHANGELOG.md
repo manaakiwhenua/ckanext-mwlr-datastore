@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.2...v2.1.3) (2026-09-28)
+
+
+### Fixes
+
+* MWDS-510 update javascript for CKAN 2.12 ([#49](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/49)) ([695aa90](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/695aa90edebc76497df898b308d1235f89f8f260))
+
 ## [2.1.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.1...v2.1.2) (2026-09-22)
 
 
