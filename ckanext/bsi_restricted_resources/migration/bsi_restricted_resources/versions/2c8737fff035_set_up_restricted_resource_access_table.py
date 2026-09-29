@@ -26,7 +26,9 @@ def upgrade():
         sa.Column(
             "user_id", sa.UnicodeText(), sa.ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True
         ),
-        sa.Column("granted_by_user_id", sa.UnicodeText(), sa.ForeignKey("user.id"), nullable=False),
+        sa.Column(
+            "granted_by_user_id", sa.UnicodeText(), sa.ForeignKey("user.id"), nullable=False
+        ),  # No CASCADE. We don't want to be able to delete any users who granted access, so we have the records for audit purposes
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.UniqueConstraint("resource_id", "user_id", name="uq_resource_user"),
     )

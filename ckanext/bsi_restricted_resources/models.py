@@ -12,7 +12,9 @@ class RestrictedResourceAccess(toolkit.BaseModel):
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
     resource_id = Column(UnicodeText, ForeignKey("resource.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(UnicodeText, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
-    granted_by_user_id = Column(UnicodeText, ForeignKey("user.id"), nullable=False)
+    granted_by_user_id = Column(
+        UnicodeText, ForeignKey("user.id"), nullable=False
+    )  # No CASCADE. We don't want to be able to delete any users who granted access, so we have the records for audit purposes
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     def as_dict(self):
