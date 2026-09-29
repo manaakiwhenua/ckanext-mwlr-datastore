@@ -270,12 +270,13 @@ resource_fields:
   preset: resource_format_autocomplete
   validators: if_empty_guess_format ignore_empty strip_value ckanext_mwlr_datastore_remove_leading_dot_if_present clean_format unicode_safe
 
+# Default(by_request) gives 'by_request' as the default for anything adding a resource via the API. 'Scheming-required' isn't needed here, as the dropdown automatically selects the default value.
 - field_name: resource_access_level
   label: Resource access level
   preset: select
   required: true
   default: by_request
-  validators: scheming_required unicode_safe
+  validators: default(by_request) unicode_safe
   help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
   choices:
     - value: public
