@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.3...v2.2.0) (2026-09-30)
+
+
+### Features
+
+* MWDS-459 scaffold the bsi restricted resources plugin and the dataset approval scheming variants ([bfcd6d3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/bfcd6d389ef2b41d61ad5eaa122e84fc75372f34))
+
 ## [2.1.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.2...v2.1.3) (2026-09-28)
 
 
