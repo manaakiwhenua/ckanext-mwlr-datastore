@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.0...v2.3.1) (2026-10-01)
+
+
+### Fixes
+
+* MWDS-529 What's new - no stray sidebar rule, and links for the base image's extensions ([#55](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/55)) ([9bcda9f](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/9bcda9f3f5a321692c9811f204732bb6ff5c8631))
+
 ## [2.3.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.2.0...v2.3.0) (2026-10-01)
 
 
