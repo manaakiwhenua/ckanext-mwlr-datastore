@@ -47,3 +47,7 @@
   </div>
 </article>
 {% endblock %}
+
+{#- An empty sidebar makes page.html add "no-nav", which drops the sidebar's
+    divider line - without it a full-width page has a stray vertical rule. #}
+{% block secondary %}{% endblock %}
