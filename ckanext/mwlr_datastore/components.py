@@ -6,9 +6,11 @@ belong to the build that is running. Signed-in users also see every enabled
 plugin, the package it comes from and its version or commit, read from the
 installed packages at runtime - like mwlr_versions(), never a list kept by hand.
 """
+import functools
 import json
 import logging
 import re
+import subprocess
 from importlib.metadata import distribution, entry_points
 
 import ckan.plugins.toolkit as toolkit
@@ -39,33 +41,82 @@ def ckan_changelog_url(version):
     return f"https://docs.ckan.org/en/{m.group(1)}.{m.group(2)}/changelog.html"
 
 
-def source_of(name, version, direct_url):
+TAG_LIKE = re.compile(r"^(v|release-|ckan-)?\d+(\.\d+)*$")
+
+
+def _normalise_repo(url):
+    url = re.sub(r"^git\+", "", url or "")
+    url = re.sub(r"^git@github\.com:", "https://github.com/", url)
+    return re.sub(r"\.git$", "", url).rstrip("/")
+
+
+def _short(repo):
+    return re.sub(r"^https://(github\.com|bitbucket\.org)/", "", repo)
+
+
+def _link(repo, commit, tag):
+    """A tag's release page, else the commit, else the repository."""
+    github = repo.startswith("https://github.com/")
+    if tag and github:
+        return f"{repo}/releases/tag/{tag}"
+    if commit and github:
+        return f"{repo}/tree/{commit}"
+    if commit and repo.startswith("https://bitbucket.org/"):
+        return f"{repo}/src/{commit}"
+    return repo
+
+
+@functools.lru_cache(maxsize=None)
+def git_checkout(path):
+    """Repository, commit and exact tag of a source checkout, or None.
+
+    The base image installs most extensions from git clones under /srv/app/src
+    owned by another user, hence safe.directory. Read once per process: the
+    image does not change under a running site.
+    """
+    def git(*args):
+        out = subprocess.run(
+            ["git", "-c", "safe.directory=*", "-C", path, *args],
+            capture_output=True, text=True, timeout=5, check=False)
+        return out.stdout.strip() if out.returncode == 0 else ""
+    try:
+        repo = _normalise_repo(git("config", "--get", "remote.origin.url"))
+        commit = git("rev-parse", "HEAD")
+        tag = git("describe", "--tags", "--exact-match")
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if not repo or not commit:
+        return None
+    return {"repo": repo, "commit": commit, "tag": tag}
+
+
+def source_of(name, version, direct_url, checkout=git_checkout):
     """Where a package came from, and the page that says what is in it.
 
     direct_url is pip's record of an install from a URL (PEP 610), or None for
     an install from PyPI. A git install records the repository, the ref asked
-    for and the commit it resolved to: a tag links to its release page, anything
-    else to the commit. A local or editable install has no public page.
+    for and the commit it resolved to. A local install (the base image's git
+    clones) is read from its checkout. Either way a tag links to its release
+    page and anything else to the commit, and the ref shown is the tag or the
+    short commit - which can differ from the package's own version when a
+    project forgets to bump it.
     """
     if not direct_url:
         return {"source": "PyPI", "ref": version,
                 "url": f"https://pypi.org/project/{name}/{version}/"}
     vcs = direct_url.get("vcs_info")
     if vcs:
-        repo = re.sub(r"^git\+", "", direct_url.get("url", ""))
-        repo = re.sub(r"\.git$", "", repo)
+        repo = _normalise_repo(direct_url.get("url", ""))
         commit = vcs.get("commit_id", "")
-        ref = vcs.get("requested_revision") or commit[:7]
-        github = repo.startswith("https://github.com/")
-        if ref and re.match(r"^v?\d+(\.\d+)*$", ref) and github:
-            url = f"{repo}/releases/tag/{ref}"
-        elif commit and github:
-            url = f"{repo}/tree/{commit}"
-        elif commit and repo.startswith("https://bitbucket.org/"):
-            url = f"{repo}/src/{commit}"
-        else:
-            url = repo or ""
-        return {"source": repo, "ref": ref, "url": url}
+        requested = vcs.get("requested_revision") or ""
+        tag = requested if TAG_LIKE.match(requested) else ""
+        return {"source": _short(repo), "ref": requested or commit[:7],
+                "url": _link(repo, commit, tag)}
+    url = direct_url.get("url", "")
+    info = checkout(url[len("file://"):]) if url.startswith("file://") else None
+    if info:
+        return {"source": _short(info["repo"]), "ref": info["tag"] or info["commit"][:7],
+                "url": _link(info["repo"], info["commit"], info["tag"])}
     return {"source": "local", "ref": version, "url": ""}
 
 

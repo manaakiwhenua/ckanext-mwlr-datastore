@@ -94,7 +94,8 @@ def test_a_git_commit_links_to_the_commit():
         "vcs_info": {"vcs": "git", "requested_revision": "downstream", "commit_id": "0123456789abcdef"},
     })
     assert row["url"] == "https://github.com/manaakiwhenua/ckanext-ldap/tree/0123456789abcdef"
-    assert row["source"] == "https://github.com/manaakiwhenua/ckanext-ldap"
+    assert row["source"] == "manaakiwhenua/ckanext-ldap"
+    assert row["ref"] == "downstream"
 
 
 def test_a_pypi_install_links_to_pypi():
@@ -102,6 +103,46 @@ def test_a_pypi_install_links_to_pypi():
     assert row["url"] == "https://pypi.org/project/ckanext-scheming/3.0.0/"
 
 
-def test_a_local_install_has_no_link():
-    row = components.source_of("ckanext-datapusher-plus", "2.0.0", {"url": "file:///srv/app/src", "dir_info": {"editable": True}})
+def test_a_local_install_without_a_checkout_has_no_link():
+    row = components.source_of("ckanext-datapusher-plus", "2.0.0",
+                               {"url": "file:///srv/app/src/x", "dir_info": {"editable": True}},
+                               checkout=lambda path: None)
     assert row["url"] == ""
+    assert row["source"] == "local"
+
+
+def test_a_local_checkout_on_a_tag_links_to_the_release():
+    """The base image's git clones: the tag, not the package version, which
+    upstream sometimes forgets to bump (ckanext-pdfview 0.0.8 says 0.0.7)."""
+    row = components.source_of("ckanext-pdfview", "0.0.7",
+                               {"url": "file:///srv/app/src/ckanext-pdfview", "dir_info": {}},
+                               checkout=lambda path: {"repo": "https://github.com/ckan/ckanext-pdfview",
+                                                      "commit": "3acd4a5aaaa", "tag": "0.0.8"})
+    assert row["url"] == "https://github.com/ckan/ckanext-pdfview/releases/tag/0.0.8"
+    assert row["ref"] == "0.0.8"
+    assert row["source"] == "ckan/ckanext-pdfview"
+
+
+def test_a_local_checkout_off_a_tag_links_to_the_commit():
+    row = components.source_of("ckanext-datapusher-plus", "2.0.0",
+                               {"url": "file:///srv/app/src/ckanext-datapusher-plus", "dir_info": {}},
+                               checkout=lambda path: {"repo": "https://github.com/manaakiwhenua/datapusher-plus",
+                                                      "commit": "eefbc00ff60d", "tag": ""})
+    assert row["url"] == "https://github.com/manaakiwhenua/datapusher-plus/tree/eefbc00ff60d"
+    assert row["ref"] == "eefbc00"
+
+
+def test_git_checkout_reads_a_real_repository(tmp_path):
+    import subprocess
+    repo = tmp_path / "ext"
+    repo.mkdir()
+    run = lambda *a: subprocess.run(["git", "-C", str(repo), *a], check=True, capture_output=True)  # noqa: E731
+    run("init", "-q")
+    run("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "--allow-empty", "-m", "c")
+    run("tag", "v1.2.3")
+    run("remote", "add", "origin", "git@github.com:ckan/ckanext-example.git")
+    components.git_checkout.cache_clear()
+    info = components.git_checkout(str(repo))
+    assert info["repo"] == "https://github.com/ckan/ckanext-example"
+    assert info["tag"] == "v1.2.3"
+    assert len(info["commit"]) == 40
