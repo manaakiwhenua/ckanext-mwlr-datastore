@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.2.0...v2.3.0) (2026-10-01)
+
+
+### Features
+
+* MWDS-529 What's new page linked from the footer, with component versions for signed-in users ([#53](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/53)) ([ea4bd7f](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/ea4bd7f25912dc3b72fc8220b013a499f48a9aea))
+
 ## [2.2.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.3...v2.2.0) (2026-09-30)
 
 
