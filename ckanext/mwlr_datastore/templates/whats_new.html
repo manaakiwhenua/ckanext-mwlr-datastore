@@ -1,0 +1,49 @@
+{% extends "page.html" %}
+
+{# MWDS-529: release notes for users, from the Markdown file the DataStore image
+   bakes in (so they belong to the running build), and - for signed-in users -
+   what the site is built from, read from the installed packages at runtime. #}
+
+{% block breadcrumb_content %}
+  <li class="active"><a href="{{ h.url_for('mwlr_datastore.whats_new') }}">{{ _("What's new") }}</a></li>
+{% endblock %}
+
+{% block subtitle %}{{ _("What's new") }}{% endblock %}
+
+{% block primary %}
+<article class="module">
+  <div class="module-content mwlr-whats-new">
+    <h1 class="page-heading">{{ _("What's new in DataStore") }}</h1>
+    {% set v = h.mwlr_versions() %}
+    {% if v.release %}
+      <p>You are using DataStore {{ v.release }}{% if v.build %} (build {{ v.build }}){% endif %}.</p>
+    {% endif %}
+
+    {% if notes %}
+      {{ h.render_markdown(notes) }}
+    {% else %}
+      <p>There are no release notes in this build.</p>
+    {% endif %}
+
+    {% if h.mwlr_show_components() %}
+      <h2 id="versions">{{ _("Versions") }}</h2>
+      <p>What this site is built from: each enabled plugin, the package that provides it, and where to read that package's changes.</p>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr><th>Package</th><th>Version</th><th>Plugins</th><th>Changes</th></tr>
+        </thead>
+        <tbody>
+          {% for c in h.mwlr_components() %}
+          <tr>
+            <td>{{ c.package }}</td>
+            <td><code>{{ c.ref or c.version }}</code></td>
+            <td>{{ c.plugins | join(', ') }}</td>
+            <td>{% if c.url %}<a href="{{ c.url }}" rel="noopener">{{ c.source }}</a>{% else %}{{ c.source }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}
