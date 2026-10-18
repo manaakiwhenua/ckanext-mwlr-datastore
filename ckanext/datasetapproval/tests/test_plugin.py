@@ -54,3 +54,14 @@ from ckan.plugins.core import plugin_loaded
 @pytest.mark.usefixtures("standard_plugins")
 def test_plugin():
     assert plugin_loaded("dataset_approval")
+
+
+# MWDS-536: an undeclared option logs "Option ... is not declared" on every read.
+@pytest.mark.usefixtures("standard_plugins")
+@pytest.mark.parametrize("key", [
+    "ckanext.approval.reviewer_guidelines_link",
+    "ckanext.approval.turn_on_email_notifications",
+])
+def test_options_are_declared(key):
+    from ckan.common import config_declaration
+    assert key in config_declaration
