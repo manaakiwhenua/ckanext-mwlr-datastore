@@ -8,7 +8,7 @@ Proposed until the restricted resources design settles; the rules below are writ
 
 This extension ships CKAN plugins from one package: `mwlr_datastore` and, since v1.3.0, `dataset_approval`. A restricted resources feature is being planned ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and will most likely arrive as another plugin here.
 
-Keeping them as separate plugins in one package is deliberate: one release train and one test suite, but each capability switched on per environment by listing it in `ckan.plugins`. `dataset_approval` is off everywhere except the approvals environment, and its database migration only runs when it is listed.
+Keeping them as separate plugins in one package is deliberate: one release train and one test suite, but each capability switched on per deployment by listing it in `ckan.plugins`. A plugin that is not listed does nothing, and `dataset_approval`'s database migrations only matter where it is listed.
 
 Separate plugins still share CKAN's extension points with each other and with CKAN's own plugins, and dataset approval and restricted resources both change **who can see what**. Some of those extension points combine plugins in order, and one of them silently ignores all but the first plugin. Without agreed rules, the second of the two to be written can quietly undo the first.
 
@@ -33,10 +33,10 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 - **Chained actions:** `dataset_approval` chains `package_create`, `package_update`, `package_show` (a pass-through), `resource_create` and `resource_update`.
 - **Templates, between our plugins:** `package/read_base.html`, `package/search.html` and `page.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders.
 - **Templates, with core `tracking`:** CKAN's own `tracking` plugin (2.11 onwards) and `dataset_approval` both replace the same block in two templates, and neither calls `super()`:
-    - `package/search.html`, block `form`: whichever is listed first supplies the search form. On the approvals environment `tracking` comes first, so the sysadmin-only sort options `dataset_approval` adds (In progress, Rejected, Review pending) do not appear.
+    - `package/search.html`, block `form`: whichever is listed first supplies the search form. With `tracking` listed first, the sysadmin-only sort options `dataset_approval` adds (In progress, Rejected, Review pending) do not appear.
     - `snippets/package_item.html`, block `heading_meta`: `dataset_approval`'s version replaces the base and already includes the "recent views" badge. `tracking`'s version calls `super()` and adds the badge again, so with `tracking` first a popular dataset shows it twice.
 - **Helpers:** no name collisions.
-- **Plugin order differs:** the approvals environment and CI list `tracking` before `dataset_approval`; the DataStore repository's `.env.example` says to add `dataset_approval` at the start.
+- **Plugin order is not written down anywhere:** this repository's CI lists `tracking` before `dataset_approval`.
 
 ## Decision
 
@@ -85,7 +85,7 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
     - some of these fields may describe the dataset rather than the workflow (whether a dataset needs te ao Māori review, for instance), and those may be worth keeping whether the workflow runs or not. That is for the data owners to say.
 
     To be proposed by the approval workflow's maintainers (Mary O'Leary, Justine Waterson), who know why each field exists. Restricted resources will face the same question for its resource fields, so the answer becomes a rule here.
-- **Blueprint precedence.** `dataset_approval` registers its own `/dataset/new` and `/dataset/edit/<id>` views, which scheming and core also register. Which one serves the request depends on registration order, not on this ADR's plugin order alone. Confirm on the approvals environment and record the answer here.
+- **Blueprint precedence.** `dataset_approval` registers its own `/dataset/new` and `/dataset/edit/<id>` views, which scheming and core also register. Which one serves the request depends on registration order, not on this ADR's plugin order alone. Confirm on a deployment that lists `dataset_approval` and record the answer here.
 
 ## Revisit if
 

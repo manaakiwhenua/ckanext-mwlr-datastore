@@ -8,13 +8,13 @@ How this plugin must fit with the others in this extension is set by [decision 0
 
 ## Turning it on
 
-The plugin is off unless an environment lists it in `ckan.plugins`. Today only the approvals environment does. Decision 0001 sets the order:
+The plugin is off unless a deployment lists it in `ckan.plugins`. Decision 0001 sets where it goes in the list:
 
 ```text
 mwlr_datastore dataset_approval tracking ... scheming_datasets ...
 ```
 
-When it is listed, the DataStore image runs `ckan db upgrade -p dataset_approval` at start-up, creating its two tables. Environments that do not list it never get the tables.
+Its two tables come from its own migrations, `ckan db upgrade -p dataset_approval`, which a deployment runs when it lists the plugin. A deployment that does not list it never gets the tables.
 
 | Setting | Does |
 |---|---|
@@ -58,7 +58,7 @@ The workflow state lives on the dataset itself, as fields that scheming has to d
 
 ## Open questions
 
-Found reading the code for [MWDS-469](https://manaakiwhenua.atlassian.net/browse/MWDS-469). Each needs confirming on the approvals environment before the workflow goes to testers.
+Found reading the code for [MWDS-469](https://manaakiwhenua.atlassian.net/browse/MWDS-469). Each needs confirming on a deployment that runs the workflow before it goes to testers.
 
 1. **The workflow fields are not in the schema, so the workflow cannot run.** The fields above are commented out of `ckanext/mwlr_datastore/scheming/dataset.yaml` (MWDS-348 took them out so the workflow could be removed from production), and the approvals environment uses that same schema. CKAN's package schema drops undeclared top-level fields without an error, so `publishing_status` is thrown away on every save: nothing ever reaches `in_review`, the reviewer queue stays empty, and the approve and reject endpoints return 404 for every dataset. None of the approvals environment's public datasets has a `publishing_status`. Where these fields should live is an open question in [decision 0001](decisions/0001-plugin-composition.md#open-questions); something has to change before testing is worth anyone's time.
 2. **Editing a resource may unpublish its dataset.** Adding or changing a resource calls `package_update` internally without the dataset form's context, so for an editor the publishing check takes the "saved, not submitted" branch: the dataset becomes private and `in_progress`. That may be intended (any change is reviewed again), but it happens silently and needs an explicit decision, especially once restricted resources lets an editor change a resource's access.

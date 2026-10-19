@@ -8,10 +8,12 @@ The DataStore deployment itself - the image, the environments, the pipeline - is
 
 One package, more than one CKAN plugin. Each is switched on by listing it in `ckan.plugins`, so an environment gets exactly the capabilities it lists.
 
-| Plugin | What it does | Enabled |
-|---|---|---|
-| `mwlr_datastore` | the dataset schema and its validators, the theme templates, facets, view and download counts, environment and build helpers, the readiness endpoint | every environment |
-| `dataset_approval` | the [dataset approval](dataset-approval.md) workflow | the approvals environment only |
+| Plugin | What it does |
+|---|---|
+| `mwlr_datastore` | the dataset schema and its validators, the theme templates, facets, view and download counts, environment and build helpers, the readiness endpoint |
+| `dataset_approval` | the [dataset approval](dataset-approval.md) workflow |
+
+Which deployment lists which plugin is that deployment's configuration, not something this extension records.
 
 Restricted resources is being designed ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and is expected to arrive as another plugin here.
 
