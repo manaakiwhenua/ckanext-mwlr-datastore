@@ -1,0 +1,13 @@
+# Config options this plugin reads (MWDS-536). Declared so CKAN knows them and
+# stops warning "Option ... is not declared" on each read.
+version: 1
+groups:
+  - annotation: ckanext-datasetapproval
+    options:
+      - key: ckanext.approval.reviewer_guidelines_link
+        description: The reviewer guidelines page linked from the approval workflow.
+
+      # Untyped on purpose: the mailer compares the value to the string "false".
+      - key: ckanext.approval.turn_on_email_notifications
+        default: "true"
+        description: Set to "false" to stop approval workflow emails.

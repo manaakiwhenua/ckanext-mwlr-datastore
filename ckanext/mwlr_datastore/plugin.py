@@ -12,6 +12,7 @@ from ckanext.mwlr_datastore.logic import validators
 def terms_of_use():
     return toolkit.render('terms_of_use.html')
 
+@toolkit.blanket.config_declarations
 class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IConfigurer)
@@ -54,6 +55,7 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         return {
             'get_env_var': self.get_env_var,
             'mwlr_environment': self.mwlr_environment,
+            'mwlr_data_management_email': self.mwlr_data_management_email,
             'mwlr_versions': self.mwlr_versions,
             'mwlr_components': components.components,
             'mwlr_show_components': components.show_components,
@@ -71,6 +73,11 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         """
         value = (toolkit.config.get('ckanext.mwlr_datastore.environment') or '').strip().lower()
         return ''.join(c for c in value if c.isalnum() or c == '-')[:16]
+
+    def mwlr_data_management_email(self):
+        """The Data Management Team's address, from the required
+        ``ckan.datastore.data_management_email`` option (MWDS-536)."""
+        return toolkit.config.get('ckan.datastore.data_management_email')
 
     def mwlr_versions(self):
         """What is actually deployed (MWDS-357), every value read at runtime.

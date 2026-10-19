@@ -100,6 +100,10 @@ jobs:
           for plugin in ("mwlr_datastore", "datasetapproval"):
               pkg = r.files(f"ckanext.{plugin}")
               base = src / "ckanext" / plugin
+              # Without it the config_declarations decorator stops CKAN
+              # starting (MWDS-536).
+              if not (pkg / "config_declaration.yml").is_file():
+                  missing.append(f"{plugin}/config_declaration.yml")
               for sub in ("templates", "public"):
                   for path in sorted((base / sub).rglob("*")):
                       # Dotfiles are repository housekeeping (a .gitignore
