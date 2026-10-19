@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.1...v2.3.2) (2026-10-19)
+
+
+### Fixes
+
+* MWDS-536 declare the extension's config options and require the data management email ([#57](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/57)) ([9c2ffbf](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/9c2ffbf05583069e14082d5d333dbe2019c126da))
+
 ## [2.3.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.0...v2.3.1) (2026-10-01)
 
 
