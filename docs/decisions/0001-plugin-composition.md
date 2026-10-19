@@ -79,12 +79,26 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ## Open questions
 
-- **Where a plugin's fields live.** The approval fields (`publishing_status`, `chosen_visibility`, the review questions, conditions of release) sit commented out in `mwlr_datastore`'s schema, so the workflow cannot store its state (see [dataset approval](../dataset-approval.md#open-questions), question 1). The aim is that switching a plugin off hides its fields and switching it back on restores them. Constraints any answer has to meet:
+- **Where a plugin's fields live.** The aim is that switching a plugin off hides its fields and switching it back on restores them. Constraints any answer has to meet:
     - scheming holds one schema per dataset type; a second file for the same type replaces the first, and there is no include or merge;
     - CKAN drops fields the schema does not declare, without an error, so removing a field from the schema loses its stored values the next time each dataset is edited;
     - some of these fields may describe the dataset rather than the workflow (whether a dataset needs te ao Māori review, for instance), and those may be worth keeping whether the workflow runs or not. That is for the data owners to say.
 
-    To be proposed by the approval workflow's maintainers (Mary O'Leary, Justine Waterson), who know why each field exists. Restricted resources will face the same question for its resource fields, so the answer becomes a rule here.
+    **The current approach**, from [#48](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/pull/48) ([MWDS-459](https://manaakiwhenua.atlassian.net/browse/MWDS-459)), is one schema per combination of plugins, and a deployment points `scheming.dataset_schemas` at the one that matches the plugins it lists:
+
+    | Schema | For |
+    |---|---|
+    | `dataset.yaml` | neither plugin; the approval fields stay commented out ([MWDS-348](https://manaakiwhenua.atlassian.net/browse/MWDS-348)) |
+    | `dataset_with_dataset_approval.yaml` | `dataset_approval` |
+    | `dataset_with_restricted_resources.yaml` | restricted resources |
+    | `dataset_with_both_restricted_resources_and_dataset_approval.yaml` | both |
+
+    It meets the first constraint, since each deployment has exactly one schema. What it costs:
+    - every field the files share is copied into each of them, and has to be kept in step by hand;
+    - each plugin that adds fields doubles the number of files;
+    - switching a plugin off still means moving to a schema without its fields, so their values are dropped on each dataset's next edit (the second constraint).
+
+    To be confirmed by the approval workflow's maintainers (Mary O'Leary, Justine Waterson) as the intended answer. Restricted resources faces the same question for its resource fields, so once confirmed the answer becomes a rule here.
 - **Blueprint precedence.** `dataset_approval` registers its own `/dataset/new` and `/dataset/edit/<id>` views, which scheming and core also register. Which one serves the request depends on registration order, not on this ADR's plugin order alone. Confirm on a deployment that lists `dataset_approval` and record the answer here.
 
 ## Revisit if

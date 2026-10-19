@@ -14,6 +14,8 @@ The plugin is off unless a deployment lists it in `ckan.plugins`. Decision 0001 
 mwlr_datastore dataset_approval tracking ... scheming_datasets ...
 ```
 
+It also needs a dataset schema that declares its fields: `dataset_with_dataset_approval.yaml`, or `dataset_with_both_restricted_resources_and_dataset_approval.yaml` alongside restricted resources (see [Data](#data)).
+
 Its two tables come from its own migrations, `ckan db upgrade -p dataset_approval`, which a deployment runs when it lists the plugin. A deployment that does not list it never gets the tables.
 
 | Setting | Does |
@@ -54,13 +56,13 @@ A dataset's workflow state is its `publishing_status`:
 
 ## Data
 
-The workflow state lives on the dataset itself, as fields that scheming has to declare: `publishing_status`, `chosen_visibility` and the review fields (`te_ao_māori_review_required`, `scientific_technical_review_required` and so on, with notes). Reviewer decisions and comments live in the plugin's own tables.
+The workflow state lives on the dataset itself, as fields that scheming has to declare: `publishing_status`, `chosen_visibility` and the review fields (`te_ao_māori_review_required`, `scientific_technical_review_required` and so on, with notes). They are declared in the schemas for the plugin, not in the plain `dataset.yaml`; how that is arranged is an open question in [decision 0001](decisions/0001-plugin-composition.md#open-questions). Reviewer decisions and comments live in the plugin's own tables.
 
 ## Open questions
 
 Found reading the code for [MWDS-469](https://manaakiwhenua.atlassian.net/browse/MWDS-469). Each needs confirming on a deployment that runs the workflow before it goes to testers.
 
-1. **The workflow fields are not in the schema, so the workflow cannot run.** The fields above are commented out of `ckanext/mwlr_datastore/scheming/dataset.yaml` (MWDS-348 took them out so the workflow could be removed from production), and the approvals environment uses that same schema. CKAN's package schema drops undeclared top-level fields without an error, so `publishing_status` is thrown away on every save: nothing ever reaches `in_review`, the reviewer queue stays empty, and the approve and reject endpoints return 404 for every dataset. None of the approvals environment's public datasets has a `publishing_status`. Where these fields should live is an open question in [decision 0001](decisions/0001-plugin-composition.md#open-questions); something has to change before testing is worth anyone's time.
+1. **The workflow needs its own schema, and fails silently without it.** The fields above are commented out of the plain `dataset.yaml` ([MWDS-348](https://manaakiwhenua.atlassian.net/browse/MWDS-348) took them out so production could run without the workflow) and declared in `dataset_with_dataset_approval.yaml` since [#48](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/pull/48). A deployment that lists the plugin but keeps the plain schema gets no error: CKAN drops undeclared fields, so `publishing_status` is thrown away on every save, nothing reaches `in_review`, the reviewer queue stays empty, and approve and reject return 404. That is what happened before #48. Worth a startup check that the plugin's fields are declared, so the mistake fails loudly.
 2. **Editing a resource may unpublish its dataset.** Adding or changing a resource calls `package_update` internally without the dataset form's context, so for an editor the publishing check takes the "saved, not submitted" branch: the dataset becomes private and `in_progress`. That may be intended (any change is reviewed again), but it happens silently and needs an explicit decision, especially once restricted resources lets an editor change a resource's access.
 3. **`has_approval_permission` narrows what a user can see.** For a user with that flag in their `plugin_extras`, the plugin removes every organisation membership label and adds back only the organisations they administer, so they stop seeing private datasets in organisations where they are an editor or member. Nothing in the code sets the flag; it can only be set by hand. Decide whether the flag is still needed, and if so whether the narrowing is intended.
 4. **`retrieve_publishing_status` answers anyone.** It reads the dataset with `ignore_auth` and its auth function allows anonymous access, so anyone who knows a dataset's id can learn whether it is in review or was rejected, including for private datasets. Low impact, but it should check `package_show` access first.
