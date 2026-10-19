@@ -71,10 +71,13 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ## Consequences
 
-- The approvals environment and CI move `tracking` after `dataset_approval`. That brings back the workflow's sort options, and also shows two CKAN 2.10 leftovers in the workflow's search form (see [dataset approval](../dataset-approval.md#open-questions), question 9). The DataStore `.env.example` comment ("add dataset_approval to the start") changes to match.
-- Restricted resources has its integration points decided before its design starts: chained auth functions and actions, no permission labels, listed before `dataset_approval`.
-- `dataset_approval` gets checked against these rules before it goes to testing ([dataset approval](../dataset-approval.md) lists what that check found).
-- CI grows tests of the combined behaviour.
+- Restricted resources has its integration points set before its design starts: chained auth functions and actions, no permission labels, listed before `dataset_approval`.
+- A deployment's plugin list is checked against two rules rather than copied from one canonical list, so deployments that enable different plugins do not drift from each other.
+- `dataset_approval` keeps replacing two blocks that core `tracking` also replaces (the search form and the listing badge), so its templates have to carry what `tracking` would have added, and keep doing so across CKAN upgrades.
+- Adding a plugin, an action or auth override, or a template override that another plugin also touches means checking it against these rules in the same pull request.
+- `dataset_approval` was checked against these rules before testing; what that found is on the [dataset approval](../dataset-approval.md#open-questions) page.
+
+The work these lead to is tracked in Jira: [MWDS-537](https://manaakiwhenua.atlassian.net/browse/MWDS-537) (CI's plugin order), [MWDS-538](https://manaakiwhenua.atlassian.net/browse/MWDS-538) (tests of the plugins working together) and [MWDS-475](https://manaakiwhenua.atlassian.net/browse/MWDS-475) (the approval templates alongside core `tracking`).
 
 ## Open questions
 
