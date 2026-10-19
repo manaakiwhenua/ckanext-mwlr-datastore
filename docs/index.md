@@ -15,17 +15,17 @@ One package, more than one CKAN plugin. Each is switched on by listing it in `ck
 
 Which deployment lists which plugin is that deployment's configuration, not something this extension records.
 
-Restricted resources is being designed ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and is expected to arrive as another plugin here.
+Restricted resources ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) is being built as a third plugin, `bsi_restricted_resources`.
 
 ## Plugin composition
 
-Several of CKAN's extension points combine plugins - ours and CKAN's own - in the order they appear in `ckan.plugins`, and one - permission labels - uses only the first plugin that implements it. Dataset approval and restricted resources both change who can see what, so the order and the division of responsibilities are fixed in [decision 0001](decisions/0001-plugin-composition.md). In short:
+Several of CKAN's extension points combine plugins - ours and CKAN's own - in the order they appear in `ckan.plugins`, and one - permission labels - uses only the first plugin that implements it. Dataset approval and restricted resources both change who can see what, so how they are ordered and what each is responsible for are set in [decision 0001](decisions/0001-plugin-composition.md). In short:
 
-- one order everywhere - `mwlr_datastore <restricted resources> dataset_approval tracking ...` - so access control wraps the workflow, and the workflow's templates win over core tracking's;
+- two ordering rules: restricted resources before `dataset_approval`, so access control wraps the workflow, and `dataset_approval` before `tracking`, so the workflow's templates render rather than core tracking's;
 - exactly one of our plugins implements `IPermissionLabels`;
 - resource-level access control uses chained auth functions and actions, not permission labels;
 - every override of a core action or auth function is chained;
-- the test suite runs the plugins together in that order.
+- the test suite runs the plugins together, in an order that meets those rules.
 
 Read the decision before adding a plugin, an action or auth override, or a template override that another plugin also touches.
 

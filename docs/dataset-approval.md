@@ -8,11 +8,7 @@ How this plugin must fit with the others in this extension is set by [decision 0
 
 ## Turning it on
 
-The plugin is off unless a deployment lists it in `ckan.plugins`. Decision 0001 sets where it goes in the list:
-
-```text
-mwlr_datastore dataset_approval tracking ... scheming_datasets ...
-```
+The plugin is off unless a deployment lists it in `ckan.plugins`, before `tracking` and after restricted resources ([decision 0001](decisions/0001-plugin-composition.md), rule 1).
 
 It also needs a dataset schema that declares its fields: `dataset_with_dataset_approval.yaml`, or `dataset_with_both_restricted_resources_and_dataset_approval.yaml` alongside restricted resources (see [Data](#data)).
 
@@ -70,4 +66,4 @@ Found reading the code for [MWDS-469](https://manaakiwhenua.atlassian.net/browse
 6. **Review requests go to every sysadmin**, as well as the organisation's admins. Confirm that is wanted at production volumes.
 7. **An "approved for restricted access" outcome is waiting on restricted resources.** It is commented out of the approval outcomes "until restricted functionality implemented". That is the first concrete point where the two features meet, and belongs in the restricted resources design.
 8. **The testing plan predates CKAN 2.12 and the move.** The [testing plan](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/16651878401) was last updated in December 2025 and needs revising once the points above are settled.
-9. **Core `tracking` hides the workflow's search options, and the search form still has CKAN 2.10 names.** From CKAN 2.11 page tracking is the core `tracking` plugin, and it replaces the same search-form block the plugin does. The approvals environment lists `tracking` first, so the sysadmin sort options (In progress, Rejected, Review pending) never appear, and a popular dataset shows its "recent views" badge twice in listings. Decision 0001 puts `dataset_approval` first. Once it is, the plugin's search form renders, and it still uses `g.tracking_enabled` and `request.params`, neither of which exists on 2.12: the Popular sort option disappears and the form's show-empty behaviour stops working.
+9. **The workflow's search form still has CKAN 2.10 names.** From CKAN 2.11 page tracking is the core `tracking` plugin, which replaces the same search-form and listing blocks this plugin does. Listed before `tracking`, as decision 0001 requires, this plugin's versions render; listed after it, the sysadmin sort options (In progress, Rejected, Review pending) never appear and a popular dataset shows its "recent views" badge twice. This plugin's search form still uses `g.tracking_enabled` and `request.params`, neither of which exists on 2.12, so the Popular sort option is missing and the form's show-empty behaviour does not work ([MWDS-475](https://manaakiwhenua.atlassian.net/browse/MWDS-475)).

@@ -6,7 +6,7 @@ Proposed until the restricted resources design settles; the rules below are writ
 
 ## Context
 
-This extension ships CKAN plugins from one package: `mwlr_datastore` and, since v1.3.0, `dataset_approval`. A restricted resources feature is being planned ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) and will most likely arrive as another plugin here.
+This extension ships CKAN plugins from one package: `mwlr_datastore` and, since v1.3.0, `dataset_approval`. Restricted resources ([User Requirements - DataStore Resource Access Control](https://manaakiwhenua.atlassian.net/wiki/spaces/CKAN/pages/17277124610)) is arriving as a third plugin here, `bsi_restricted_resources`, scaffolded in [MWDS-459](https://manaakiwhenua.atlassian.net/browse/MWDS-459).
 
 Keeping them as separate plugins in one package is deliberate: one release train and one test suite, but each capability switched on per deployment by listing it in `ckan.plugins`. A plugin that is not listed does nothing, and `dataset_approval`'s database migrations only matter where it is listed.
 
@@ -14,7 +14,7 @@ Separate plugins still share CKAN's extension points with each other and with CK
 
 ### How CKAN combines plugins
 
-Checked against the CKAN 2.12.0 source.
+Checked against the CKAN 2.12.0 source. Two plugins overriding the same template file is not a problem in itself; it matters only when they replace the same **block**.
 
 | Extension point | How several plugins combine | Source |
 |---|---|---|
@@ -29,9 +29,10 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ### Where the plugins overlap today
 
-- **Permission labels:** `dataset_approval` implements `IPermissionLabels`; nothing else does.
+- **Permission labels:** `dataset_approval` implements `IPermissionLabels`; nothing else does. `bsi_restricted_resources` is a scaffold so far, with no actions, auth functions or labels yet.
 - **Chained actions:** `dataset_approval` chains `package_create`, `package_update`, `package_show` (a pass-through), `resource_create` and `resource_update`.
-- **Templates, between our plugins:** `package/read_base.html`, `package/search.html` and `page.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders.
+- **Templates, between our plugins:** `package/read_base.html`, `package/search.html`, `page.html` and `scheming/package/snippets/resource_form.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders. `bsi_restricted_resources` overrides only `package/snippets/resource_item.html`, which neither of the others touches.
+- **Templates, `mwlr_datastore` with core `tracking`:** both override `package/search.html` and `page.html`, on different blocks.
 - **Templates, with core `tracking`:** CKAN's own `tracking` plugin (2.11 onwards) and `dataset_approval` both replace the same block in two templates, and neither calls `super()`:
     - `package/search.html`, block `form`: whichever is listed first supplies the search form. With `tracking` listed first, the sysadmin-only sort options `dataset_approval` adds (In progress, Rejected, Review pending) do not appear.
     - `snippets/package_item.html`, block `heading_meta`: `dataset_approval`'s version replaces the base and already includes the "recent views" badge. `tracking`'s version calls `super()` and adds the badge again, so with `tracking` first a popular dataset shows it twice.
@@ -40,17 +41,15 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 ## Decision
 
-1. **One plugin order, recorded here and used everywhere:**
-
-    ```text
-    mwlr_datastore <restricted resources> dataset_approval tracking ... scheming_datasets ...
-    ```
-
-    Two constraints set it; the rest is today's order kept:
+1. **Two ordering rules for `ckan.plugins`; everything else is free:**
     - restricted resources before `dataset_approval`, so its chained actions are the outermost: nothing another plugin does to a dataset or resource reaches a user without passing its check last;
     - `dataset_approval` before core `tracking`, so the workflow's search form and listing badges are the ones that render.
 
-    `mwlr_datastore` overlaps with neither on anything that depends on order, so it stays first. Environments that do not enable a plugin omit it; the relative order of the rest does not change.
+    `mwlr_datastore` shares no block, action or helper with either, so where it goes does not matter. A deployment that does not enable a plugin leaves it out, and the rules still hold for the rest. One order that meets them:
+
+    ```text
+    bsi_restricted_resources dataset_approval tracking mwlr_datastore ... scheming_datasets ...
+    ```
 
 2. **Exactly one `IPermissionLabels` implementation among our plugins.** Today that is `dataset_approval`. Restricted resources does not implement `IPermissionLabels`: labels cannot express resource-level restriction anyway. If a later feature needs dataset-level labels as well, the label logic moves into one implementation that combines the rules, rather than a second plugin implementing the interface.
 
@@ -58,15 +57,15 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 4. **Every override of a core action or auth function is chained** (`@toolkit.chained_action`, `@toolkit.chained_auth_function`), never a plain replacement. Two plain replacements of the same action fail at startup, and a plain replacement discards core's implementation, so it has to reimplement it and keep up with every CKAN upgrade that changes it.
 
-5. **Template overrides use `{% ckan_extends %}` and the narrowest block available, and call `super()` where they add to a block rather than replace it.** Two plugins replacing the same block is a bug to fix, not a precedence to rely on - including when the other plugin is one of CKAN's own. Where replacing is unavoidable, as with `dataset_approval`'s search form, rule 1 decides the winner and the replacing template carries what the other one would have added.
+5. **Template overrides use `{% ckan_extends %}` and the narrowest block available, and call `super()` where they add to a block rather than replace it.** Two plugins replacing the same block is a bug to fix, not a precedence to rely on - including when the other plugin is one of CKAN's own. Where replacing is unavoidable, as with `dataset_approval`'s search form, rule 1 decides which one renders and the replacing template carries what the other one would have added.
 
-6. **The test suite runs the plugins together, in this order, and tests what they do together.** CI already loads them together on each CKAN version it tests, with `tracking` before `dataset_approval`; it moves to rule 1's order. What it lacks are tests of the combined behaviour: a dataset in review stays out of search, the workflow's sort options appear for a sysadmin, a restricted resource on an approved public dataset stays restricted.
+6. **The test suite runs the plugins together, in an order that meets rule 1, and tests what they do together.**
 
 ## Alternatives considered
 
 **Merge everything into `mwlr_datastore`.** One plugin removes ordering from the picture entirely. Rejected: switching the approval workflow off would need a feature flag of our own, where listing the plugin already does that for free, and the approval code, which carries Datopian's history and AGPL attribution, would lose its clear boundary. The composition problems do not go away either; they move inside one class where they are harder to see.
 
-**No fixed order, each plugin defensive about the others.** Rejected: permission labels cannot be made defensive - the ignored plugin never runs - and chained actions give different results in a different order by design.
+**No ordering rules, each plugin defensive about the others.** Rejected: permission labels cannot be made defensive - the ignored plugin never runs - and chained actions give different results in a different order by design.
 
 **Restricted resources as a separate package.** Possible, and nothing here prevents it later. Rejected for now for the same reason approval moved into this extension ([MWDS-400](https://manaakiwhenua.atlassian.net/browse/MWDS-400)): one release train and one place for the tests that exercise the combination.
 
