@@ -16,8 +16,11 @@ Its two tables come from its own migrations, `ckan db upgrade -p dataset_approva
 
 | Setting | Does |
 |---|---|
-| `ckan.datastore.data_management_email` | the contact address shown on the review forms |
+| `ckan.datastore.data_management_email` | the contact address shown on the review forms. Declared by `mwlr_datastore` and required: CKAN 2.11+ does not start without it |
 | `ckanext.approval.reviewer_guidelines_link` | a link to the reviewer guidelines, shown to reviewers |
+| `ckanext.approval.turn_on_email_notifications` | set to `false` to stop the workflow's emails; on by default |
+
+All three are declared, so CKAN validates them and `ckan config describe` lists them (v2.3.2, [MWDS-536](https://manaakiwhenua.atlassian.net/browse/MWDS-536)).
 
 ## The workflow
 
@@ -32,7 +35,7 @@ A dataset's workflow state is its `publishing_status`:
 
 - **An organisation admin (or sysadmin) creating or editing** a dataset skips review: it goes straight to `approved` with the visibility they set.
 - **An editor** either saves (`in_progress`, private) or submits for review (`in_review`). Submitting emails every admin of the organisation **and every sysadmin**.
-- **An editor changing only visibility** on an approved dataset uses the "bypass review" button, which keeps it approved.
+- **An editor changing only the visibility** of an approved dataset is offered **Update** instead of Submit when saving ("Updating dataset visibility"). It is sent as `bypass-review` and the dataset stays approved; any other change goes back through review.
 - **Reviewing:** admins see datasets awaiting them at `/user/<id>/dataset_review`; editors see their own submissions at `/user/<id>/my_requests`. The reviewer picks the review types that apply (metadata and documentation, scientific and technical, te ao Māori, ethics and security risk, intellectual property), then approves or rejects. Rejection takes one or more reasons and comments. The outcome is emailed to the dataset's editors.
 - **History:** each approval or rejection is stored with its comments, and org admins and sysadmins can read it at `/dataset/review_history/<name>`.
 
