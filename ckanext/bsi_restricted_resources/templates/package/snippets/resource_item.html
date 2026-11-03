@@ -1,34 +1,35 @@
-{% ckan_extends "package/snippets/resource_item.html" %}
+{% ckan_extends %}
 {% set can_edit = h.check_access('package_update', {'id':pkg.id })%}
-{% set authorised_to_view_resources = can_edit or c.userobj and h.resource_user_has_download_access(c, pkg) or not
+{% set authorised_to_view_this_resource = can_edit or not
 h.resource_requires_request_to_access(res) %}
 {% set resource_masked_title = res.mimetype | default('Unknown type', true) + ' resource' %}
 
 {% block resource_item_title %}
-    {% if authorised_to_view_resources %}
-    {{ super() }}
-    {% else %}
-    <div>
-        <div class="heading">{{ resource_masked_title }}</div>
-        <span class="format-label" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}
-        </span>
-    </div>
-    {% endif %}
+{% if authorised_to_view_this_resource %}
+{{ super() }}
+{% else %}
+<span>
+    <a class="heading text-muted hover-disabled text-decoration-none" disabled="true"
+        title="{{ res.name or res.description }}">{{
+        resource_masked_title }}
+        <span class="format-label text-muted" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}</span>
+    </a>
+</span>
+{% endif %}
 {% endblock %}
 
 {% block resource_item_description %}
-    {% if authorised_to_view_resources %}
-    {{ super() }}
-    {% endif %}
+{% if authorised_to_view_this_resource %}
+{{ super() }}
+{% else %}
+<p class="text-muted fst-italic">To view this resource, please log in and request access.</p>
+{% endif %}
 {% endblock %}
 
 {% block resource_item_explore %}
-    {% if authorised_to_view_resources %}
-    {{ super() }}
-    {% else %}
-    <div class="d-flex flex-row align-items-center justify-content-between" title="You must be logged in to request access">
-        <p class="text-muted">To view this resource, please log in and request access.</p>
-        <button type="button" class="btn btn-primary btn-disabled" disabled>Request Access</button>
-    </div>
-    {% endif %}
+{% if authorised_to_view_this_resource %}
+{{ super() }}
+{% else %}
+<!-- This block is empty because we're removing the explore button for unauthorized users -->
+{% endif %}
 {% endblock %}
