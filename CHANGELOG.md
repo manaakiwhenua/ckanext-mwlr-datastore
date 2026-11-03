@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.2...v2.3.3) (2026-11-03)
+
+
+### Documentation
+
+* MWDS-469 plugin composition decision, dataset approval as built, TechDocs and catalogue entry ([#32](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/32)) ([4e763af](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/4e763afe408c0cee3fc1af66ba44c4980ab995e7))
+
 ## [2.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.1...v2.3.2) (2026-10-19)
 
 
