@@ -282,4 +282,4 @@ resource_fields:
     - value: public
       label: Public (resource will be public when the dataset is public)
     - value: private
-      label: Private (resource will remain private)
+      label: Full restriction (resource will remain private to the dataset owner, even if the dataset is made public)

@@ -1,8 +1,7 @@
 {% ckan_extends %}
-{% set can_edit = h.check_access('package_update', {'id':pkg.id })%}
-{% set authorised_to_view_this_resource = can_edit or not
-h.resource_requires_request_to_access(res) %}
-{% set resource_masked_title = res.mimetype | default('Unknown type', true) + ' resource' %}
+{% set authorised_to_view_this_resource =
+h.check_access('resource_show', {'id': res.id}) %}
+{% set resource_masked_title = res.format | default('Unknown type', true) + ' resource' %}
 
 {% block resource_item_title %}
 {% if authorised_to_view_this_resource %}
@@ -10,9 +9,9 @@ h.resource_requires_request_to_access(res) %}
 {% else %}
 <span>
     <a class="heading text-muted hover-disabled text-decoration-none" disabled="true"
-        title="{{ res.name or res.description }}">{{
+        title="{{ resource_masked_title }}">{{
         resource_masked_title }}
-        <span class="format-label text-muted" data-format="{{ res.format.lower() or 'data' }}">{{ res.format }}</span>
+        <span class="format-label" data-format="{{ res.format.lower() or 'data' }}"></span>
     </a>
 </span>
 {% endif %}
@@ -22,7 +21,7 @@ h.resource_requires_request_to_access(res) %}
 {% if authorised_to_view_this_resource %}
 {{ super() }}
 {% else %}
-<p class="text-muted fst-italic">To view this resource, please log in and request access.</p>
+<p class="text-muted fst-italic">To view this resource, please request access from the dataset maintainer.</p>
 {% endif %}
 {% endblock %}
 
@@ -30,6 +29,6 @@ h.resource_requires_request_to_access(res) %}
 {% if authorised_to_view_this_resource %}
 {{ super() }}
 {% else %}
-<!-- This block is empty because we're removing the explore button for unauthorized users -->
+<!-- This block is empty because we're removing the 'explore' button for unauthorized users -->
 {% endif %}
 {% endblock %}
