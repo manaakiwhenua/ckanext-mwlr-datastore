@@ -11,6 +11,8 @@ log = logging.getLogger(__name__)
 Resource_view_list action wrapper to handle restricted resources.
 We wrap CKAN's original resource_view_list action to add exception handling
 for restricted resources on the dataset read page and the resource read page.
+
+Based partly on EnviDat's resource_view_list handling https://github.com/EnviDat/ckanext-restricted/blob/011c7af86e634d130c7fa7800eaa9beab165b822/ckanext/restricted/action.py#L69
 """
 
 
@@ -23,21 +25,16 @@ def resource_view_list(next_action, context, data_dict):
         return next_action(context, data_dict)
 
     except tk.NotAuthorized:
-        # If this wasn't an HTTP request (e.g., called from the CLI), we can't access request.endpoint, so just raise the exception
-        if not has_request_context():
-            raise
+        # Request might be outside of an HTTP request context (e.g., called from the CLI), so we need to check if request.endpoint is available.
+        request_endpoint = request.endpoint if has_request_context() else None
 
         dataset_view_page = "dataset.read"
         resource_view_page = "dataset_resource.read"
 
-        if request.endpoint == dataset_view_page:
-            log.debug(
-                "Omitting restricted preview from dataset page: restricted resource=%s",
-                data_dict.get("id"),
-            )
-            return []
+        if request_endpoint == dataset_view_page:
+            return []  # no preview for this restricted resource, allows the dataset page to render without errors
 
-        if request.endpoint == resource_view_page:
+        if request_endpoint == resource_view_page:
             # raise an HTTP 403 Forbidden error for restricted resources - shows an '403 Forbidden' page to the user
             base.abort(
                 403,
@@ -47,7 +44,61 @@ def resource_view_list(next_action, context, data_dict):
         raise
 
 
+@tk.chained_action
+@tk.side_effect_free
+def package_search(next_action, context, data_dict):
+
+    search_result = next_action(context, data_dict)
+    masked_search_results = [mask_dataset_resources(context, dataset) for dataset in search_result["results"]]
+
+    return {
+        **search_result,
+        "results": masked_search_results,
+    }
+
+
+@tk.chained_action
+@tk.side_effect_free
+def package_show(next_action, context, data_dict):
+
+    dataset = next_action(context, data_dict)
+    masked_dataset = mask_dataset_resources(context, dataset)
+    return masked_dataset
+
+
+def mask_dataset_resources(context, dataset):
+
+    processed_resources = []
+
+    for resource in dataset["resources"]:
+        try:
+            tk.check_access(
+                "resource_show",
+                context.copy(),
+                {"id": resource["id"]},
+            )
+            processed_resources.append(resource)
+        except tk.NotAuthorized:
+            processed_resources.append(mask_resource(resource))
+
+    return {
+        **dataset,
+        "resources": processed_resources,
+    }
+
+
+def mask_resource(resource):
+    return {
+        "id": resource["id"],
+        "package_id": resource["package_id"],
+        "name": "Restricted resource",
+        "format": resource.get("format", ""),
+    }
+
+
 def get_actions():
     return {
         "resource_view_list": resource_view_list,
+        "package_search": package_search,
+        "package_show": package_show,
     }

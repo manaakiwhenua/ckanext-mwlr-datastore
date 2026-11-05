@@ -7,9 +7,14 @@ Run these tests with:
     cd /srv/app/src_extensions/ckanext-mwlr-datastore
     pytest -v ckanext/bsi_restricted_resources/tests/test_anonymous_user_access.py
 
-Note that these tests do clean the database, and you may need to compose down and up again to be able to login afterwards. You may also need to reindex Solr:
+Note that these tests do clean the database, and you may need to compose restart to be able to login afterwards as local_admin.
 
+./bin/restart
+
+If you run into Solr indexing issues, you may need to rebuild the search index:
 ./bin/ckan search-index rebuild
+
+(Hopefully this shouldn't happen due to 'clean_db' and 'clean_index' fixtures being used in the tests.)
 
 """
 
