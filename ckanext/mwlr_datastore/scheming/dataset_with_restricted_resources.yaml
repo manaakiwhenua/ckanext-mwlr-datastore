@@ -277,9 +277,9 @@ resource_fields:
   required: true
   default: private
   validators: default(private) unicode_safe
-  help_text: For private datasets, resources will remain private. When a dataset is made public, the access level of its resources will be determined by this setting.
+  help_text: Options are 'Dataset access level' - resource will match the dataset's access level - e.g. if the dataset is public, the resource will be public, and 'Restrict to dataset owner' - resource will remain private to the dataset owner, even if the dataset is made public.
   choices:
-    - value: public
-      label: Public (resource will be public when the dataset is public)
-    - value: private
-      label: Full restriction (resource will remain private to the dataset owner, even if the dataset is made public)
+    - value: dataset_access_level
+      label: Dataset access level
+    - value: restrict_to_owner
+      label: Restrict to dataset owner

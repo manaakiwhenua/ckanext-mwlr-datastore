@@ -1,19 +1,42 @@
 import ckan.plugins.toolkit as tk
+from ckan.logic.auth import get_resource_object
 
-# Auth functions have the same names as the actions they are authorizing
+from ckanext.bsi_restricted_resources.logic.access_helpers import (
+    resource_requires_request_to_access,
+)
 
-def request_access_to_dataset_resources(context, data_dict):
-    user = context.get("user")
-    if not user:
-        return {"success": False, "msg": "Login required"}
-    package_id = data_dict.get("package_id")
+
+@tk.chained_auth_function
+@tk.auth_allow_anonymous_access
+def resource_show(next_auth, context, data_dict):
+
+    # Use CKAN's next_auth to check if the user has access to the dataset first
+    result = next_auth(context, data_dict)
+    if not result["success"]:
+        return result
+
+    resource = get_resource_object(context, data_dict)
+
+    # If the resource is public, return success
+    if not resource_requires_request_to_access(resource.as_dict()):
+        return result
+
     try:
-        tk.check_access("package_show", context, {"id": package_id})
+        tk.check_access(
+            "package_update",
+            context,
+            {"id": resource.package_id},
+        )
     except tk.NotAuthorized:
-        return {"success": False, "msg": "Not authorised"}
-    return {"success": True}
+        return {
+            "success": False,
+            "msg": tk._("You are not authorised to access this resource."),
+        }
+
+    return result
+
 
 def get_auth_functions():
     return {
-        "request_access_to_dataset_resources": request_access_to_dataset_resources,
+        "resource_show": resource_show,
     }

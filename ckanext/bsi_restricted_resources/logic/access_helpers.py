@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 def resource_requires_request_to_access(resource):
     resource_access_level = resource.get("resource_access_level", "")
-    requires_request = resource_access_level != "public"
+    requires_request = resource_access_level != "dataset_access_level"
     return requires_request
 
 

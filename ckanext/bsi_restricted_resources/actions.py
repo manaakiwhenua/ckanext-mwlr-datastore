@@ -1,35 +1,53 @@
-import ckan.plugins.toolkit as tk
 import logging
-from ckanext.bsi_restricted_resources.mailer import notify_dataset_owner_of_request
+
+import ckan.plugins.toolkit as tk
+from flask import has_request_context, request
+import ckan.lib.base as base
 
 log = logging.getLogger(__name__)
 
-def request_access_to_dataset_resources(context, data_dict):
-    tk.check_access("request_access_to_dataset_resources", context, data_dict)
 
-    package_id = tk.get_or_bust(data_dict, "package_id")
-    package_title = data_dict.get("package_title", "")
-    message = data_dict.get("message", "")
-    requester = context["auth_user_obj"]
-    maintainer_email = tk.get_action("package_show")(context, {"id": package_id})["maintainer_email"]
+"""
+Resource_view_list action wrapper to handle restricted resources.
+We wrap CKAN's original resource_view_list action to add exception handling
+for restricted resources on the dataset read page and the resource read page.
+"""
 
-    if maintainer_email is None:
-        return {"success": False, "msg": "Dataset maintainer email not found."}
 
-    dataset_url = tk.url_for("package_show", id=package_id, _external=True)
+@tk.chained_action
+@tk.side_effect_free
+def resource_view_list(next_action, context, data_dict):
 
-    result = notify_dataset_owner_of_request(
-        maintainer_email,
-        package_id,
-        package_title,
-        dataset_url,
-        requester,
-        message
-    )
+    try:
+        # Call the next action in the chain (CKAN's original resource_view_list). This triggers our auth.resource_show logic and raises a NotAuthorized for restricted resources.
+        return next_action(context, data_dict)
 
-    return result
+    except tk.NotAuthorized:
+        # If this wasn't an HTTP request (e.g., called from the CLI), we can't access request.endpoint, so just raise the exception
+        if not has_request_context():
+            raise
+
+        dataset_view_page = "dataset.read"
+        resource_view_page = "dataset_resource.read"
+
+        if request.endpoint == dataset_view_page:
+            log.debug(
+                "Omitting restricted preview from dataset page: restricted resource=%s",
+                data_dict.get("id"),
+            )
+            return []
+
+        if request.endpoint == resource_view_page:
+            # raise an HTTP 403 Forbidden error for restricted resources - shows an '403 Forbidden' page to the user
+            base.abort(
+                403,
+                tk._("You are not authorised to access this resource."),
+            )
+
+        raise
+
 
 def get_actions():
     return {
-        "request_access_to_dataset_resources": request_access_to_dataset_resources,
+        "resource_view_list": resource_view_list,
     }
