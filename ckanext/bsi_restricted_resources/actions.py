@@ -59,6 +59,19 @@ def package_search(next_action, context, data_dict):
 
 @tk.chained_action
 @tk.side_effect_free
+def resource_search(next_action, context, data_dict):
+
+    search_result = next_action(context, data_dict)
+    masked_search_results = [mask_resource(resource) for resource in search_result["results"]]
+
+    return {
+        **search_result,
+        "results": masked_search_results,
+    }
+
+
+@tk.chained_action
+@tk.side_effect_free
 def package_show(next_action, context, data_dict):
 
     dataset = next_action(context, data_dict)
@@ -101,4 +114,5 @@ def get_actions():
         "resource_view_list": resource_view_list,
         "package_search": package_search,
         "package_show": package_show,
+        "resource_search": resource_search,
     }
