@@ -4,6 +4,7 @@ import ckan.plugins.toolkit as tk
 import ckan.plugins as plugins
 from ckan.tests import factories
 from uuid import uuid4
+from ckanext.bsi_restricted_resources.tests.access_scenarios import ACCESS_PARAMETERS, ACCESS_SCENARIOS, access_scenario
 
 # Spatial_metadata is required due to the spatial_query.html snippet being included in the search
 pytestmark = pytest.mark.ckan_config(
@@ -12,114 +13,125 @@ pytestmark = pytest.mark.ckan_config(
 )
 
 
-@pytest.fixture
-def searchable_dataset(with_plugins, clean_db, clean_index):
-    assert plugins.plugin_loaded("bsi_restricted_resources")
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+def test_ui_search_hides_restricted_resource_metadata(app, access_scenario):
 
-    organisation = factories.Organization()
-    dataset = factories.Dataset(
-        private=False,
-        owner_org=organisation["id"],
-    )
-
-    public_resource = factories.Resource(
-        package_id=dataset["id"],
-        name="public_resource",
-        resource_access_level="dataset_access_level",
-    )
-
-    private_resource_name_id = uuid4().hex
-
-    private_resource_name = f"restricted_name_{private_resource_name_id}"
-    private_resource_description = f"restricted_description_{private_resource_name_id}"
-    private_resource_url = f"https://example.invalid/restricted_file_{private_resource_name_id}.csv"
-
-    private_resource = factories.Resource(
-        package_id=dataset["id"],
-        name=private_resource_name,
-        description=private_resource_description,
-        url=private_resource_url,
-        resource_access_level="restrict_to_creator",
-    )
-
-    searchable_dataset_dictionary = {
-        "dataset_id": dataset["id"],
-        "dataset_name": dataset["name"],
-        "public_resource": public_resource,
-        "private_resource": private_resource,
-        "restricted_values": [
-            private_resource_name,
-            private_resource_description,
-            private_resource_url,
-        ],
-    }
-
-    return searchable_dataset_dictionary
-
-
-def test_ui_search_hides_restricted_resource_metadata(app, searchable_dataset):
-
-    dataset_search_url = tk.url_for("dataset.search", q=f"id:{searchable_dataset['dataset_id']}")
-    response = app.get(dataset_search_url)
+    dataset = access_scenario["dataset"]
+    headers = {"Authorization": access_scenario["user"]["token"]} if access_scenario["user"] else {}
+    dataset_search_url = tk.url_for("dataset.search", q=f"id:{dataset['id']}")
+    response = app.get(dataset_search_url, headers=headers)
 
     assert response.status_code == 200
-    assert searchable_dataset["dataset_name"] in response.text, "The public dataset must appear in the search results."
 
-    for value in searchable_dataset["restricted_values"]:
-        assert value not in response.text, f"UI search exposed restricted resource metadata: {value!r}"
+    if access_scenario["user_has_dataset_access"]:
+        assert dataset["name"] in response.text, "The public dataset must appear in the search results."
+    else:
+        assert dataset["name"] not in response.text, (
+            "The private dataset must not appear in the search results for users without access."
+        )
+
+    if not access_scenario["user_has_resource_access"]:
+        for resource in dataset["resources"]:
+            for value in (resource["name"], resource["description"], resource["url"]):
+                assert value not in response.text, f"UI search exposed restricted resource metadata: {value!r}"
 
 
-def test_package_search_hides_restricted_resource_metadata(app, searchable_dataset):
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+def test_package_search_hides_restricted_resource_metadata(app, access_scenario):
 
     package_search_url = tk.url_for(
-        "api.action", ver=3, logic_function="package_search", q=f"id:{searchable_dataset['dataset_id']}"
+        "api.action",
+        ver=3,
+        logic_function="package_search",
+        q=f"id:{access_scenario['dataset']['id']}",
+        include_private=True,
     )
-    response = app.get(package_search_url)
 
-    public_resource_id = searchable_dataset["public_resource"]["id"]
-    dataset_id = searchable_dataset["dataset_id"]
+    headers = {"Authorization": access_scenario["user"]["token"]} if access_scenario["user"] else {}
+    response = app.get(package_search_url, headers=headers)
+
+    resource = access_scenario["resource"]
+    dataset_id = access_scenario["dataset"]["id"]
+    user_has_resource_access = access_scenario["user_has_resource_access"]
+    user_has_dataset_access = access_scenario["user_has_dataset_access"]
 
     assert response.status_code == 200
     payload = response.json
     assert payload["success"] is True
 
+    # Users without access should not see private datasets in the search results.
+    if not user_has_dataset_access:
+        results = payload["result"]["results"]
+        assert len(results) == 0, "The dataset must not be present in the search results for users without access."
+        return
+
     results = payload["result"]["results"]
-    assert len(results) == 1, "The public dataset must be present in the search results."
+    assert len(results) == 1, "The dataset must be present in the search results."
 
     search_result_dataset = results[0]
     assert search_result_dataset["id"] == dataset_id
 
     search_result_resource_ids = {resource["id"] for resource in search_result_dataset["resources"]}
-    assert public_resource_id in search_result_resource_ids, (
-        "The public resource must be present in the search results."
-    )
+    assert resource["id"] in search_result_resource_ids, "The resource ids must be present in the search results."
 
     serialised_result = json.dumps(search_result_dataset)
+    resource_data = [resource["name"], resource["description"], resource["url"]]
 
-    for value in searchable_dataset["restricted_values"]:
-        assert value not in serialised_result, f"package_search exposed restricted resource metadata: {value!r}"
+    # Users with access should see private datasets and their resources in the search results.
+    if user_has_resource_access:
+        for value in resource_data:
+            assert value in serialised_result, f"Users with access should see: {value!r}"
+    # Users without access should see non-private datasets but not the restricted resource metadata.
+    else:
+        for value in resource_data:
+            assert value not in serialised_result, f"package_search exposed restricted resource metadata: {value!r}"
 
 
-def test_resource_search_masks_restricted_resource_metadata(app, searchable_dataset):
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+def test_resource_search_masks_restricted_resource_metadata(app, access_scenario):
+
+    resource = access_scenario["resource"]
+    user_has_resource_access = access_scenario["user_has_resource_access"]
+    user_has_dataset_access = access_scenario["user_has_dataset_access"]
+    dataset_is_private = access_scenario["dataset"]["private"]
+
     resource_search_url = tk.url_for(
         "api.action",
         ver=3,
         logic_function="resource_search",
-        query=f"name:{searchable_dataset['private_resource']['name']}",
+        query=f"name:{resource['name']}",
     )
-    response = app.get(resource_search_url)
+    headers = {"Authorization": access_scenario["user"]["token"]} if access_scenario["user"] else {}
+    response = app.get(resource_search_url, headers=headers)
 
     assert response.status_code == 200
     payload = response.json
     assert payload["success"] is True
 
+    # Resource search prevents all resource access for resources in private datasets, even for users who would otherwise have access.
+    if dataset_is_private:
+        results = payload["result"]["results"]
+        assert len(results) == 0, "The resource must not be present in the search results for private datasets."
+        return
+
+    if not user_has_dataset_access:
+        results = payload["result"]["results"]
+        assert len(results) == 0, "The resource must not be present in the search results for users without access."
+        return
+
     results = payload["result"]["results"]
-    assert len(results) == 1, "The private resource must be present in the search results."
+    assert len(results) == 1, "The resource must be present in the search results."
+    search_result_resource = results[0]
+    assert search_result_resource["id"] == resource["id"]
 
-    search_result_private_resource = results[0]
-    assert search_result_private_resource["id"] == searchable_dataset["private_resource"]["id"]
+    serialised_result = json.dumps(search_result_resource)
+    resource_data = [resource["name"], resource["description"], resource["url"]]
 
-    serialised_result = json.dumps(search_result_private_resource)
-
-    for value in searchable_dataset["restricted_values"]:
-        assert value not in serialised_result, f"resource_search exposed restricted resource metadata: {value!r}"
+    # Users with access should see resource metadata in the search results.
+    if user_has_resource_access:
+        for value in resource_data:
+            assert value in serialised_result, f"Users with access should see: {value!r}"
+    # Users without access should see non-private datasets but not the restricted resource metadata.
+    else:
+        for value in resource_data:
+            assert value not in serialised_result, f"resource_search exposed restricted resource metadata: {value!r}"

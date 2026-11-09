@@ -85,20 +85,21 @@ def access_scenario(
         package_id=dataset["id"],
         resource_id=resource_id,
         resource_access_level=resource_access_level,
-        name=f"Resource name for {resource_id}",
-        description=f"Resource description for {resource_id}",
+        name=f"Resource_name_for_{resource_id}",
+        description=f"Resource_description_for_{resource_id}",
         url=f"https://example.invalid/protected-test-resource-{resource_id}.csv",
     )
 
-    user_has_access_to_private_dataset = user_type in PRIVATE_DATASET_READERS
-    user_expected_to_have_access = (
-        not dataset_is_private or user_has_access_to_private_dataset
-    ) and user_type in RESOURCE_ACCESS_LEVEL_DICT[resource_access_level]
+    user_has_dataset_access = user_type in PRIVATE_DATASET_READERS or not dataset_is_private
+    user_has_resource_access = (
+        user_has_dataset_access and user_type in RESOURCE_ACCESS_LEVEL_DICT[resource_access_level]
+    )
 
     return {
         "user": users[user_type],
         "dataset_creator_user_id": users["dataset_creator"]["id"],
         "dataset": dataset,
         "resource": resource,
-        "expected_to_have_access": user_expected_to_have_access,
+        "user_has_resource_access": user_has_resource_access,
+        "user_has_dataset_access": user_has_dataset_access,
     }

@@ -40,7 +40,7 @@ def get_user_context(resource):
     return user_context
 
 
-# access_scenario is a pytest fixture, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level, expected_to_have_access).
+# access_scenario is a pytest fixture, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level, user_has_resource_access).
 
 
 # ACCESS_PARAMETERS defines the names of the parameters, which are listed as values in each entry of ACCESS_SCENARIOS
@@ -51,7 +51,7 @@ def test_resource_access_on_resource_show(access_scenario):
     user_context = get_user_context(access_scenario)
     assert access_scenario["dataset"]["creator_user_id"] == access_scenario["dataset_creator_user_id"]
 
-    if access_scenario["expected_to_have_access"]:
+    if access_scenario["user_has_resource_access"]:
         result = tk.get_action("resource_show")(user_context, resource_context)
         assert result["id"] == resource_context["id"]
         assert result["name"] == access_scenario["resource"]["name"]
@@ -75,7 +75,7 @@ def test_resource_masking_on_package_show(access_scenario, dataset_is_private, u
     dataset = tk.get_action("package_show")(user_context.copy(), dataset_context)
     resource = next(item for item in dataset["resources"] if item["id"] == access_scenario["resource"]["id"])
 
-    if access_scenario["expected_to_have_access"]:
+    if access_scenario["user_has_resource_access"]:
         for field in ("name", "description", "url"):
             assert resource[field] == access_scenario["resource"][field]
     else:
@@ -104,7 +104,7 @@ def test_private_resource_page_gives_CKAN_403_page(app, access_scenario):
 
     response = app.get(resource_page_url, headers=headers)
 
-    if access_scenario["expected_to_have_access"]:
+    if access_scenario["user_has_resource_access"]:
         assert response.status_code == 200
     else:
         assert response.status_code == 403
@@ -131,7 +131,7 @@ def test_private_resource_api_returns_json_error(app, access_scenario):
     resource_api_url = tk.url_for("api.action", ver=3, logic_function="resource_show", id=resource["id"])
     response = app.get(resource_api_url, headers=headers)
 
-    if access_scenario["expected_to_have_access"]:
+    if access_scenario["user_has_resource_access"]:
         assert response.status_code == 200
         assert response.content_type == "application/json;charset=utf-8"
         return

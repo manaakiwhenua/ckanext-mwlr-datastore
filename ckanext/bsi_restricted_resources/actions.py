@@ -62,7 +62,7 @@ def package_search(next_action, context, data_dict):
 def resource_search(next_action, context, data_dict):
 
     search_result = next_action(context, data_dict)
-    masked_search_results = [mask_resource(resource) for resource in search_result["results"]]
+    masked_search_results = [mask_resources(context, resource) for resource in search_result["results"]]
 
     return {
         **search_result,
@@ -84,15 +84,7 @@ def mask_dataset_resources(context, dataset):
     processed_resources = []
 
     for resource in dataset["resources"]:
-        try:
-            tk.check_access(
-                "resource_show",
-                context.copy(),
-                {"id": resource["id"]},
-            )
-            processed_resources.append(resource)
-        except tk.NotAuthorized:
-            processed_resources.append(mask_resource(resource))
+        processed_resources.append(mask_resources(context, resource))
 
     return {
         **dataset,
@@ -100,13 +92,24 @@ def mask_dataset_resources(context, dataset):
     }
 
 
-def mask_resource(resource):
-    return {
+def mask_resources(context, resource):
+
+    masked_resource = {
         "id": resource["id"],
         "package_id": resource["package_id"],
         "name": "Restricted resource",
         "format": resource.get("format", ""),
     }
+
+    try:
+        tk.check_access(
+            "resource_show",
+            context.copy(),
+            {"id": resource["id"]},
+        )
+        return resource
+    except tk.NotAuthorized:
+        return masked_resource
 
 
 def get_actions():
