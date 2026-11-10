@@ -5,13 +5,14 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from flask import Blueprint
 
-from ckanext.mwlr_datastore import readiness, tracking
+from ckanext.mwlr_datastore import components, readiness, tracking
 from ckanext.mwlr_datastore.logic import validators
 
 
 def terms_of_use():
     return toolkit.render('terms_of_use.html')
 
+@toolkit.blanket.config_declarations
 class MwlrDatastorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IConfigurer)
@@ -27,11 +28,12 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         return []
 
     def get_blueprint(self):
-        """Provides Flask blueprint which sets up a custom
-        `terms_of_use` URL and the readiness endpoint. Uses IBlueprint interface."""
+        """Provides Flask blueprint which sets up a custom `terms_of_use` URL,
+        the What's new page and the readiness endpoint. Uses IBlueprint interface."""
         blueprint = Blueprint('mwlr_datastore', self.__module__)
         rules = [
             ('/terms_of_use', 'terms_of_use', terms_of_use),
+            ('/whats-new', 'whats_new', components.whats_new),
             (readiness.readiness_path(), 'readiness', readiness.ready),
         ]
         for rule in rules:
@@ -53,7 +55,11 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         return {
             'get_env_var': self.get_env_var,
             'mwlr_environment': self.mwlr_environment,
+            'mwlr_data_management_email': self.mwlr_data_management_email,
             'mwlr_versions': self.mwlr_versions,
+            'mwlr_components': components.components,
+            'mwlr_show_components': components.show_components,
+            'mwlr_ckan_changelog_url': components.ckan_changelog_url,
             **tracking.get_helpers(),
         }
 
@@ -67,6 +73,11 @@ class MwlrDatastorePlugin(plugins.SingletonPlugin):
         """
         value = (toolkit.config.get('ckanext.mwlr_datastore.environment') or '').strip().lower()
         return ''.join(c for c in value if c.isalnum() or c == '-')[:16]
+
+    def mwlr_data_management_email(self):
+        """The Data Management Team's address, from the required
+        ``ckan.datastore.data_management_email`` option (MWDS-536)."""
+        return toolkit.config.get('ckan.datastore.data_management_email')
 
     def mwlr_versions(self):
         """What is actually deployed (MWDS-357), every value read at runtime.

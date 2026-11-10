@@ -6,6 +6,7 @@ import logging as log
 
 log = log.getLogger(__name__)
 
+
 class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
@@ -14,9 +15,9 @@ class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin, toolkit.DefaultDatas
 
     def get_helpers(self):
         return access_helpers.get_access_helpers()
-    
+
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, 'templates')
+        toolkit.add_template_directory(config_, "templates")
 
     def get_actions(self):
         return actions.get_actions()

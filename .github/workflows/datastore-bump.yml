@@ -5,6 +5,12 @@ name: Bump the DataStore image to this release
 # the new tag. The datastore pipeline then builds the image and deploys dev in
 # its normal way, instead of someone editing the pin by hand (MWDS-444).
 #
+# The pull request title carries this release's type and MWDS keys, e.g.
+# "feat: MWDS-459 ckanext-mwlr-datastore v2.2.0" (MWDS-528). The title is the
+# commit that lands in DataStore, so: a feature or fix here makes a DataStore
+# release (a chore: would not), and the keys give those work items the DataStore
+# Jira Fix version and its deployments, which both read keys from commits.
+#
 # Needs one repository secret: BITBUCKET_RELEASE_TOKEN, a Bitbucket
 # *repository access token* on landcareresearch/datastore with Repositories:
 # Write and Pull requests: Write (not a personal token - it belongs to the
@@ -47,10 +53,41 @@ jobs:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
         run: |
           git clone --depth 1 --branch main "https://x-token-auth:${BB_TOKEN}@bitbucket.org/${BB_REPO}.git" datastore
+      - name: Work out the title from the release notes
+        if: steps.creds.outputs.have == 'true'
+        id: title
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Read the notes with gh rather than from the event, so a by-hand run
+          # (workflow_dispatch) gets the same title as a published release.
+          notes=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body -q .body 2>/dev/null || true)
+          # Headings are this repository's changelog-sections in
+          # release-please-config.json (Features, Fixes, Performance), plus
+          # release-please's defaults in case they are renamed back. A breaking
+          # extension change is a feat: here; whether it breaks DataStore is the
+          # DataStore release's call.
+          if printf '%s' "$notes" | grep -qE '^### (Features|⚠ BREAKING CHANGES)'; then type=feat
+          elif printf '%s' "$notes" | grep -qE '^### (Fixes|Bug Fixes|Performance|Performance Improvements|Reverts)$'; then type=fix
+          else type=chore; fi
+          keys=$(printf '%s' "$notes" | grep -oE 'MWDS-[0-9]+' | sort -t- -k2,2n -u | tr '\n' ' ' | sed 's/ $//')
+          # Commitlint allows a 100-character header; keys that do not fit stay
+          # in the commit body (Refs:), where Jira still finds them.
+          title="${type}: ckanext-mwlr-datastore ${TAG}"
+          for k in $keys; do
+            t="${type}: ${shown:+$shown }${k} ckanext-mwlr-datastore ${TAG}"
+            [ ${#t} -le 100 ] || break
+            shown="${shown:+$shown }${k}"; title="$t"
+          done
+          echo "title: $title"; echo "keys: ${keys:-none}"
+          { echo "title=$title"; echo "keys=$keys"; } >> "$GITHUB_OUTPUT"
       - name: Move the pin and push a branch
         if: steps.creds.outputs.have == 'true'
         id: branch
         working-directory: datastore
+        env:
+          TITLE: ${{ steps.title.outputs.title }}
+          KEYS: ${{ steps.title.outputs.keys }}
         run: |
           current=$(sed -nE 's/^ARG MWLR_DATASTORE_REF=(.*)$/\1/p' ckan/Dockerfile)
           echo "current pin: $current -> $TAG"
@@ -59,8 +96,10 @@ jobs:
           git checkout -b "$branch"
           sed -i -E "s/^ARG MWLR_DATASTORE_REF=.*$/ARG MWLR_DATASTORE_REF=${TAG}/" ckan/Dockerfile
           git -c user.name="ckanext-mwlr-datastore release" -c user.email="DataManager@landcareresearch.co.nz" \
-            commit -am "chore: ckanext-mwlr-datastore ${TAG}" \
-            -m "Pinned by the extension's release workflow. Release notes: ${{ github.event.release.html_url }}"
+            commit -am "$TITLE" \
+            -m "Pinned by the extension's release workflow. Release notes: ${{ github.event.release.html_url }}${KEYS:+
+
+          Refs: $KEYS}"
           git push -u origin "$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"; echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Open the pull request
@@ -69,9 +108,13 @@ jobs:
         env:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.branch }}
+          TITLE: ${{ steps.title.outputs.title }}
+          KEYS: ${{ steps.title.outputs.keys }}
         run: |
-          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow and merged by it once the build passes. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}"
-          jq -n --arg t "chore: ckanext-mwlr-datastore ${TAG}" --arg b "$BRANCH" --arg d "$body" \
+          body="Moves MWLR_DATASTORE_REF to ${TAG}. Raised automatically by the extension's release workflow and merged by it once the build passes. Release notes: ${{ github.event.release.html_url || 'raised by hand, no release page' }}${KEYS:+
+
+          Refs: $KEYS}"
+          jq -n --arg t "$TITLE" --arg b "$BRANCH" --arg d "$body" \
             '{title:$t, source:{branch:{name:$b}}, destination:{branch:{name:"main"}}, description:$d, close_source_branch:true}' \
           | curl -sS -f -H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json' -X POST \
               "https://api.bitbucket.org/2.0/repositories/${BB_REPO}/pullrequests" -d @- > pr.json
@@ -99,7 +142,14 @@ jobs:
           BB_TOKEN: ${{ secrets.BITBUCKET_RELEASE_TOKEN }}
           PR_ID: ${{ steps.pr.outputs.id }}
           SHA: ${{ steps.nudge.outputs.sha }}
+          TITLE: ${{ steps.title.outputs.title }}
+          KEYS: ${{ steps.title.outputs.keys }}
         run: |
+          # The squash commit's message: the title, then every key, so keys that
+          # did not fit in the title still reach the commit Jira reads.
+          message="$TITLE${KEYS:+
+
+          Refs: $KEYS}"
           api="https://api.bitbucket.org/2.0/repositories/${BB_REPO}"
           hdr=(-H "Authorization: Bearer ${BB_TOKEN}" -H 'Content-Type: application/json')
           for i in $(seq 1 60); do
@@ -110,7 +160,7 @@ jobs:
             state=$(curl -sS "${hdr[@]}" "${api}/commit/${SHA}/statuses?pagelen=50" | jq -r '[.values[] | select(.key | startswith("prs:"))] | if length==0 then "PENDING" else .[0].state end')
             echo "attempt $i: build ${state}"
             case "$state" in
-              SUCCESSFUL) curl -sS -f "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/merge" -d '{"merge_strategy":"squash","close_source_branch":true}' | jq -r '"merged " + .links.html.href'; exit 0 ;;
+              SUCCESSFUL) jq -n --arg m "$message" '{merge_strategy:"squash", close_source_branch:true, message:$m}' | curl -sS -f "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/merge" -d @- | jq -r '"merged " + .links.html.href'; exit 0 ;;
               FAILED|STOPPED) jq -n --arg m "The pull request build did not pass, so this was not merged automatically. Fix or re-run and merge by hand." '{content:{raw:$m}}' | curl -sS "${hdr[@]}" -X POST "${api}/pullrequests/${PR_ID}/comments" -d @- > /dev/null; echo "build ${state}: left open"; exit 1 ;;
             esac
           done

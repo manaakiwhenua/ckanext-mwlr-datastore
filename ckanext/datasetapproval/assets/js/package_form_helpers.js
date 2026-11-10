@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    const form = document.querySelector("form.dataset-form")
-    if (!form) return;
+    const form = document.getElementById("dataset-edit")
+    if (!form) {
+        console.warn("Dataset edit form not found.");
+        return;
+    }
 
     const publishingStatus = await retrieve_publishing_status();
     const submitButton = form.querySelector("#submitButton");
@@ -89,12 +92,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     // the tag and license fields are handled with jquery select2 events so needed additional work
     if (window.jQuery) {
         jQuery("[name='license_id']").on("change select2:select select2:unselect", function () {
-            console.log("license changed:", jQuery(this).val());
             checkMeaningfulChanges();
         });
 
         jQuery("[name='tag_string']").on("change select2:select select2:unselect", function () {
-            console.log("tags changed:", jQuery(this).val());
             checkMeaningfulChanges();
         });
     }

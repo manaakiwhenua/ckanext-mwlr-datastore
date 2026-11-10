@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.1...v2.3.2) (2026-10-19)
+
+
+### Fixes
+
+* MWDS-536 declare the extension's config options and require the data management email ([#57](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/57)) ([9c2ffbf](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/9c2ffbf05583069e14082d5d333dbe2019c126da))
+
+## [2.3.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.0...v2.3.1) (2026-10-01)
+
+
+### Fixes
+
+* MWDS-529 What's new - no stray sidebar rule, and links for the base image's extensions ([#55](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/55)) ([9bcda9f](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/9bcda9f3f5a321692c9811f204732bb6ff5c8631))
+
+## [2.3.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.2.0...v2.3.0) (2026-10-01)
+
+
+### Features
+
+* MWDS-529 What's new page linked from the footer, with component versions for signed-in users ([#53](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/53)) ([ea4bd7f](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/ea4bd7f25912dc3b72fc8220b013a499f48a9aea))
+
+## [2.2.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.3...v2.2.0) (2026-09-30)
+
+
+### Features
+
+* MWDS-459 scaffold the bsi restricted resources plugin and the dataset approval scheming variants ([bfcd6d3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/bfcd6d389ef2b41d61ad5eaa122e84fc75372f34))
+
+## [2.1.3](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.2...v2.1.3) (2026-09-28)
+
+
+### Fixes
+
+* MWDS-510 update javascript for CKAN 2.12 ([#49](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/49)) ([695aa90](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/695aa90edebc76497df898b308d1235f89f8f260))
+
 ## [2.1.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.1.1...v2.1.2) (2026-09-22)
 
 

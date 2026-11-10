@@ -6,6 +6,7 @@ import logging as log
 
 log = log.getLogger(__name__)
 
+@toolkit.blanket.config_declarations
 class DatasetapprovalPlugin(plugins.SingletonPlugin,
         DefaultPermissionLabels, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)

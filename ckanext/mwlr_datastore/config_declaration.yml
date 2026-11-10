@@ -1,0 +1,29 @@
+# Config options this plugin reads (MWDS-536). Declared so CKAN knows them:
+# no "Option ... is not declared" warning on each read, defaults applied by
+# CKAN, and `ckan config describe` lists them. Set any of them from the
+# environment as CKANEXT__MWLR_DATASTORE__<NAME> (CKAN__DATASTORE__... for the
+# email).
+version: 1
+groups:
+  - annotation: ckanext-mwlr-datastore
+    options:
+      - key: ckanext.mwlr_datastore.readiness_path
+        default: /mwlr_datastore/ready
+        description: Where the readiness endpoint is served (MWDS-378).
+
+      - key: ckanext.mwlr_datastore.whats_new_path
+        default: /srv/app/whats-new.md
+        description: The Markdown file the What's new page renders (MWDS-529).
+
+      - key: ckanext.mwlr_datastore.environment
+        description: >-
+          Which environment this site is (dev, test, stage). Unset on
+          production, which is what makes production show no environment
+          marker (MWDS-360).
+
+      - key: ckan.datastore.data_management_email
+        required: true
+        description: >-
+          Where the resource help sends people with files over the size limit,
+          and the address dataset approval mails use. Required: without it
+          CKAN refuses to start, rather than serve a mailto:unknown link.

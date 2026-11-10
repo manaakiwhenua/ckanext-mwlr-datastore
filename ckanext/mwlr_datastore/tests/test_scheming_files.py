@@ -3,6 +3,7 @@ Tests for the scheming files in the mwlr_datastore extension.
 
 Run these tests by following the steps in local-development.md, under the Tests heading.
 """
+
 import yaml
 import os
 import pytest
@@ -17,20 +18,45 @@ ALL_SCHEMA_PATH = SCHEMA_DIR / "dataset_with_both_restricted_resources_and_datas
 # Field names expected to exist ONLY in the additional plugins.
 # Update this whenever you intentionally add/remove fields.
 RESTRICTED_ONLY_FIELDS = {"resource_access_level"}
-DATASET_APPROVAL_ONLY_FIELDS = {"publishing_status", "intellectual_property_review_notes", "intellectual_property_review_required", "ethics_security_risk_review_notes", "ethics_security_risk_review_required", "scientific_technical_review_required", "scientific_technical_review_notes", "te_ao_māori_review_required","te_ao_māori_review_notes", "conditions_of_release","chosen_visibility"}
+DATASET_APPROVAL_ONLY_FIELDS = {
+    "publishing_status",
+    "intellectual_property_review_notes",
+    "intellectual_property_review_required",
+    "ethics_security_risk_review_notes",
+    "ethics_security_risk_review_required",
+    "scientific_technical_review_required",
+    "scientific_technical_review_notes",
+    "te_ao_māori_review_required",
+    "te_ao_māori_review_notes",
+    "conditions_of_release",
+    "chosen_visibility",
+}
 
 # names of the scheming files to be tested.
 SCHEMING_FILES = {
-  "base_schema": {"path": BASE_SCHEMA_PATH, "dataset_fields": set(), "resource_fields": set()},
-  "restricted_schema": {"path": RESTRICTED_SCHEMA_PATH, "dataset_fields": set(), "resource_fields": RESTRICTED_ONLY_FIELDS},
-  "dataset_approval_schema": {"path": DATASET_APPROVAL_SCHEMA_PATH, "dataset_fields": DATASET_APPROVAL_ONLY_FIELDS, "resource_fields": set()},
-  "all_plugins_schema": {"path": ALL_SCHEMA_PATH, "dataset_fields": DATASET_APPROVAL_ONLY_FIELDS, "resource_fields": RESTRICTED_ONLY_FIELDS}, # additional fields from all plugins
+    "base_schema": {"path": BASE_SCHEMA_PATH, "dataset_fields": set(), "resource_fields": set()},
+    "restricted_schema": {
+        "path": RESTRICTED_SCHEMA_PATH,
+        "dataset_fields": set(),
+        "resource_fields": RESTRICTED_ONLY_FIELDS,
+    },
+    "dataset_approval_schema": {
+        "path": DATASET_APPROVAL_SCHEMA_PATH,
+        "dataset_fields": DATASET_APPROVAL_ONLY_FIELDS,
+        "resource_fields": set(),
+    },
+    "all_plugins_schema": {
+        "path": ALL_SCHEMA_PATH,
+        "dataset_fields": DATASET_APPROVAL_ONLY_FIELDS,
+        "resource_fields": RESTRICTED_ONLY_FIELDS,
+    },  # additional fields from all plugins
 }
 
 NON_BASE_SCHEMA_NAMES = [key for key in SCHEMING_FILES if key != "base_schema"]
 FIELD_LIST_KEYS = ["dataset_fields", "resource_fields"]
 
-@pytest.mark.parametrize("schema_key", list(SCHEMING_FILES.keys())) # run this test for all schema files
+
+@pytest.mark.parametrize("schema_key", list(SCHEMING_FILES.keys()))  # run this test for all schema files
 def test_scheming_files_exist(schema_key):
     """
     Test that the scheming files exist in the mwlr_datastore extension.
@@ -38,10 +64,10 @@ def test_scheming_files_exist(schema_key):
     file_path = SCHEMING_FILES[schema_key]["path"]
     assert os.path.exists(file_path), f"{file_path} does not exist"
 
-@pytest.mark.parametrize("field_list_key", FIELD_LIST_KEYS)
-@pytest.mark.parametrize("schema_key", NON_BASE_SCHEMA_NAMES) # run this test for all non-base schema files
-def test_additional_fields_are_as_expected(schema_key, field_list_key):
 
+@pytest.mark.parametrize("field_list_key", FIELD_LIST_KEYS)
+@pytest.mark.parametrize("schema_key", NON_BASE_SCHEMA_NAMES)  # run this test for all non-base schema files
+def test_additional_fields_are_as_expected(schema_key, field_list_key):
     """Assert that the fields in the additional scheming file are as expected compared to the base scheming file."""
 
     base = _load_schema(SCHEMING_FILES["base_schema"]["path"])
@@ -58,14 +84,17 @@ def test_additional_fields_are_as_expected(schema_key, field_list_key):
         f"unexpected={sorted(additional - expected)}"
     )
 
+
 def _load_schema(path):
     with open(path) as f:
         return yaml.safe_load(f)
+
 
 def _fields_by_name(field_list):
     """Key a dataset_fields/resource_fields list by field_name so comparisons
     don't care about ordering."""
     return {field["field_name"]: field for field in field_list}
+
 
 @pytest.mark.parametrize("field_list_key", FIELD_LIST_KEYS)
 @pytest.mark.parametrize("schema_key", NON_BASE_SCHEMA_NAMES)
