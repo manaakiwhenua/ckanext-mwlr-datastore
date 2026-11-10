@@ -1,6 +1,7 @@
 {% ckan_extends %}
-{% set authorised_to_view_this_resource =
-h.check_access('resource_show', {'id': res.id}) %}
+{% set authorised_to_view_this_resource = not res.resource_is_masked and h.check_access('resource_show', {'id':
+res.id})
+%}
 {% set resource_masked_title = res.format | default('Unknown type', true) + ' resource' %}
 
 {% block resource_item_title %}
@@ -8,9 +9,9 @@ h.check_access('resource_show', {'id': res.id}) %}
 {{ super() }}
 {% else %}
 <span>
-    <a class="heading text-muted hover-disabled text-decoration-none" disabled="true"
-        title="{{ resource_masked_title }}">{{
-        resource_masked_title }}
+    <!-- Disable link for unauthorized users -->
+    <a class="heading text-muted hover-disabled text-decoration-none" disabled="true" title="{{ res.name }}">{{
+        res.name }}
         <span class="format-label" data-format="{{ res.format.lower() or 'data' }}"></span>
     </a>
 </span>

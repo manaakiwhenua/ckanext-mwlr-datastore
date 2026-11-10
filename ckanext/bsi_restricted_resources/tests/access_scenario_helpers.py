@@ -18,3 +18,7 @@ ALL_ACCESS_SCENARIOS = [
     for dataset_is_private in (False, True)
     for user_type in ALL_USER_TYPES
 ]
+
+
+def get_resource_data_that_should_be_masked(resource):
+    return [resource["description"], resource["url"]]

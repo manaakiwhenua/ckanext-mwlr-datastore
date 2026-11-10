@@ -20,14 +20,16 @@ If you run into Solr indexing issues, you may need to rebuild the search index:
 
 import pytest
 import ckan.plugins.toolkit as tk
-from ckanext.bsi_restricted_resources.tests.access_scenario_constants import (
+from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
     ALL_ACCESS_SCENARIOS,
     ACCESS_PARAMETERS,
+    get_resource_data_that_should_be_masked,
 )
 from ckan.tests import helpers
-from ckanext.bsi_restricted_resources.logic.access_helpers import RESTRICTED_RESOURCE_NAME
 
-pytestmark = pytest.mark.ckan_config("ckan.plugins", "mwlr_datastore bsi_restricted_resources")
+pytestmark = pytest.mark.ckan_config(
+    "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking"
+)  # tracking needs to be included to pick up any issues from masking resources
 
 
 def get_user_context(resource):
@@ -40,7 +42,7 @@ def get_user_context(resource):
     return user_context
 
 
-# access_scenario is a pytest fixture, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level, user_has_resource_access).
+# access_scenario is a pytest fixture in conftest.py, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level).
 # ACCESS_PARAMETERS defines the names of the parameters, which are listed as values in each entry of ALL_ACCESS_SCENARIOS
 @pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_resource_access_on_resource_show(access_scenario):
@@ -60,7 +62,8 @@ def test_resource_access_on_resource_show(access_scenario):
 
 @pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_resource_masking_on_package_show(access_scenario):
-
+    resource = access_scenario["resource"]
+    resource_data = get_resource_data_that_should_be_masked(resource)
     dataset_context = {"id": access_scenario["dataset"]["id"]}
     user_context = get_user_context(access_scenario)
 
@@ -70,15 +73,14 @@ def test_resource_masking_on_package_show(access_scenario):
         return
 
     dataset = tk.get_action("package_show")(user_context.copy(), dataset_context)
-    resource = next(item for item in dataset["resources"] if item["id"] == access_scenario["resource"]["id"])
+    result_resource = next(item for item in dataset["resources"] if item["id"] == access_scenario["resource"]["id"])
 
     if access_scenario["user_has_resource_access"]:
-        for field in ("name", "description", "url"):
-            assert resource[field] == access_scenario["resource"][field]
+        for value in resource_data:
+            assert value in result_resource.values()
     else:
-        assert resource["name"] == RESTRICTED_RESOURCE_NAME
-        assert "description" not in resource
-        assert "url" not in resource
+        for value in resource_data:
+            assert value not in result_resource.values()
 
 
 # Previously having an issue where there was a bare 403 page without the Datastore layout
@@ -156,7 +158,7 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
     assert "Resources" in response.text, "Dataset page should contain the Resources section"
 
     resource = access_scenario["resource"]
-    resource_data = [resource["name"], resource["description"], resource["url"]]
+    resource_data = get_resource_data_that_should_be_masked(resource)
 
     for value in resource_data:
         assert value not in response.text, f"Dataset HTML exposed restricted metadata: {value!r}"

@@ -63,7 +63,7 @@ def access_scenario(
         owner_org=organisation["id"],
         user=users["dataset_creator"],
     )
-    resource_id = f"resource-{uuid.uuid4()}"
+    resource_id = f"resource_{uuid.uuid4()}"
     resource = factories.Resource(
         package_id=dataset["id"],
         resource_id=resource_id,

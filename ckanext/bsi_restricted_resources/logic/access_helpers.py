@@ -1,7 +1,5 @@
 import ckan.authz as authz
 
-RESTRICTED_RESOURCE_NAME = "Restricted resource"
-
 ALL_USER_TYPES = frozenset(
     ("anonymous", "logged_in_not_member", "member", "editor", "dataset_creator", "admin", "sysadmin")
 )

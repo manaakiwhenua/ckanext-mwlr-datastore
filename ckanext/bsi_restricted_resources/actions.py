@@ -1,7 +1,6 @@
 import logging
 import ckan.plugins.toolkit as tk
 
-from ckanext.bsi_restricted_resources.logic.access_helpers import RESTRICTED_RESOURCE_NAME
 from flask import has_request_context, request
 import ckan.lib.base as base
 
@@ -96,8 +95,10 @@ def mask_resource_if_restricted(context, resource):
     masked_resource = {
         "id": resource["id"],
         "package_id": resource["package_id"],
-        "name": RESTRICTED_RESOURCE_NAME,
+        "name": resource["name"],
         "format": resource.get("format", ""),
+        "resource_is_masked": True,
+        "tracking_summary": resource.get("tracking_summary", ""),
     }
 
     # If the resource is set to the dataset access level (e.g. public if the dataset is public, private if the dataset is private), don't mask it. The dataset and standard CKAN handle access control at the dataset level
