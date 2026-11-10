@@ -43,8 +43,6 @@ def get_user_context(resource):
 
 
 # access_scenario is a pytest fixture, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level, user_has_resource_access).
-
-
 # ACCESS_PARAMETERS defines the names of the parameters, which are listed as values in each entry of ACCESS_SCENARIOS
 @pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
 def test_resource_access_on_resource_show(access_scenario):

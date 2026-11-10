@@ -7,7 +7,7 @@ import logging as log
 log = log.getLogger(__name__)
 
 
-class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
+class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
