@@ -3,22 +3,23 @@ from ckan.tests import factories
 import ckan.plugins as plugins
 import uuid
 from ckanext.bsi_restricted_resources.logic.access_helpers import (
-    USER_TYPES,
+    ALL_USER_TYPES,
     RESOURCE_ACCESS_LEVEL_DICT,
     PRIVATE_DATASET_READERS,
 )
 
 
-def create_users():
-    return {
-        "anonymous": None,
-        "logged_in_not_member": factories.UserWithToken(),
-        "member": factories.UserWithToken(),
-        "editor": factories.UserWithToken(),
-        "admin": factories.UserWithToken(),
-        "dataset_creator": factories.UserWithToken(),
-        "sysadmin": factories.SysadminWithToken(),
-    }
+def create_users(user_types):
+    users = {}
+    for user_type in user_types:
+        if user_type != "anonymous" and user_type != "sysadmin":
+            users[user_type] = factories.UserWithToken()
+        if user_type == "sysadmin":
+            users[user_type] = factories.SysadminWithToken()
+        if user_type == "anonymous":
+            users[user_type] = None
+
+    return users
 
 
 # Parameters name each of the values in ACCESS_SCENARIOS, when passing ACCESS_SCENARIOS to a test function via pytest.mark.parametrize
@@ -35,7 +36,7 @@ ACCESS_SCENARIOS = [
     )
     for resource_access_level in RESOURCE_ACCESS_LEVEL_DICT.keys()
     for dataset_is_private in (False, True)
-    for user_type in USER_TYPES
+    for user_type in ALL_USER_TYPES
 ]
 
 
@@ -52,7 +53,7 @@ def access_scenario(
         "Test setup failed: bsi_restricted_resources is not loaded."
     )
 
-    users = create_users()
+    users = create_users(ALL_USER_TYPES)
 
     organisation = factories.Organization(
         users=[
@@ -91,9 +92,8 @@ def access_scenario(
     )
 
     user_has_dataset_access = user_type in PRIVATE_DATASET_READERS or not dataset_is_private
-    user_has_resource_access = (
-        user_has_dataset_access and user_type in RESOURCE_ACCESS_LEVEL_DICT[resource_access_level]
-    )
+    users_who_can_access_resource = RESOURCE_ACCESS_LEVEL_DICT.get(resource_access_level, set())
+    user_has_resource_access = user_has_dataset_access and user_type in users_who_can_access_resource
 
     return {
         "user": users[user_type],
