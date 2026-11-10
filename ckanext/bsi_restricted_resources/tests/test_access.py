@@ -20,11 +20,9 @@ If you run into Solr indexing issues, you may need to rebuild the search index:
 
 import pytest
 import ckan.plugins.toolkit as tk
-from ckanext.bsi_restricted_resources.tests.access_scenarios import (
-    ACCESS_SCENARIOS,
+from ckanext.bsi_restricted_resources.tests.access_scenario_constants import (
+    ALL_ACCESS_SCENARIOS,
     ACCESS_PARAMETERS,
-    access_scenario,
-    PRIVATE_DATASET_READERS,
 )
 from ckan.tests import helpers
 from ckanext.bsi_restricted_resources.logic.access_helpers import RESTRICTED_RESOURCE_NAME
@@ -43,8 +41,8 @@ def get_user_context(resource):
 
 
 # access_scenario is a pytest fixture, and pytest parametrize passes access_scenario the named parameters it requires (in this case, user_type, dataset_is_private, resource_access_level, user_has_resource_access).
-# ACCESS_PARAMETERS defines the names of the parameters, which are listed as values in each entry of ACCESS_SCENARIOS
-@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+# ACCESS_PARAMETERS defines the names of the parameters, which are listed as values in each entry of ALL_ACCESS_SCENARIOS
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_resource_access_on_resource_show(access_scenario):
 
     resource_context = {"id": access_scenario["resource"]["id"]}
@@ -60,14 +58,13 @@ def test_resource_access_on_resource_show(access_scenario):
             tk.get_action("resource_show")(user_context, resource_context)
 
 
-@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
-def test_resource_masking_on_package_show(access_scenario, dataset_is_private, user_type):
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
+def test_resource_masking_on_package_show(access_scenario):
 
     dataset_context = {"id": access_scenario["dataset"]["id"]}
     user_context = get_user_context(access_scenario)
-    dataset_is_private_to_this_user = dataset_is_private and user_type not in PRIVATE_DATASET_READERS
 
-    if dataset_is_private_to_this_user:
+    if not access_scenario["user_has_dataset_access"]:
         with pytest.raises(tk.NotAuthorized):
             tk.get_action("package_show")(user_context.copy(), dataset_context)
         return

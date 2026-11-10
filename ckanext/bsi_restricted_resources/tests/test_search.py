@@ -1,10 +1,7 @@
 import json
 import pytest
 import ckan.plugins.toolkit as tk
-import ckan.plugins as plugins
-from ckan.tests import factories
-from uuid import uuid4
-from ckanext.bsi_restricted_resources.tests.access_scenarios import ACCESS_PARAMETERS, ACCESS_SCENARIOS, access_scenario
+from ckanext.bsi_restricted_resources.tests.access_scenario_constants import ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS
 
 # Spatial_metadata is required due to the spatial_query.html snippet being included in the search
 pytestmark = pytest.mark.ckan_config(
@@ -13,7 +10,7 @@ pytestmark = pytest.mark.ckan_config(
 )
 
 
-@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_ui_search_hides_restricted_resource_metadata(app, access_scenario):
 
     dataset = access_scenario["dataset"]
@@ -36,7 +33,7 @@ def test_ui_search_hides_restricted_resource_metadata(app, access_scenario):
                 assert value not in response.text, f"UI search exposed restricted resource metadata: {value!r}"
 
 
-@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_package_search_hides_restricted_resource_metadata(app, access_scenario):
 
     package_search_url = tk.url_for(
@@ -87,7 +84,7 @@ def test_package_search_hides_restricted_resource_metadata(app, access_scenario)
             assert value not in serialised_result, f"package_search exposed restricted resource metadata: {value!r}"
 
 
-@pytest.mark.parametrize(ACCESS_PARAMETERS, ACCESS_SCENARIOS)
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
 def test_resource_search_masks_restricted_resource_metadata(app, access_scenario):
 
     resource = access_scenario["resource"]

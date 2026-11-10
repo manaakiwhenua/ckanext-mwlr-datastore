@@ -22,24 +22,6 @@ def create_users(user_types):
     return users
 
 
-# Parameters name each of the values in ACCESS_SCENARIOS, when passing ACCESS_SCENARIOS to a test function via pytest.mark.parametrize
-ACCESS_PARAMETERS = "user_type, dataset_is_private, resource_access_level"
-ACCESS_SCENARIOS = [
-    pytest.param(
-        user_type,
-        dataset_is_private,
-        resource_access_level,
-        # id for the test case - only used by parametrize for readability of test output
-        id=(
-            f"{user_type}-user-{'private' if dataset_is_private else 'public'}-dataset-{resource_access_level}-resource"
-        ),
-    )
-    for resource_access_level in RESOURCE_ACCESS_LEVEL_DICT.keys()
-    for dataset_is_private in (False, True)
-    for user_type in ALL_USER_TYPES
-]
-
-
 @pytest.fixture
 def access_scenario(
     user_type,
