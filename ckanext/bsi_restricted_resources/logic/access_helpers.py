@@ -1,17 +1,8 @@
 import ckan.authz as authz
-
-ALL_USER_TYPES = frozenset(
-    ("anonymous", "logged_in_not_member", "member", "editor", "dataset_creator", "admin", "sysadmin")
+from ckanext.bsi_restricted_resources.types import (
+    UserType,
+    RESOURCE_ACCESS_LEVEL_DICT,
 )
-
-RESOURCE_ACCESS_LEVEL_DICT = {
-    "dataset_access_level": ALL_USER_TYPES,
-    "restrict_to_editors": frozenset({"dataset_creator", "admin", "editor", "sysadmin"}),
-    # Add other scenarios here, e.g. "restrict_to_organisation"
-}
-
-# Users types who can access private datasets (a separate list than those who can access restricted resources)
-PRIVATE_DATASET_READERS = ALL_USER_TYPES - frozenset({"anonymous", "logged_in_not_member"})
 
 
 def resource_requires_request_to_access(dataset, resource, user):
@@ -20,26 +11,25 @@ def resource_requires_request_to_access(dataset, resource, user):
     user_id = getattr(user, "id", None)
     user_name = getattr(user, "name", None)
     user_is_sysadmin = getattr(user, "sysadmin", False)
-    user_is_dataset_creator = user_id is not None and user_id == dataset.get("creator_user_id")
-
+    dataset_creator_user_id = dataset.get("creator_user_id")
+    user_is_dataset_creator = user_id is not None and user_id == dataset_creator_user_id
     resource_access_level = resource.get("resource_access_level", "")
-    users_who_have_access = RESOURCE_ACCESS_LEVEL_DICT.get(resource_access_level, frozenset())
-
-    if len(users_who_have_access) == 0:
-        return False  # Existing resources have no recognized access level, so won't be restricted
 
     # Sysadmins and dataset creators always have access without requiring a request
     if user_is_sysadmin or user_is_dataset_creator:
         return False
 
+    if resource_access_level == "":
+        return False  # No resource access level specified (most likely a legacy resource), dataset-level access applies
+
+    users_who_have_access = RESOURCE_ACCESS_LEVEL_DICT.get(resource_access_level, frozenset())
+    if resource_access_level != "" and len(users_who_have_access) == 0:
+        return True  # This means an unrecognised resource access level (possibly a typo or new level not in the dict). Resource will require a request to access
+
     org_id = dataset.get("owner_org")
     user_role_in_this_org = authz.users_role_for_group_or_org(org_id, user_name)
 
-    if user_role_in_this_org is None:
-        user_type = "anonymous" if not user_id else "logged_in_not_member"
-    else:
-        user_type = user_role_in_this_org
-
+    user_type = UserType.from_CKAN_role(user_role_in_this_org, user_id, dataset_creator_user_id)
     requires_request = user_type not in users_who_have_access
     return requires_request
 

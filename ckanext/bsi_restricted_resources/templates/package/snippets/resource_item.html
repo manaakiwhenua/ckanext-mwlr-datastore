@@ -1,6 +1,5 @@
 {% ckan_extends %}
-{% set authorised_to_view_this_resource = not res.resource_is_masked and h.check_access('resource_show', {'id':
-res.id})
+{% set authorised_to_view_this_resource = not res.resource_is_masked
 %}
 {% set resource_masked_title = res.format | default('Unknown type', true) + ' resource' %}
 

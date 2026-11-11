@@ -3,6 +3,7 @@ import ckan.plugins.toolkit as tk
 
 from flask import has_request_context, request
 import ckan.lib.base as base
+from ckanext.bsi_restricted_resources.types import ResourceAccessLevel
 
 log = logging.getLogger(__name__)
 
@@ -101,10 +102,14 @@ def mask_resource_if_restricted(context, resource):
         "tracking_summary": resource.get("tracking_summary", ""),
     }
 
-    # If the resource is set to the dataset access level (e.g. public if the dataset is public, private if the dataset is private), don't mask it. The dataset and standard CKAN handle access control at the dataset level
-    if resource.get("resource_access_level") == "dataset_access_level":
+    # If the resource is set to the dataset access level (e.g. public if the dataset is public, private if the dataset is private), or if the resource access level is empty (e.g. older resources), don't mask it. The dataset and standard CKAN handle access control at the dataset level
+    if (
+        resource.get("resource_access_level") == ResourceAccessLevel.DATASET_ACCESS_LEVEL
+        or resource.get("resource_access_level", "") == ""
+    ):
         return resource
 
+    # This could cause a performance issue - we're doing an access check for each resource individually, which may be expensive for large datasets. May need to replace in future with bulk access checks
     try:
         tk.check_access(
             "resource_show",

@@ -26,6 +26,7 @@ from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
     get_resource_data_that_should_be_masked,
 )
 from ckan.tests import helpers
+from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 
 pytestmark = pytest.mark.ckan_config(
     "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking"
@@ -87,7 +88,11 @@ def test_resource_masking_on_package_show(access_scenario):
 # Test that accessing a private resource page as an anonymous user returns a proper CKAN 403 page
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
-    [pytest.param("anonymous", False, "restrict_to_editors", id="private-resource-in-public-dataset")],
+    [
+        pytest.param(
+            UserType.ANONYMOUS, False, ResourceAccessLevel.RESTRICT_TO_EDITORS, id="private-resource-in-public-dataset"
+        )
+    ],
 )
 def test_private_resource_page_gives_CKAN_403_page(app, access_scenario):
 
@@ -116,9 +121,17 @@ def test_private_resource_page_gives_CKAN_403_page(app, access_scenario):
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
     [
-        pytest.param("anonymous", False, "restrict_to_editors", id="anonymous-user-private-resource-in-public-dataset"),
         pytest.param(
-            "dataset_creator", False, "restrict_to_editors", id="dataset-creator-private-resource-in-public-dataset"
+            UserType.ANONYMOUS,
+            False,
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
+            id="anonymous-user-private-resource-in-public-dataset",
+        ),
+        pytest.param(
+            UserType.DATASET_CREATOR,
+            False,
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
+            id="dataset-creator-private-resource-in-public-dataset",
         ),
     ],
 )
@@ -147,7 +160,14 @@ def test_private_resource_api_returns_json_error(app, access_scenario):
 # Test that the dataset UI page masks restricted resource metadata
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
-    [("anonymous", False, "restrict_to_editors")],
+    [
+        pytest.param(
+            UserType.ANONYMOUS,
+            False,
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
+            id="anonymous-user-private-resource-in-public-dataset",
+        )
+    ],
 )
 def test_dataset_page_masks_restricted_resource(app, access_scenario):
     dataset = access_scenario["dataset"]
@@ -169,14 +189,14 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
     ACCESS_PARAMETERS,
     [
         pytest.param(
-            "anonymous",
+            UserType.ANONYMOUS,
             False,
-            "unknown_access_level",
-            id="anonymous-user-unknown-access-level-resource-in-public-dataset",
+            "",
+            id="anonymous-user-empty-resource-access-level-resource-in-public-dataset",
         )
     ],
 )
-def test_resource_with_unknown_access_level_is_unrestricted(app, access_scenario):
+def test_resource_with_empty_resource_access_level_is_unrestricted(app, access_scenario):
     resource = access_scenario["resource"]
     user = access_scenario["user"]
     headers = {"Authorization": user["token"]} if user else {}
@@ -190,20 +210,46 @@ def test_resource_with_unknown_access_level_is_unrestricted(app, access_scenario
     assert response.status_code == 200
 
 
+# Test that a resource with an unknown but not empty access level is restricted (an unknown access level may be a typo or not added to the RESOURCE_ACCESS_LEVEL_DICT)
+@pytest.mark.parametrize(
+    ACCESS_PARAMETERS,
+    [
+        pytest.param(
+            UserType.ANONYMOUS,
+            False,
+            "unknown_access_level",
+            id="anonymous-user-unknown-access-level-resource-in-public-dataset",
+        )
+    ],
+)
+def test_resource_with_unknown_access_level_is_restricted(app, access_scenario):
+    resource = access_scenario["resource"]
+    user = access_scenario["user"]
+    headers = {"Authorization": user["token"]} if user else {}
+    resource_page_url = tk.url_for(
+        "dataset_resource.read",
+        id=resource["package_id"],
+        resource_id=resource["id"],
+    )
+
+    response = app.get(resource_page_url, headers=headers)
+    assert response.status_code == 403
+
+
 # Test that a deleted dataset is still restricted
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
     [
         pytest.param(
-            "anonymous",
+            UserType.ANONYMOUS,
             False,
-            "restrict_to_editors",
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
             id="anonymous-user-restricted-resource-in-deleted-dataset",
         ),
         pytest.param(
-            "admin",
+            UserType.SYSADMIN,
             False,
-            "restrict_to_editors",
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
             id="admin-user-restricted-resource-in-deleted-dataset",
         ),
     ],
@@ -229,15 +275,15 @@ def test_deleted_dataset_still_restricts_resource_access(app, access_scenario):
     ACCESS_PARAMETERS,
     [
         pytest.param(
-            "member",
+            UserType.MEMBER,
             False,
-            "restrict_to_editors",
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
             id="member-cannot-patch-restricted-resource",
         ),
         pytest.param(
-            "editor",
+            UserType.EDITOR,
             True,
-            "restrict_to_editors",
+            ResourceAccessLevel.RESTRICT_TO_EDITORS,
             id="editor-can-patch-restricted-resource",
         ),
     ],
@@ -248,10 +294,11 @@ def test_only_editor_level_access_can_patch_restricted_resource(app, access_scen
     headers = {"Authorization": user["token"]} if user else {}
 
     url = tk.url_for("api.action", ver=3, logic_function="resource_patch")
+    # Try to update a restricted resource's access level to the dataset access level
     response = app.post(
         url,
         headers=headers,
-        json={"id": resource["id"], "resource_access_level": "dataset_access_level"},
+        json={"id": resource["id"], "resource_access_level": ResourceAccessLevel.DATASET_ACCESS_LEVEL},
     )
 
     if access_scenario["user_has_resource_access"]:
