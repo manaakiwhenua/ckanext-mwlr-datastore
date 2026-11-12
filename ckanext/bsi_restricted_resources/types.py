@@ -67,7 +67,7 @@ RESOURCE_ACCESS_LEVEL_DICT: Dict[ResourceAccessLevel, FrozenSet[UserType]] = {
     ),
     # Everyone that is authenticated
     ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS: frozenset(
-        frozenset({reader for reader in UserType if reader != UserType.ANONYMOUS}),
+        {reader for reader in UserType if reader != UserType.ANONYMOUS},
     )
     # Add other scenarios here, e.g. "restrict_to_group"
 }
