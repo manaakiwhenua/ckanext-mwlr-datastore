@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block resource_list %}
+  {{ super() }}
+  {% block resource_list_request_access %}
+    {% if h.some_resources_are_restricted(resources) %}
+      {% snippet 'package/snippets/restricted_resources_info.html', pkg=pkg %}
+    {% endif %}
+  {% endblock %}
+{% endblock %}

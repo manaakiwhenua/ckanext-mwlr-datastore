@@ -34,7 +34,14 @@ def resource_requires_request_to_access(dataset, resource, user):
     return requires_request
 
 
+def some_resources_are_restricted(resources) -> bool:
+    if not isinstance(resources, list):
+        return False
+    return any(resource.get("resource_is_masked") for resource in resources)
+
+
 def get_access_helpers():
     return {
+        "some_resources_are_restricted": some_resources_are_restricted,
         "resource_requires_request_to_access": resource_requires_request_to_access,
     }

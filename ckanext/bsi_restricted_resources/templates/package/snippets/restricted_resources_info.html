@@ -1,0 +1,18 @@
+{% set package_title = (pkg.title or pkg.name) | safe %}
+{% set package_url = h.url_for(pkg.type ~ '.read', id=pkg.name, qualified=true) | safe %}
+{% if g.userobj %}
+  {% set username = (g.userobj.display_name or g.userobj.name) | safe %}
+{% endif %}
+{% autoescape false %}
+{% set email_body %}{% include 'emails/restricted_resource_access_request.txt' %}{% endset %}
+<div class="restricted-resources-info card">
+  <h4>{{ _('🔒 Restricted resources') }}</h4>
+  <p>{{ _('This dataset contains resources that are available only to authorised users.') }}</p>
+  <p>
+    {% if not g.userobj %}
+     <a href="{{ h.url_for('user.login') }}">{{ _('Log in') }}</a> {{ _('or') }}
+    {% endif %}
+    <a href="mailto:{{ h.mwlr_data_management_email() | e }}?subject={{ 'DataStore Resource Request' | urlencode }}&amp;body={{ email_body | urlencode }}">{{ _('Request access to restricted resources') }}</a>
+  </p>
+</div>
+{% endautoescape %}

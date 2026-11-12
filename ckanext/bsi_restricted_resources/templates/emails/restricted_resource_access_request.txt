@@ -1,0 +1,19 @@
+Kia ora Data Management Team,
+
+I would like to request access to the following DataStore resource:
+
+Dataset Title: {{ package_title }}
+Dataset URL: {{ package_url }}
+Resource Name: [Resource Name]
+Resource URL: [Resource URL]
+
+Reason for Request: [Please explain]
+Requester Name: {{ username | default('[Your Name]') }}
+Organisation: {{ organization | default('[Your Organisation]') }}
+
+Please let me know if additional authorisation is required.
+
+Thank you.
+
+Ngā mihi,
+{{ username | default('[Your Name]') }}
