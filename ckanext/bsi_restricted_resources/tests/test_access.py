@@ -25,7 +25,7 @@ from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
     ACCESS_PARAMETERS,
     get_resource_data_that_should_be_masked,
 )
-from ckan.tests import helpers
+from ckan.tests import helpers, factories
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 
 pytestmark = pytest.mark.ckan_config(
@@ -56,6 +56,53 @@ def test_resource_access_on_resource_show(access_scenario):
         result = tk.get_action("resource_show")(user_context, resource_context)
         assert result["id"] == resource_context["id"]
         assert result["name"] == access_scenario["resource"]["name"]
+    else:
+        with pytest.raises(tk.NotAuthorized):
+            tk.get_action("resource_show")(user_context, resource_context)
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.parametrize(["dataset_is_private", "user_is_selected", "user_has_resource_access"], [
+    pytest.param(True,  True,   False,  id="private-dataset-user-selected"),
+    pytest.param(True,  False,  False,  id="private-dataset-user-not-selected"),
+    pytest.param(False, True,   True,   id="public-dataset-user-selected"),
+    pytest.param(False, False,  False,  id="public-dataset-user-not-selected"),
+])
+def test_resource_access_on_restrict_to_selected_users(dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user):
+    user_list = [user] if user_is_selected else []
+    resource = resource_restricted_to_selected_users(user_list, dataset_is_private)
+    resource_context = { "id": resource["id"] }
+    user_context = {"user": user["name"] }
+    if user_has_resource_access:
+        result = tk.get_action("resource_show")(user_context, resource_context)
+        assert result["id"] == resource_context["id"]
+    else:
+        with pytest.raises(tk.NotAuthorized):
+            tk.get_action("resource_show")(user_context, resource_context)
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.parametrize(["dataset_is_private", "user_is_selected", "user_has_resource_access"], [
+    pytest.param(True,  True,   True,   id="private-dataset-user-selected"),
+    pytest.param(True,  False,  False,  id="private-dataset-user-not-selected"),
+    pytest.param(False, True,   True,   id="public-dataset-user-selected"),
+    pytest.param(False, False,  False,  id="public-dataset-user-not-selected"),
+])
+def test_resource_access_on_restrict_to_selected_users_on_collection_members(dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user):
+    # make the user a member of the organisation (aka collection)
+    org = factories.Organization(
+        users = [{
+            "name": user["name"],
+            "capacity": "member",
+        }]
+    )
+    user_list = [user] if user_is_selected else []
+    resource = resource_restricted_to_selected_users(user_list, dataset_is_private, org)
+    resource_context = { "id": resource["id"] }
+    user_context = {"user": user["name"] }
+    if user_has_resource_access:
+        result = tk.get_action("resource_show")(user_context, resource_context)
+        assert result["id"] == resource_context["id"]
     else:
         with pytest.raises(tk.NotAuthorized):
             tk.get_action("resource_show")(user_context, resource_context)
