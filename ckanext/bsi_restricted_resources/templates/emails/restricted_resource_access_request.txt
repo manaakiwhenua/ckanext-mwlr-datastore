@@ -15,5 +15,5 @@ Please let me know if additional authorisation is required.
 
 Thank you.
 
-Nga mihi,
+Ngā mihi,
 {{ username | default('[Your Name]') }}
