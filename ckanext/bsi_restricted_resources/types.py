@@ -1,6 +1,9 @@
 from typing import Dict, FrozenSet
 from enum import StrEnum
+import ckan.plugins.toolkit as tk
+import logging
 
+log = logging.getLogger(__name__)
 
 class UserType(StrEnum):
     ANONYMOUS = "anonymous"
@@ -41,7 +44,20 @@ class PrivateDatasetReaders(StrEnum):
 class ResourceAccessLevel(StrEnum):
     DATASET_ACCESS_LEVEL = "dataset_access_level"
     RESTRICT_TO_EDITORS = "restrict_to_editors"
+    RESTRICT_TO_AUTHENTICATED_USERS = "restrict_to_authenticated_users"
 
+    def label(self) -> str:
+        """
+        Human-readable label for this access level
+        """
+        match self:
+            case ResourceAccessLevel.DATASET_ACCESS_LEVEL:
+                return tk._('Dataset access level')
+            case ResourceAccessLevel.RESTRICT_TO_EDITORS:
+                return tk._('Restrict to dataset editors')
+            case ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS:
+                return tk._('Only authenticated users')
+        raise tk.ValidationError()
 
 # Specify which users have access for each resource access level
 RESOURCE_ACCESS_LEVEL_DICT: Dict[ResourceAccessLevel, FrozenSet[UserType]] = {
@@ -49,5 +65,9 @@ RESOURCE_ACCESS_LEVEL_DICT: Dict[ResourceAccessLevel, FrozenSet[UserType]] = {
     ResourceAccessLevel.RESTRICT_TO_EDITORS: frozenset(
         {UserType.DATASET_CREATOR, UserType.ADMIN, UserType.EDITOR, UserType.SYSADMIN}
     ),
+    # Everyone that is authenticated
+    ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS: frozenset(
+        frozenset({reader for reader in UserType if reader != UserType.ANONYMOUS}),
+    )
     # Add other scenarios here, e.g. "restrict_to_group"
 }
