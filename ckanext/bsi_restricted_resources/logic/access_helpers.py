@@ -32,9 +32,6 @@ def resource_requires_request_to_access(dataset, resource, user):
     org_id = dataset.get("owner_org")
     user_role_in_this_org = authz.users_role_for_group_or_org(org_id, user_name)
 
-    if resource_access_level == ResourceAccessLevel.RESTRICT_TO_COLLECTION_MEMBERS:
-        return user_role_in_this_org is None
-
     user_type = UserType.from_CKAN_role(user_role_in_this_org, user_id, dataset_creator_user_id)
     requires_request = user_type not in users_who_have_access
     return requires_request
