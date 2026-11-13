@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.4.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.2...v2.4.0) (2026-11-13)
+
+
+### Features
+
+* mwds 539 bsi restricted resources plugin ([#60](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/60)) ([16e9da1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/16e9da12e823a2b338c51806f2a49327a62ba3d1))
+* MWDS-540 resources restricted to authenticated only ([#62](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/62)) ([d476d8d](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/d476d8dfc5dc91540b1053400d7f6662078bef9f))
+* MWDS-541 make resources restricted to collection members ([#63](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/63)) ([5909d17](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/5909d1795756e9e0d3394fa733ffe21c78f46e54))
+* MWDS-543 resource request info panel ([#61](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/61)) ([73562cf](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/73562cf31c7cbd2cf718740eae7390951ce24f74))
+
+
+### Documentation
+
+* MWDS-469 plugin composition decision, dataset approval as built, TechDocs and catalogue entry ([#32](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/32)) ([4e763af](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/4e763afe408c0cee3fc1af66ba44c4980ab995e7))
+
 ## [2.3.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.1...v2.3.2) (2026-10-19)
 
 
