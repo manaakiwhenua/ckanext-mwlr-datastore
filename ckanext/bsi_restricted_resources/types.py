@@ -72,7 +72,7 @@ RESOURCE_ACCESS_LEVEL_DICT: Dict[ResourceAccessLevel, FrozenSet[UserType]] = {
     ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS: frozenset(
         {reader for reader in UserType if reader != UserType.ANONYMOUS},
     ),
-    # Everyone that is authenticated
+    # Everyone that belongs to the collection
     ResourceAccessLevel.RESTRICT_TO_COLLECTION_MEMBERS: frozenset(
         {reader for reader in UserType if reader not in [UserType.ANONYMOUS, UserType.LOGGED_IN_NOT_MEMBER]},
     ),
