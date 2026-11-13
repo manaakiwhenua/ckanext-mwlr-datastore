@@ -72,7 +72,7 @@ def user_choices(*args) -> List[Dict[str, str]]:
     :return:
     """
     users = tk.get_action("user_list")({ "keep_email": True }, { "all_fields": True })
-    return [{ "value": user["id"], "label": user["email"] } for user in users]
+    return [{ "value": user["id"], "label": "%s - %s" %(user["name"], user["email"]) } for user in users]
 
 
 def get_access_helpers():
