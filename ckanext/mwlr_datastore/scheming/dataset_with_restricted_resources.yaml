@@ -282,12 +282,11 @@ resource_fields:
 
 - field_name: resource_access_users
   label: Users granted access
-  repeating_label: Users
   display_snippet: blank.html
+  repeating_label: Users
   repeating_subfields:
     - field_name: resource_grant_user_id
       label: User
       preset: select
-      display_snippet: blank.html
       choices_helper: user_choices
       validators: user_id_exists
