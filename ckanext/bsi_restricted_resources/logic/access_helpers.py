@@ -2,14 +2,17 @@ import ckan.authz as authz
 from ckanext.bsi_restricted_resources.types import (
     UserType,
     RESOURCE_ACCESS_LEVEL_DICT,
+    ResourceAccessLevel
 )
+from typing import Dict, List
 
 
 def resource_requires_request_to_access(dataset, resource, user):
 
     # User may be of type AnonymousUser, which requires us to use 'getattr', rather than directly accessing attributes
-    user_id = getattr(user, "id", None)
-    user_name = getattr(user, "name", None)
+    # AnonymousUser returns "" for id, name, and email
+    user_id = getattr(user, "id", None) or None
+    user_name = getattr(user, "name", None) or None
     user_is_sysadmin = getattr(user, "sysadmin", False)
     dataset_creator_user_id = dataset.get("creator_user_id")
     user_is_dataset_creator = user_id is not None and user_id == dataset_creator_user_id
@@ -40,8 +43,19 @@ def some_resources_are_restricted(resources) -> bool:
     return any(resource.get("resource_is_masked") for resource in resources)
 
 
+# noinspection unused-parameter
+def resource_access_level_choices(*args) -> List[Dict[str, str]]:
+    """
+    Used to generate field choices in the scheming yaml dataset_with_restricted_resources.
+    :param args:
+    :return:
+    """
+    return [{ "value": variant.value, "label": variant.label() } for variant in ResourceAccessLevel]
+
+
 def get_access_helpers():
     return {
         "some_resources_are_restricted": some_resources_are_restricted,
         "resource_requires_request_to_access": resource_requires_request_to_access,
+        "resource_access_level_choices": resource_access_level_choices,
     }
