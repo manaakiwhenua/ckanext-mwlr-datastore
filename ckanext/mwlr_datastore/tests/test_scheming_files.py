@@ -17,7 +17,7 @@ ALL_SCHEMA_PATH = SCHEMA_DIR / "dataset_with_both_restricted_resources_and_datas
 
 # Field names expected to exist ONLY in the additional plugins.
 # Update this whenever you intentionally add/remove fields.
-RESTRICTED_ONLY_FIELDS = {"resource_access_level"}
+RESTRICTED_ONLY_FIELDS = {"resource_access_level", "resource_access_users"}
 DATASET_APPROVAL_ONLY_FIELDS = {
     "publishing_status",
     "intellectual_property_review_notes",
