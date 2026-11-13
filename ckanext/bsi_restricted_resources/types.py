@@ -45,6 +45,7 @@ class ResourceAccessLevel(StrEnum):
     DATASET_ACCESS_LEVEL = "dataset_access_level"
     RESTRICT_TO_EDITORS = "restrict_to_editors"
     RESTRICT_TO_AUTHENTICATED_USERS = "restrict_to_authenticated_users"
+    RESTRICT_TO_COLLECTION_MEMBERS = "restrict_to_collection_members"
 
     def label(self) -> str:
         """
@@ -57,6 +58,8 @@ class ResourceAccessLevel(StrEnum):
                 return tk._('Restrict to dataset editors')
             case ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS:
                 return tk._('Only authenticated users')
+            case ResourceAccessLevel.RESTRICT_TO_COLLECTION_MEMBERS:
+                return tk._('Restrict to members of this collection')
         raise tk.ValidationError()
 
 # Specify which users have access for each resource access level
@@ -68,6 +71,10 @@ RESOURCE_ACCESS_LEVEL_DICT: Dict[ResourceAccessLevel, FrozenSet[UserType]] = {
     # Everyone that is authenticated
     ResourceAccessLevel.RESTRICT_TO_AUTHENTICATED_USERS: frozenset(
         {reader for reader in UserType if reader != UserType.ANONYMOUS},
-    )
+    ),
+    # Everyone that belongs to the collection
+    ResourceAccessLevel.RESTRICT_TO_COLLECTION_MEMBERS: frozenset(
+        {reader for reader in UserType if reader not in [UserType.ANONYMOUS, UserType.LOGGED_IN_NOT_MEMBER]},
+    ),
     # Add other scenarios here, e.g. "restrict_to_group"
 }
