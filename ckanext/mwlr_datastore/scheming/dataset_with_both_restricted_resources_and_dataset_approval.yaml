@@ -403,3 +403,5 @@ resource_fields:
       preset: select
       choices_helper: user_choices
       validators: user_id_exists
+      form_attrs:
+        "data-module": "autocomplete"
