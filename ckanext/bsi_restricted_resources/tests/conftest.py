@@ -29,6 +29,7 @@ def access_scenario(
     user_type,
     dataset_is_private,
     resource_access_level,
+    activity_db,
     with_plugins,
     clean_db,
     clean_index,
@@ -64,15 +65,18 @@ def access_scenario(
         private=dataset_is_private,
         owner_org=organisation["id"],
         user=users[UserType.DATASET_CREATOR],
-    )
-    resource_id = f"resource_{uuid.uuid4()}"
-    resource = factories.Resource(
-        package_id=dataset["id"],
-        resource_id=resource_id,
-        resource_access_level=resource_access_level,
-        name=f"Resource_name_for_{resource_id}",
-        description=f"Resource_description_for_{resource_id}",
-        url=f"https://example.invalid/protected-test-resource-{resource_id}.csv",
+        resources=[
+            {
+                "description": f"Resource_description_{uuid.uuid4()}",
+                "name": f"Resource_name_{uuid.uuid4()}",
+                "url": f"https://example.invalid/restricted-resource-{uuid.uuid4()}.csv",
+                "resource_access_level": resource_access_level,
+                "author": users[UserType.DATASET_CREATOR]["name"],
+                "maintainer": users[UserType.DATASET_CREATOR]["name"],
+                "maintainer_email": f"{users[UserType.DATASET_CREATOR]['name']}@example.invalid",
+                "publication_year": 2024,
+            }
+        ],
     )
 
     user_has_dataset_access = user_type in PrivateDatasetReaders.__members__.values() or not dataset_is_private
@@ -83,7 +87,14 @@ def access_scenario(
         "user": users[user_type],
         "dataset_creator_user_id": users[UserType.DATASET_CREATOR]["id"],
         "dataset": dataset,
-        "resource": resource,
+        "resource": dataset["resources"][0],
         "user_has_resource_access": user_has_resource_access,
         "user_has_dataset_access": user_has_dataset_access,
     }
+
+
+# Test_activity_list requires db migration for the activity plugin
+@pytest.fixture
+def activity_db(with_plugins, clean_db, migrate_db_for):
+    if plugins.plugin_loaded("activity"):
+        migrate_db_for("activity")

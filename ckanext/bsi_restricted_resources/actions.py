@@ -1,6 +1,6 @@
 import logging
 import ckan.plugins.toolkit as tk
-
+from ckan import model
 from flask import has_request_context, request
 import ckan.lib.base as base
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel
@@ -71,6 +71,55 @@ def resource_search(next_action, context, data_dict):
 
 @tk.chained_action
 @tk.side_effect_free
+def current_package_list_with_resources(next_action, context, data_dict):
+
+    dataset_list = next_action(context, data_dict)
+    masked_search_results = [mask_dataset_resources(context, dataset) for dataset in dataset_list]
+    return masked_search_results
+
+
+@tk.chained_action
+@tk.side_effect_free
+def package_activity_list(next_action, context, data_dict):
+
+    activity_list = next_action(context, data_dict)
+
+    masked_activities = []
+    for activity in activity_list:
+        dataset = activity.get("data", {}).get("package")
+        if dataset is None:
+            masked_activities.append(activity)  # no dataset in activity, leave as is
+            continue
+        masked_activities.append(
+            {**activity, "data": {**activity["data"], "package": mask_historical_dataset(context, dataset)}}
+        )
+
+    return masked_activities
+
+
+def mask_historical_resource(context, dataset, historical_resource):
+    # Because we're checking the history of a resource, we need to check if the resource currently exists and if the user has access to it. If it doesn't currently exist (has been hard-deleted for some reason), mask the historical snapshot by default, because we can't check the permissions with resource_show.
+    current_resource = model.Resource.get(historical_resource["id"])
+    if current_resource is None:
+        return mask_resource(historical_resource)
+
+    access_context = context.copy()
+    try:
+        tk.check_access("resource_show", access_context, {"id": historical_resource["id"]})
+        return historical_resource
+    except tk.NotAuthorized:
+        return mask_resource(historical_resource)
+
+
+def mask_historical_dataset(context, dataset):
+    return {
+        **dataset,
+        "resources": [mask_historical_resource(context, dataset, resource) for resource in dataset["resources"]],
+    }
+
+
+@tk.chained_action
+@tk.side_effect_free
 def package_show(next_action, context, data_dict):
 
     dataset = next_action(context, data_dict)
@@ -91,9 +140,8 @@ def mask_dataset_resources(context, dataset):
     }
 
 
-def mask_resource_if_restricted(context, resource):
-
-    masked_resource = {
+def mask_resource(resource):
+    return {
         "id": resource["id"],
         "package_id": resource["package_id"],
         "name": resource["name"],
@@ -101,6 +149,11 @@ def mask_resource_if_restricted(context, resource):
         "resource_is_masked": True,
         "tracking_summary": resource.get("tracking_summary", ""),
     }
+
+
+def mask_resource_if_restricted(context, resource):
+
+    masked_resource = mask_resource(resource)
 
     # If the resource is set to the dataset access level (e.g. public if the dataset is public, private if the dataset is private), or if the resource access level is empty (e.g. older resources), don't mask it. The dataset and standard CKAN handle access control at the dataset level
     if (
@@ -127,4 +180,6 @@ def get_actions():
         "package_search": package_search,
         "package_show": package_show,
         "resource_search": resource_search,
+        "current_package_list_with_resources": current_package_list_with_resources,
+        "package_activity_list": package_activity_list,
     }

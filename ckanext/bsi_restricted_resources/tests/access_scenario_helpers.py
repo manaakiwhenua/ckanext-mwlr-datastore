@@ -19,5 +19,6 @@ ALL_ACCESS_SCENARIOS = [
 ]
 
 
+# Examples of resource data that should be masked in tests
 def get_resource_data_that_should_be_masked(resource):
     return [resource["description"], resource["url"]]

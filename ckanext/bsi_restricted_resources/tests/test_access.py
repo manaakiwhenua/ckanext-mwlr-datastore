@@ -29,8 +29,8 @@ from ckan.tests import helpers
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 
 pytestmark = pytest.mark.ckan_config(
-    "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking"
-)  # tracking needs to be included to pick up any issues from masking resources
+    "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking activity"
+)  # tracking and activity need to be included to pick up any issues from masking resources
 
 
 def get_user_context(resource):
@@ -259,7 +259,11 @@ def test_deleted_dataset_still_restricts_resource_access(app, access_scenario):
     user = access_scenario["user"]
     headers = {"Authorization": user["token"]} if user else {}
 
-    helpers.call_action("package_delete", id=access_scenario["dataset"]["id"])
+    helpers.call_action(
+        "package_delete",
+        context={"user": access_scenario["dataset_creator_user_id"]},
+        id=access_scenario["dataset"]["id"],
+    )
 
     resource_api_url = tk.url_for("api.action", ver=3, logic_function="resource_show", id=resource["id"])
     response = app.get(resource_api_url, headers=headers)
