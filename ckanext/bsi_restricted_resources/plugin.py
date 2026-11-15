@@ -18,6 +18,7 @@ class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin):
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
+        toolkit.add_resource("assets", "bsi_restricted_resources")
 
     def get_actions(self):
         return actions.get_actions()

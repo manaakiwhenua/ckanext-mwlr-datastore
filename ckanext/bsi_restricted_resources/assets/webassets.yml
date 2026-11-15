@@ -1,0 +1,7 @@
+conditional_fields:
+  output: bsi-restricted-resources/%(version)s-conditional-fields.js
+  contents:
+    - conditional-fields.js
+  extra:
+    preload:
+      - base/main

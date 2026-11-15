@@ -394,6 +394,7 @@ resource_fields:
   choices_helper: resource_access_level_choices
 
 - field_name: resource_access_users
+  form_snippet: conditional_repeating_subfields.html
   label: Users granted access
   display_snippet: blank.html
   repeating_label: Users
