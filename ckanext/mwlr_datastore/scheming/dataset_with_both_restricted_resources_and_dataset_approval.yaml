@@ -403,6 +403,6 @@ resource_fields:
       label: User
       preset: select
       choices_helper: user_choices
-      validators: user_id_exists
+      validators: ignore_empty user_id_exists
       form_attrs:
         "data-module": "autocomplete"
