@@ -71,6 +71,15 @@ def resource_search(next_action, context, data_dict):
 
 @tk.chained_action
 @tk.side_effect_free
+def package_show(next_action, context, data_dict):
+
+    dataset = next_action(context, data_dict)
+    masked_dataset = mask_dataset_resources(context, dataset)
+    return masked_dataset
+
+
+@tk.chained_action
+@tk.side_effect_free
 def current_package_list_with_resources(next_action, context, data_dict):
 
     dataset_list = next_action(context, data_dict)
@@ -83,6 +92,26 @@ def current_package_list_with_resources(next_action, context, data_dict):
 def package_activity_list(next_action, context, data_dict):
 
     activity_list = next_action(context, data_dict)
+    return mask_activity_list(context, activity_list)
+
+
+@tk.chained_action
+@tk.side_effect_free
+def recently_changed_packages_activity_list(next_action, context, data_dict):
+
+    activity_list = next_action(context, data_dict)
+    return mask_activity_list(context, activity_list)
+
+
+@tk.chained_action
+@tk.side_effect_free
+def organization_activity_list(next_action, context, data_dict):
+
+    activity_list = next_action(context, data_dict)
+    return mask_activity_list(context, activity_list)
+
+
+def mask_activity_list(context, activity_list):
 
     masked_activities = []
     for activity in activity_list:
@@ -95,36 +124,6 @@ def package_activity_list(next_action, context, data_dict):
         )
 
     return masked_activities
-
-
-def mask_historical_resource(context, dataset, historical_resource):
-    # Because we're checking the history of a resource, we need to check if the resource currently exists and if the user has access to it. If it doesn't currently exist (has been hard-deleted for some reason), mask the historical snapshot by default, because we can't check the permissions with resource_show.
-    current_resource = model.Resource.get(historical_resource["id"])
-    if current_resource is None:
-        return mask_resource(historical_resource)
-
-    access_context = context.copy()
-    try:
-        tk.check_access("resource_show", access_context, {"id": historical_resource["id"]})
-        return historical_resource
-    except tk.NotAuthorized:
-        return mask_resource(historical_resource)
-
-
-def mask_historical_dataset(context, dataset):
-    return {
-        **dataset,
-        "resources": [mask_historical_resource(context, dataset, resource) for resource in dataset["resources"]],
-    }
-
-
-@tk.chained_action
-@tk.side_effect_free
-def package_show(next_action, context, data_dict):
-
-    dataset = next_action(context, data_dict)
-    masked_dataset = mask_dataset_resources(context, dataset)
-    return masked_dataset
 
 
 def mask_dataset_resources(context, dataset):
@@ -174,6 +173,27 @@ def mask_resource_if_restricted(context, resource):
         return masked_resource
 
 
+def mask_historical_resource(context, dataset, historical_resource):
+    # Because we're checking the history of a resource, we need to check if the resource currently exists and if the user has access to it. If it doesn't currently exist (has been hard-deleted for some reason), mask the historical snapshot by default, because we can't check the permissions with resource_show.
+    current_resource = model.Resource.get(historical_resource["id"])
+    if current_resource is None:
+        return mask_resource(historical_resource)
+
+    access_context = context.copy()
+    try:
+        tk.check_access("resource_show", access_context, {"id": historical_resource["id"]})
+        return historical_resource
+    except tk.NotAuthorized:
+        return mask_resource(historical_resource)
+
+
+def mask_historical_dataset(context, dataset):
+    return {
+        **dataset,
+        "resources": [mask_historical_resource(context, dataset, resource) for resource in dataset["resources"]],
+    }
+
+
 def get_actions():
     return {
         "resource_view_list": resource_view_list,
@@ -182,4 +202,6 @@ def get_actions():
         "resource_search": resource_search,
         "current_package_list_with_resources": current_package_list_with_resources,
         "package_activity_list": package_activity_list,
+        "recently_changed_packages_activity_list": recently_changed_packages_activity_list,
+        "organization_activity_list": organization_activity_list,
     }
