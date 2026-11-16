@@ -12,6 +12,7 @@ class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IResourceController, inherit=True)
 
     def get_helpers(self):
         return access_helpers.get_access_helpers()
@@ -25,3 +26,19 @@ class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin):
 
     def get_auth_functions(self):
         return auth.get_auth_functions()
+
+    def after_resource_create(self, context, resource):
+        toolkit.get_action("restricted_resource_access_create")(context, resource)
+
+    def after_resource_update(self, context, resource):
+        toolkit.get_action("restricted_resource_access_update")(context, resource)
+
+    def before_resource_delete(self, context, resource, resources):
+        # We want to update the restricted resources table AFTER the resource has been deleted,
+        # but, the after_resource_delete hook doesn't receive the resource id, so here, we
+        # store it in context
+        context["__restricted_resource_access_delete"] = resource["id"]
+
+    def after_resource_delete(self, context, resources):
+        # Use the id stored in the before_resource_delete hook
+        toolkit.get_action("restricted_resource_access_delete")(context, { "id": context["__restricted_resource_access_delete"] })
