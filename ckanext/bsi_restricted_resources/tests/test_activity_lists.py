@@ -128,7 +128,7 @@ def test_recently_changed_packages_activity_list_masks_restricted_resources(app,
 
 
 @pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
-def test_organization_activity_list_hides_restricted_resources(app, access_scenario):
+def test_organization_activity_list_masks_restricted_resources(app, access_scenario):
 
     check_activity_plugin_loaded()
     unmasked_resource_data = get_unmasked_resource_data(access_scenario["resource"])
@@ -147,6 +147,32 @@ def test_organization_activity_list_hides_restricted_resources(app, access_scena
         assert len(response.json["result"]) > 0
     else:
         assert len(response.json["result"]) == 0
+        return
+
+    returned_resources = get_returned_resources_from_activity_list(
+        response.json["result"], access_scenario["dataset"]["id"], access_scenario["resource"]["id"]
+    )
+
+    check_returned_resources_against_user_resource_access(
+        returned_resources, unmasked_resource_data, access_scenario["user_has_resource_access"]
+    )
+
+
+@pytest.mark.parametrize(ACCESS_PARAMETERS, ALL_ACCESS_SCENARIOS)
+def test_user_activity_list_masks_restricted_resources(app, access_scenario):
+
+    check_activity_plugin_loaded()
+    unmasked_resource_data = get_unmasked_resource_data(access_scenario["resource"])
+
+    resource_api_url, headers = create_url_with_headers(
+        access_scenario["user"], "user_activity_list", id=access_scenario["dataset_creator_user_id"]
+    )
+    response = app.get(resource_api_url, headers=headers)
+    assert response.status_code == 200 and response.json["result"] is not None
+
+    # If the user doesn't have access to the dataset, the searched user's activity list only be of type 'new user' and contain no resource data
+    if not access_scenario["user_has_dataset_access"]:
+        assert len(response.json["result"][0]["data"]) == 0
         return
 
     returned_resources = get_returned_resources_from_activity_list(
