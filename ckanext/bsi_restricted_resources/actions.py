@@ -111,6 +111,14 @@ def organization_activity_list(next_action, context, data_dict):
     return mask_activity_list(context, activity_list)
 
 
+@tk.chained_action
+@tk.side_effect_free
+def user_activity_list(next_action, context, data_dict):
+
+    activity_list = next_action(context, data_dict)
+    return mask_activity_list(context, activity_list)
+
+
 def mask_activity_list(context, activity_list):
 
     masked_activities = []
@@ -204,4 +212,5 @@ def get_actions():
         "package_activity_list": package_activity_list,
         "recently_changed_packages_activity_list": recently_changed_packages_activity_list,
         "organization_activity_list": organization_activity_list,
+        "user_activity_list": user_activity_list,
     }

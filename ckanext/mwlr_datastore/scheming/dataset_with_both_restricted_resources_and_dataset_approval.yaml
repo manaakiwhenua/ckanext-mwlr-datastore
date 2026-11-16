@@ -390,5 +390,5 @@ resource_fields:
   required: true
   default: restrict_to_editors
   validators: default(restrict_to_editors) unicode_safe
-  help_text: Options are 'Dataset access level' - resource will match the dataset's access level (if the dataset is public, the resource will be public), and 'Restrict to dataset editors' (resource will remain private to those with dataset edit access, even if the dataset is made public).
+  help_text: The most open option is 'Dataset access level' - resource will match the dataset's access level (if the dataset is public, the resource will be public). The most restrictive option is 'Restrict to dataset editors' (resource will remain private to those with dataset edit access, even if the dataset is made public).
   choices_helper: resource_access_level_choices
