@@ -16,9 +16,9 @@ jobs:
         # until production has moved (MWDS-359).
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets"
+            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources"
           - ckan: "2.10"
-            plugins: "mwlr_datastore dataset_approval scheming_datasets"
+            plugins: "mwlr_datastore dataset_approval scheming_datasets bsi_restricted_resources"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
       # The 2.11+ dev images end on USER ckan; the runner's checkout and state
@@ -89,6 +89,8 @@ jobs:
         # It runs from /tmp on purpose. With the repository as the working
         # directory, `ckanext` imports from the source tree and the check
         # inspects the very files it is meant to be verifying were installed.
+        #
+        # Reads config_declaration.yml for each plugin to ensure all required configuration options are included in the package
         run: |
           python -m venv /tmp/v && . /tmp/v/bin/activate
           pip install dist/*.tar.gz
@@ -97,7 +99,7 @@ jobs:
           os.chdir("/tmp")
           src = pathlib.Path(os.environ["SRC"])
           missing = []
-          for plugin in ("mwlr_datastore", "datasetapproval", "bsi_restricted_resources"):
+          for plugin in ("mwlr_datastore", "datasetapproval"):
               pkg = r.files(f"ckanext.{plugin}")
               base = src / "ckanext" / plugin
               # Without it the config_declarations decorator stops CKAN
