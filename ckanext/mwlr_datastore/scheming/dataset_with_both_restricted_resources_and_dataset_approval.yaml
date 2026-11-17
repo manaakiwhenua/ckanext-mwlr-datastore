@@ -396,7 +396,6 @@ resource_fields:
 - field_name: resource_access_users
   form_snippet: conditional_repeating_subfields.html
   label: Users granted access
-  display_snippet: blank.html
   repeating_label: Users
   repeating_subfields:
     - field_name: resource_grant_user_id

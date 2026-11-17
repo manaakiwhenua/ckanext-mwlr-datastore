@@ -141,7 +141,7 @@ def restricted_resource_access_create(context, data_dict):
         # nothing to create
         return
 
-    current_user = User.get(context["user"])
+    current_user = tk.current_user or User.get(context["user"])
     items = [{ "user_id": user["resource_grant_user_id"], "granted_by_user_id": current_user.id, "resource_id": data_dict["id"] } for user in users]
     log.info("Restricted resource access create: %s" % items)
     RestrictedResourceAccess.create(items)
@@ -164,7 +164,8 @@ def restricted_resource_access_update(context, data_dict):
 
     users = data_dict.get("resource_access_users", [])
     user_ids = [user["resource_grant_user_id"] for user in users]
-    RestrictedResourceAccess.update_resource_access(data_dict["id"], user_ids, tk.current_user.id)
+    current_user = tk.current_user or User.get(context["user"])
+    RestrictedResourceAccess.update_resource_access(data_dict["id"], user_ids, current_user.id)
     meta.Session.commit()
 
 
