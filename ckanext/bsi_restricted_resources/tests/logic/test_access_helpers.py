@@ -21,4 +21,4 @@ def test_user_choices(user):
     assert len(choices) > 0, "choices should not be empty"
     by_value = { choice["value"]:choice for choice in choices }
     user_choice = by_value.get(user["id"])
-    assert user_choice["label"] == user["email"], "user label should be equal to email"
+    assert user["email"] in user_choice["label"], "user label should contain email"

@@ -78,6 +78,11 @@ def test_restricted_resource_access_update():
         assert grant.user_id in user_ids
         assert grant.granted_by_user_id == current_user["id"]
 
+    data_dict = resource_for_users(resource, ResourceAccessLevel.RESTRICT_TO_SELECTED_USERS, [])
+    helpers.call_action("restricted_resource_access_update", context=context, **data_dict)
+    resource_access = RestrictedResourceAccess.find_resource_access(resource["id"])
+    assert len(resource_access) == 0
+
 
 @pytest.mark.ckan_config("ckan.plugins", "bsi_restricted_resources")
 @pytest.mark.usefixtures("with_plugins", "clean_db", "actions_test_setup")

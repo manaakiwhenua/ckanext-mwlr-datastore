@@ -1,4 +1,3 @@
-import logging
 import ckan.plugins.toolkit as tk
 from ckan.model import User
 from flask import has_request_context, request
@@ -6,8 +5,6 @@ import ckan.lib.base as base
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel
 from ckanext.bsi_restricted_resources.models import RestrictedResourceAccess
 import ckan.model.meta as meta
-
-log = logging.getLogger(__name__)
 
 
 @tk.chained_action
@@ -142,10 +139,11 @@ def restricted_resource_access_create(context, data_dict):
         return
 
     current_user = tk.current_user or User.get(context["user"])
-    items = [{ "user_id": user["resource_grant_user_id"], "granted_by_user_id": current_user.id, "resource_id": data_dict["id"] } for user in users]
-    log.info("Restricted resource access create: %s" % items)
-    RestrictedResourceAccess.create(items)
-    meta.Session.commit()
+    items = [{"user_id": user["resource_grant_user_id"], "granted_by_user_id": current_user.id,
+              "resource_id": data_dict["id"]} for user in users if "resource_grant_user_id" in user]
+    if len(items) > 0:
+        RestrictedResourceAccess.create(items)
+        meta.Session.commit()
 
 
 def restricted_resource_access_update(context, data_dict):
@@ -163,7 +161,7 @@ def restricted_resource_access_update(context, data_dict):
         return
 
     users = data_dict.get("resource_access_users", [])
-    user_ids = [user["resource_grant_user_id"] for user in users]
+    user_ids = [user["resource_grant_user_id"] for user in users if "resource_grant_user_id" in user]
     current_user = tk.current_user or User.get(context["user"])
     RestrictedResourceAccess.update_resource_access(data_dict["id"], user_ids, current_user.id)
     meta.Session.commit()
