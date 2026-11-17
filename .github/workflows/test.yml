@@ -12,13 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 2.12 is what the DataStore image runs from September 2026; 2.10 stays
-        # until production has moved (MWDS-359).
+        # 2.12 is what every DataStore environment runs since production moved
+        # on 14 October 2026 (MWDS-359); the 2.10 row went with it (MWDS-556).
+        # This list feeds `ckan db init` and any test without a ckan_config
+        # mark. The plugins a test module loads come from its own
+        # pytest.mark.ckan_config("ckan.plugins", ...) mark, so spatial_metadata
+        # and activity belong in those marks, not here.
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources spatial_metadata activity"
-          - ckan: "2.10"
-            plugins: "mwlr_datastore dataset_approval scheming_datasets"
+            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
       # The 2.11+ dev images end on USER ckan; the runner's checkout and state
@@ -26,7 +28,9 @@ jobs:
       options: --user root
     services:
       solr:
-        image: ckan/ckan-solr:${{ matrix.ckan }}-solr9
+        # The -spatial schema is what ckanext-spatial indexes into; its own CI
+        # uses this image. test_search.py loads spatial_metadata (MWDS-556).
+        image: ckan/ckan-solr:${{ matrix.ckan }}-solr9-spatial
       postgres:
         image: ckan/ckan-postgres-dev:${{ matrix.ckan }}
         env:
