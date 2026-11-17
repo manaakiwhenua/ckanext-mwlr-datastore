@@ -16,7 +16,7 @@ jobs:
         # until production has moved (MWDS-359).
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources spatial_metadata tracking activity"
+            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources spatial_metadata activity"
           - ckan: "2.10"
             plugins: "mwlr_datastore dataset_approval scheming_datasets"
     container:
