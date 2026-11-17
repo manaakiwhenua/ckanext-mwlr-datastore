@@ -28,9 +28,16 @@ from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
 from ckan.tests import helpers
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 
-pytestmark = pytest.mark.ckan_config(
-    "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking"
-)  # tracking needs to be included to pick up any issues from masking resources
+pytestmark = [
+    pytest.mark.ckan_config(
+        "ckan.plugins",
+        "mwlr_datastore bsi_restricted_resources tracking scheming_datasets",
+    ),
+    pytest.mark.ckan_config(
+        "scheming.dataset_schemas",
+        "ckanext.mwlr_datastore:scheming/dataset_with_restricted_resources.yaml",
+    ),
+]
 
 
 def get_user_context(resource):

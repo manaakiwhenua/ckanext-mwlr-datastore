@@ -64,6 +64,11 @@ def access_scenario(
         private=dataset_is_private,
         owner_org=organisation["id"],
         user=users[UserType.DATASET_CREATOR],
+        author=users[UserType.DATASET_CREATOR]["name"],
+        maintainer=users[UserType.DATASET_CREATOR]["name"],
+        maintainer_email=f"{users[UserType.DATASET_CREATOR]['name']}@example.invalid",
+        publication_year=2024,
+        publisher="Example Publisher",
     )
     resource_id = f"resource_{uuid.uuid4()}"
     resource = factories.Resource(
