@@ -1,7 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckanext.bsi_restricted_resources import actions, auth
-from ckanext.bsi_restricted_resources.logic import access_helpers
+from ckanext.bsi_restricted_resources.logic import access_helpers, activity_helpers
 import logging as log
 
 log = log.getLogger(__name__)
@@ -15,7 +15,10 @@ class BsiRestrictedResourcesPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IResourceController, inherit=True)
 
     def get_helpers(self):
-        return access_helpers.get_access_helpers()
+        return {
+            **access_helpers.get_access_helpers(),
+            **activity_helpers.get_helpers()
+        }
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
