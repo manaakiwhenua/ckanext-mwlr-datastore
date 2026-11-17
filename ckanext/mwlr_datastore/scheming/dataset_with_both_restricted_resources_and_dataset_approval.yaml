@@ -399,6 +399,7 @@ resource_fields:
   repeating_label: Users
   repeating_subfields:
     - field_name: resource_grant_user_id
+      display_snippet: resource_grant_user.html
       label: User
       preset: select
       choices_helper: user_choices
