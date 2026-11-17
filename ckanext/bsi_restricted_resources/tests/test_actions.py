@@ -1,5 +1,4 @@
 import pytest
-import ckan.plugins.toolkit as tk
 import ckan.plugins as plugins
 from ckan.tests import helpers, factories
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel

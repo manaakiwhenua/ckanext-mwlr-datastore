@@ -5,7 +5,7 @@ from ckan.plugins import toolkit
 import uuid
 from sqlalchemy.sql import func
 import ckan.model.meta as meta
-from typing import List
+from typing import List, Self
 
 
 class RestrictedResourceAccess(toolkit.BaseModel):
@@ -21,7 +21,7 @@ class RestrictedResourceAccess(toolkit.BaseModel):
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     @classmethod
-    def find_resource_access(cls, resource_id: str) -> List[RestrictedResourceAccess]:
+    def find_resource_access(cls, resource_id: str) -> List[Self]:
         items = meta.Session.execute(
             sa.select(cls).where(cls.resource_id == resource_id)
         )
