@@ -30,7 +30,7 @@ def access_scenario(
     user_type,
     dataset_is_private,
     resource_access_level,
-    activity_db,
+    activity_db_test_setup,
     with_plugins,
     clean_db,
     clean_index,
@@ -129,6 +129,8 @@ def resource_restricted_to_selected_users():
 
 # Test_activity_list requires db migration for the activity plugin
 @pytest.fixture
-def activity_db(with_plugins, clean_db, migrate_db_for):
-    if plugins.plugin_loaded("activity"):
-        migrate_db_for("activity")
+def activity_db_test_setup(with_plugins, clean_db, migrate_db_for):
+    assert plugins.plugin_loaded("activity"), (
+        "Tests require the activity plugin due to the 'package_activity_list' and related activity action in bsi_restricted_resources actions.py"
+    )
+    migrate_db_for("activity")

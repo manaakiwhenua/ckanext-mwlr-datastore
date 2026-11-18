@@ -7,7 +7,7 @@ from ckanext.bsi_restricted_resources.types import UserType
 
 pytestmark = pytest.mark.ckan_config(
     "ckan.plugins",
-    "mwlr_datastore bsi_restricted_resources tracking",
+    "mwlr_datastore bsi_restricted_resources tracking activity",
 )
 
 # Leave out the restricted resource scheming file to test legacy behaviour without scheming enforcement of the default 'resource_access_level' field
