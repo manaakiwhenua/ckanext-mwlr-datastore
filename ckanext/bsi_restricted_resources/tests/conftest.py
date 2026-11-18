@@ -106,6 +106,11 @@ def resource_restricted_to_selected_users():
             private=dataset_is_private,
             owner_org=organisation["id"],
             user=factories.UserWithToken(),
+            author="Example Author",
+            maintainer="Example Maintainer",
+            maintainer_email="example@maintainer.com",
+            publication_year=2024,
+            publisher="Example Publisher",
         )
         resource_id = f"{uuid.uuid4()}"
         resource = factories.Resource(
