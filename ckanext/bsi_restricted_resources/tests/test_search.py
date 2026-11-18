@@ -12,7 +12,7 @@ from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
 pytestmark = [
     pytest.mark.ckan_config(
         "ckan.plugins",
-        "mwlr_datastore bsi_restricted_resources spatial_metadata scheming_datasets",
+        "mwlr_datastore bsi_restricted_resources spatial_metadata scheming_datasets activity",
     ),
     pytest.mark.ckan_config(
         "scheming.dataset_schemas",

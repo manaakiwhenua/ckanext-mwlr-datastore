@@ -31,7 +31,7 @@ from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 pytestmark = [
     pytest.mark.ckan_config(
         "ckan.plugins",
-        "mwlr_datastore bsi_restricted_resources tracking scheming_datasets",
+        "mwlr_datastore bsi_restricted_resources tracking scheming_datasets activity",
     ),
     pytest.mark.ckan_config(
         "scheming.dataset_schemas",
@@ -69,17 +69,22 @@ def test_resource_access_on_resource_show(access_scenario):
 
 
 @pytest.mark.usefixtures("with_plugins")
-@pytest.mark.parametrize(["dataset_is_private", "user_is_selected", "user_has_resource_access"], [
-    pytest.param(True,  True,   False,  id="private-dataset-user-selected"),
-    pytest.param(True,  False,  False,  id="private-dataset-user-not-selected"),
-    pytest.param(False, True,   True,   id="public-dataset-user-selected"),
-    pytest.param(False, False,  False,  id="public-dataset-user-not-selected"),
-])
-def test_resource_access_on_restrict_to_selected_users(dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user):
+@pytest.mark.parametrize(
+    ["dataset_is_private", "user_is_selected", "user_has_resource_access"],
+    [
+        pytest.param(True, True, False, id="private-dataset-user-selected"),
+        pytest.param(True, False, False, id="private-dataset-user-not-selected"),
+        pytest.param(False, True, True, id="public-dataset-user-selected"),
+        pytest.param(False, False, False, id="public-dataset-user-not-selected"),
+    ],
+)
+def test_resource_access_on_restrict_to_selected_users(
+    dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user
+):
     user_list = [user] if user_is_selected else []
     resource = resource_restricted_to_selected_users(user_list, dataset_is_private)
-    resource_context = { "id": resource["id"] }
-    user_context = {"user": user["name"] }
+    resource_context = {"id": resource["id"]}
+    user_context = {"user": user["name"]}
     if user_has_resource_access:
         result = tk.get_action("resource_show")(user_context, resource_context)
         assert result["id"] == resource_context["id"]
@@ -89,24 +94,31 @@ def test_resource_access_on_restrict_to_selected_users(dataset_is_private, user_
 
 
 @pytest.mark.usefixtures("with_plugins")
-@pytest.mark.parametrize(["dataset_is_private", "user_is_selected", "user_has_resource_access"], [
-    pytest.param(True,  True,   True,   id="private-dataset-user-selected"),
-    pytest.param(True,  False,  False,  id="private-dataset-user-not-selected"),
-    pytest.param(False, True,   True,   id="public-dataset-user-selected"),
-    pytest.param(False, False,  False,  id="public-dataset-user-not-selected"),
-])
-def test_resource_access_on_restrict_to_selected_users_on_collection_members(dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user):
+@pytest.mark.parametrize(
+    ["dataset_is_private", "user_is_selected", "user_has_resource_access"],
+    [
+        pytest.param(True, True, True, id="private-dataset-user-selected"),
+        pytest.param(True, False, False, id="private-dataset-user-not-selected"),
+        pytest.param(False, True, True, id="public-dataset-user-selected"),
+        pytest.param(False, False, False, id="public-dataset-user-not-selected"),
+    ],
+)
+def test_resource_access_on_restrict_to_selected_users_on_collection_members(
+    dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user
+):
     # make the user a member of the organisation (aka collection)
     org = factories.Organization(
-        users = [{
-            "name": user["name"],
-            "capacity": "member",
-        }]
+        users=[
+            {
+                "name": user["name"],
+                "capacity": "member",
+            }
+        ]
     )
     user_list = [user] if user_is_selected else []
     resource = resource_restricted_to_selected_users(user_list, dataset_is_private, org)
-    resource_context = { "id": resource["id"] }
-    user_context = {"user": user["name"] }
+    resource_context = {"id": resource["id"]}
+    user_context = {"user": user["name"]}
     if user_has_resource_access:
         result = tk.get_action("resource_show")(user_context, resource_context)
         assert result["id"] == resource_context["id"]
@@ -316,7 +328,11 @@ def test_deleted_dataset_still_restricts_resource_access(app, access_scenario):
     user = access_scenario["user"]
     headers = {"Authorization": user["token"]} if user else {}
 
-    helpers.call_action("package_delete", id=access_scenario["dataset"]["id"])
+    helpers.call_action(
+        "package_delete",
+        context={"user": access_scenario["dataset_creator_user_id"]},
+        id=access_scenario["dataset"]["id"],
+    )
 
     resource_api_url = tk.url_for("api.action", ver=3, logic_function="resource_show", id=resource["id"])
     response = app.get(resource_api_url, headers=headers)

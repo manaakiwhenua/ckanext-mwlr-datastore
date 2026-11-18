@@ -30,6 +30,7 @@ def access_scenario(
     user_type,
     dataset_is_private,
     resource_access_level,
+    activity_db_test_setup,
     with_plugins,
     clean_db,
     clean_index,
@@ -73,15 +74,14 @@ def access_scenario(
         maintainer_email=f"{users[UserType.DATASET_CREATOR]['name']}@example.invalid",
         publication_year=2024,
         publisher="Example Publisher",
-    )
-    resource_id = f"resource_{uuid.uuid4()}"
-    resource = factories.Resource(
-        package_id=dataset["id"],
-        resource_id=resource_id,
-        resource_access_level=resource_access_level,
-        name=f"Resource_name_for_{resource_id}",
-        description=f"Resource_description_for_{resource_id}",
-        url=f"https://example.invalid/protected-test-resource-{resource_id}.csv",
+        resources=[
+            {
+                "description": f"Resource_description_{uuid.uuid4()}",
+                "name": f"Resource_name_{uuid.uuid4()}",
+                "url": f"https://example.invalid/restricted-resource-{uuid.uuid4()}.csv",
+                "resource_access_level": resource_access_level,
+            }
+        ],
     )
 
     user_has_dataset_access = user_type in PrivateDatasetReaders.__members__.values() or not dataset_is_private
@@ -92,7 +92,7 @@ def access_scenario(
         "user": users[user_type],
         "dataset_creator_user_id": users[UserType.DATASET_CREATOR]["id"],
         "dataset": dataset,
-        "resource": resource,
+        "resource": dataset["resources"][0],
         "user_has_resource_access": user_has_resource_access,
         "user_has_dataset_access": user_has_dataset_access,
     }
@@ -100,7 +100,7 @@ def access_scenario(
 
 @pytest.fixture
 def resource_restricted_to_selected_users():
-    def factory(users, dataset_is_private: bool, organisation = None):
+    def factory(users, dataset_is_private: bool, organisation=None):
         organisation = organisation if organisation is not None else factories.Organization()
         dataset = factories.Dataset(
             private=dataset_is_private,
@@ -120,9 +120,17 @@ def resource_restricted_to_selected_users():
             name=f"Resource_name_for_{resource_id}",
             description=f"Resource_description_for_{resource_id}",
             url=f"https://example.invalid/protected-test-resource-{resource_id}.csv",
-            resource_access_users=[
-                { "resource_grant_user_id": user["id"] for user in users }
-            ]
+            resource_access_users=[{"resource_grant_user_id": user["id"] for user in users}],
         )
         return resource
+
     return factory
+
+
+# Test_activity_list requires db migration for the activity plugin
+@pytest.fixture
+def activity_db_test_setup(with_plugins, clean_db, migrate_db_for):
+    assert plugins.plugin_loaded("activity"), (
+        "Tests require the activity plugin due to the 'package_activity_list' and related activity action in bsi_restricted_resources actions.py"
+    )
+    migrate_db_for("activity")

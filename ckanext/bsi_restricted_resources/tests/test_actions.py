@@ -9,7 +9,7 @@ def resource_for_users(resource, resource_access_level: ResourceAccessLevel, use
     return {
         "id": resource["id"],
         "resource_access_level": resource_access_level,
-        "resource_access_users": [{"resource_grant_user_id": user["id"]} for user in users]
+        "resource_access_users": [{"resource_grant_user_id": user["id"]} for user in users],
     }
 
 
@@ -21,8 +21,12 @@ def actions_test_setup(migrate_db_for):
     )
 
 
-@pytest.mark.ckan_config("ckan.plugins", "bsi_restricted_resources")
-@pytest.mark.usefixtures("with_plugins", "clean_db", "actions_test_setup")
+pytestmark = [
+    pytest.mark.ckan_config("ckan.plugins", "bsi_restricted_resources activity"),
+    pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index", "actions_test_setup", "activity_db_test_setup"),
+]
+
+
 def test_restricted_resource_access_create():
     user = factories.User()
     current_user = factories.User()
@@ -39,8 +43,6 @@ def test_restricted_resource_access_create():
     assert resource_access.granted_by_user_id == current_user["id"]
 
 
-@pytest.mark.ckan_config("ckan.plugins", "bsi_restricted_resources")
-@pytest.mark.usefixtures("with_plugins", "clean_db", "actions_test_setup")
 def test_restricted_resource_access_update():
     users = [factories.User(), factories.User(), factories.User()]
     current_user = factories.User()
@@ -84,8 +86,6 @@ def test_restricted_resource_access_update():
     assert len(resource_access) == 0
 
 
-@pytest.mark.ckan_config("ckan.plugins", "bsi_restricted_resources")
-@pytest.mark.usefixtures("with_plugins", "clean_db", "actions_test_setup")
 def test_restricted_resource_access_delete():
     users = [factories.User(), factories.User(), factories.User()]
     current_user = factories.User()
