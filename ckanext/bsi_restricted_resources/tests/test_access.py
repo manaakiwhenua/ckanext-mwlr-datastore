@@ -191,7 +191,7 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
         assert value not in response.text, f"Dataset HTML exposed restricted metadata: {value!r}"
 
 
-# Test that a resource with an unknown access level is not treated as restricted (existing resources should still be accessible)
+# Test that a resource created with an empty access level defaults to 'restricted to editors'
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
     [
@@ -203,10 +203,13 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
         )
     ],
 )
-def test_resource_with_empty_resource_access_level_is_unrestricted(app, access_scenario):
+def test_resource_with_empty_resource_access_level_defaults_to_restricted_to_editors(app, access_scenario):
     resource = access_scenario["resource"]
     user = access_scenario["user"]
     headers = {"Authorization": user["token"]} if user else {}
+
+    assert resource["resource_access_level"] == ResourceAccessLevel.RESTRICT_TO_EDITORS.value
+
     resource_page_url = tk.url_for(
         "dataset_resource.read",
         id=resource["package_id"],
@@ -214,7 +217,7 @@ def test_resource_with_empty_resource_access_level_is_unrestricted(app, access_s
     )
 
     response = app.get(resource_page_url, headers=headers)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # Test that a resource with an unknown but not empty access level is restricted (an unknown access level may be a typo or not added to the RESOURCE_ACCESS_LEVEL_DICT)
