@@ -13,7 +13,16 @@ from ckanext.bsi_restricted_resources.types import (
     UserType,
 )
 
-pytestmark = pytest.mark.ckan_config("ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking activity")
+pytestmark = [
+    pytest.mark.ckan_config(
+        "ckan.plugins",
+        "mwlr_datastore bsi_restricted_resources tracking scheming_datasets activity",
+    ),
+    pytest.mark.ckan_config(
+        "scheming.dataset_schemas",
+        "ckanext.mwlr_datastore:scheming/dataset_with_restricted_resources.yaml",
+    ),
+]
 
 
 def check_activity_plugin_loaded():

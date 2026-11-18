@@ -13,14 +13,14 @@ jobs:
       fail-fast: false
       matrix:
         # 2.12 is what every DataStore environment runs since production moved
-        # on 14 October 2026 (MWDS-359); the 2.10 row went with it (MWDS-556).
+        # on 14 October 2026 (MWDS-359); 
         # This list feeds `ckan db init` and any test without a ckan_config
         # mark. The plugins a test module loads come from its own
         # pytest.mark.ckan_config("ckan.plugins", ...) mark, so spatial_metadata
-        # and activity belong in those marks, not here.
+        # belongs in those marks, not here.
         include:
           - ckan: "2.12"
-            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources"
+            plugins: "mwlr_datastore tracking dataset_approval scheming_datasets bsi_restricted_resources activity"
     container:
       image: ckan/ckan-dev:${{ matrix.ckan }}
       # The 2.11+ dev images end on USER ckan; the runner's checkout and state
