@@ -1,11 +1,10 @@
-import logging
 import ckan.plugins.toolkit as tk
-
+from ckan.model import User
 from flask import has_request_context, request
 import ckan.lib.base as base
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel
-
-log = logging.getLogger(__name__)
+from ckanext.bsi_restricted_resources.models import RestrictedResourceAccess
+import ckan.model.meta as meta
 
 
 @tk.chained_action
@@ -121,10 +120,76 @@ def mask_resource_if_restricted(context, resource):
         return masked_resource
 
 
+def restricted_resource_access_create(context, data_dict):
+    """
+    Create restricted_resource_access records for a newly created resource
+    :param context:
+    :param data_dict:
+    :return:
+    """
+    tk.check_access("restricted_resource_access_create", context, data_dict)
+    resource_access_level = data_dict.get("resource_access_level")
+    if resource_access_level != ResourceAccessLevel.RESTRICT_TO_SELECTED_USERS:
+        # nothing to create
+        return
+
+    users = data_dict.get("resource_access_users", [])
+    if len(users) == 0:
+        # nothing to create
+        return
+
+    current_user = tk.current_user or User.get(context["user"])
+    items = [{"user_id": user["resource_grant_user_id"], "granted_by_user_id": current_user.id,
+              "resource_id": data_dict["id"]} for user in users if "resource_grant_user_id" in user]
+    if len(items) > 0:
+        RestrictedResourceAccess.create(items)
+        meta.Session.commit()
+
+
+def restricted_resource_access_update(context, data_dict):
+    """
+    Update restricted_resource_access records for a resource
+    :param context:
+    :param data_dict:
+    :return:
+    """
+    tk.check_access("restricted_resource_access_update", context, data_dict)
+
+    resource_access_level = data_dict.get("resource_access_level")
+    if resource_access_level != ResourceAccessLevel.RESTRICT_TO_SELECTED_USERS:
+        # nothing to create
+        return
+
+    users = data_dict.get("resource_access_users", [])
+    user_ids = [user["resource_grant_user_id"] for user in users if "resource_grant_user_id" in user]
+    current_user = tk.current_user or User.get(context["user"])
+    RestrictedResourceAccess.update_resource_access(data_dict["id"], user_ids, current_user.id)
+    meta.Session.commit()
+
+
+def restricted_resource_access_delete(context, data_dict):
+    """
+    Deletes all restricted_resource_access associated with a resource
+
+    :param context:
+    :param data_dict: expects { "id": str } where "id" is the id of the resource
+    :return:
+    """
+    tk.check_access("restricted_resource_access_delete", context, data_dict)
+    id = data_dict.get("id")
+    if id is None:
+        return
+    RestrictedResourceAccess.delete_resource_access(id)
+    meta.Session.commit()
+
+
 def get_actions():
     return {
         "resource_view_list": resource_view_list,
         "package_search": package_search,
         "package_show": package_show,
         "resource_search": resource_search,
+        "restricted_resource_access_create": restricted_resource_access_create,
+        "restricted_resource_access_update": restricted_resource_access_update,
+        "restricted_resource_access_delete": restricted_resource_access_delete,
     }

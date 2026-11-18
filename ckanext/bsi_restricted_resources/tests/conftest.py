@@ -4,6 +4,7 @@ import ckan.plugins as plugins
 import uuid
 from ckanext.bsi_restricted_resources.types import (
     PrivateDatasetReaders,
+    ResourceAccessLevel,
     UserType,
     RESOURCE_ACCESS_LEVEL_DICT,
 )
@@ -32,10 +33,13 @@ def access_scenario(
     with_plugins,
     clean_db,
     clean_index,
+    migrate_db_for,
 ):
     assert plugins.plugin_loaded("bsi_restricted_resources"), (
         "Test setup failed: bsi_restricted_resources is not loaded."
     )
+
+    migrate_db_for("bsi_restricted_resources")
 
     users = create_users(UserType.__members__.values())
 
@@ -92,3 +96,33 @@ def access_scenario(
         "user_has_resource_access": user_has_resource_access,
         "user_has_dataset_access": user_has_dataset_access,
     }
+
+
+@pytest.fixture
+def resource_restricted_to_selected_users():
+    def factory(users, dataset_is_private: bool, organisation = None):
+        organisation = organisation if organisation is not None else factories.Organization()
+        dataset = factories.Dataset(
+            private=dataset_is_private,
+            owner_org=organisation["id"],
+            user=factories.UserWithToken(),
+            author="Example Author",
+            maintainer="Example Maintainer",
+            maintainer_email="example@maintainer.com",
+            publication_year=2024,
+            publisher="Example Publisher",
+        )
+        resource_id = f"{uuid.uuid4()}"
+        resource = factories.Resource(
+            package_id=dataset["id"],
+            id=resource_id,
+            resource_access_level=ResourceAccessLevel.RESTRICT_TO_SELECTED_USERS,
+            name=f"Resource_name_for_{resource_id}",
+            description=f"Resource_description_for_{resource_id}",
+            url=f"https://example.invalid/protected-test-resource-{resource_id}.csv",
+            resource_access_users=[
+                { "resource_grant_user_id": user["id"] for user in users }
+            ]
+        )
+        return resource
+    return factory
