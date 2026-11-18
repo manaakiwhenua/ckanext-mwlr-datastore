@@ -33,7 +33,29 @@ def resource_show(next_auth, context, data_dict):
     return result
 
 
+def defer_to_auth_fn(name):
+    def wrapper(context, data_dict):
+        try:
+            tk.check_access(name, context, data_dict)
+            return {"success": True}
+        except tk.NotAuthorized as e:
+            return {
+                "success": False,
+                "msg": e.message,
+            }
+    return wrapper
+
+# Create simple wrappers around the equivalent resource_ auth functions
+# this provides a baseline implementation and allows for extension by other plugins
+restricted_resource_access_create = defer_to_auth_fn("resource_create")
+restricted_resource_access_update = defer_to_auth_fn("resource_update")
+restricted_resource_access_delete = defer_to_auth_fn("resource_delete")
+
+
 def get_auth_functions():
     return {
         "resource_show": resource_show,
+        "restricted_resource_access_create": restricted_resource_access_create,
+        "restricted_resource_access_update": restricted_resource_access_update,
+        "restricted_resource_access_delete": restricted_resource_access_delete,
     }

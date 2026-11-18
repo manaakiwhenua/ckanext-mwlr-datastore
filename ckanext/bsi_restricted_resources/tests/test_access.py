@@ -25,12 +25,19 @@ from ckanext.bsi_restricted_resources.tests.access_scenario_helpers import (
     ACCESS_PARAMETERS,
     get_resource_data_that_should_be_masked,
 )
-from ckan.tests import helpers
+from ckan.tests import helpers, factories
 from ckanext.bsi_restricted_resources.types import ResourceAccessLevel, UserType
 
-pytestmark = pytest.mark.ckan_config(
-    "ckan.plugins", "mwlr_datastore bsi_restricted_resources tracking activity"
-)  # tracking and activity need to be included to pick up any issues from masking resources
+pytestmark = [
+    pytest.mark.ckan_config(
+        "ckan.plugins",
+        "mwlr_datastore bsi_restricted_resources tracking scheming_datasets activity",
+    ),
+    pytest.mark.ckan_config(
+        "scheming.dataset_schemas",
+        "ckanext.mwlr_datastore:scheming/dataset_with_restricted_resources.yaml",
+    ),
+]
 
 
 def get_user_context(resource):
@@ -56,6 +63,65 @@ def test_resource_access_on_resource_show(access_scenario):
         result = tk.get_action("resource_show")(user_context, resource_context)
         assert result["id"] == resource_context["id"]
         assert result["name"] == access_scenario["resource"]["name"]
+    else:
+        with pytest.raises(tk.NotAuthorized):
+            tk.get_action("resource_show")(user_context, resource_context)
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.parametrize(
+    ["dataset_is_private", "user_is_selected", "user_has_resource_access"],
+    [
+        pytest.param(True, True, False, id="private-dataset-user-selected"),
+        pytest.param(True, False, False, id="private-dataset-user-not-selected"),
+        pytest.param(False, True, True, id="public-dataset-user-selected"),
+        pytest.param(False, False, False, id="public-dataset-user-not-selected"),
+    ],
+)
+def test_resource_access_on_restrict_to_selected_users(
+    dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user
+):
+    user_list = [user] if user_is_selected else []
+    resource = resource_restricted_to_selected_users(user_list, dataset_is_private)
+    resource_context = {"id": resource["id"]}
+    user_context = {"user": user["name"]}
+    if user_has_resource_access:
+        result = tk.get_action("resource_show")(user_context, resource_context)
+        assert result["id"] == resource_context["id"]
+    else:
+        with pytest.raises(tk.NotAuthorized):
+            tk.get_action("resource_show")(user_context, resource_context)
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.parametrize(
+    ["dataset_is_private", "user_is_selected", "user_has_resource_access"],
+    [
+        pytest.param(True, True, True, id="private-dataset-user-selected"),
+        pytest.param(True, False, False, id="private-dataset-user-not-selected"),
+        pytest.param(False, True, True, id="public-dataset-user-selected"),
+        pytest.param(False, False, False, id="public-dataset-user-not-selected"),
+    ],
+)
+def test_resource_access_on_restrict_to_selected_users_on_collection_members(
+    dataset_is_private, user_is_selected, user_has_resource_access, resource_restricted_to_selected_users, user
+):
+    # make the user a member of the organisation (aka collection)
+    org = factories.Organization(
+        users=[
+            {
+                "name": user["name"],
+                "capacity": "member",
+            }
+        ]
+    )
+    user_list = [user] if user_is_selected else []
+    resource = resource_restricted_to_selected_users(user_list, dataset_is_private, org)
+    resource_context = {"id": resource["id"]}
+    user_context = {"user": user["name"]}
+    if user_has_resource_access:
+        result = tk.get_action("resource_show")(user_context, resource_context)
+        assert result["id"] == resource_context["id"]
     else:
         with pytest.raises(tk.NotAuthorized):
             tk.get_action("resource_show")(user_context, resource_context)
@@ -184,7 +250,7 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
         assert value not in response.text, f"Dataset HTML exposed restricted metadata: {value!r}"
 
 
-# Test that a resource with an unknown access level is not treated as restricted (existing resources should still be accessible)
+# Test that a resource created with an empty access level defaults to 'restricted to editors'
 @pytest.mark.parametrize(
     ACCESS_PARAMETERS,
     [
@@ -196,10 +262,13 @@ def test_dataset_page_masks_restricted_resource(app, access_scenario):
         )
     ],
 )
-def test_resource_with_empty_resource_access_level_is_unrestricted(app, access_scenario):
+def test_resource_with_empty_resource_access_level_defaults_to_restricted_to_editors(app, access_scenario):
     resource = access_scenario["resource"]
     user = access_scenario["user"]
     headers = {"Authorization": user["token"]} if user else {}
+
+    assert resource["resource_access_level"] == ResourceAccessLevel.RESTRICT_TO_EDITORS.value
+
     resource_page_url = tk.url_for(
         "dataset_resource.read",
         id=resource["package_id"],
@@ -207,7 +276,7 @@ def test_resource_with_empty_resource_access_level_is_unrestricted(app, access_s
     )
 
     response = app.get(resource_page_url, headers=headers)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # Test that a resource with an unknown but not empty access level is restricted (an unknown access level may be a typo or not added to the RESOURCE_ACCESS_LEVEL_DICT)

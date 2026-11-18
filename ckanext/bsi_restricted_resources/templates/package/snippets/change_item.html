@@ -1,0 +1,29 @@
+<strong>{{ gettext('On %(timestamp)s, %(username)s:', timestamp=h.render_datetime(activity_diff.activities[1].timestamp, with_hours=True, with_seconds=True), username=h.linked_user(activity_diff.activities[1].user_id)) }}</strong>
+
+{% set access_changes = h.resource_access_activity_changes(activity_diff) %}
+{% set changes = h.resource_access_other_changes(activity_diff) %}
+<ul>
+  {% if not changes and not access_changes %}
+    {% snippet "snippets/changes/no_change.html" %}
+  {% endif %}
+  {% for change in changes %}
+    {% if change.type != 'no_change' or not access_changes %}
+      {% snippet "snippets/changes/{}.html".format(change.type), change=change, pkg_dict=pkg_dict, dataset_type=activity_diff.activities[1].data.package.type %}
+      <br>
+    {% endif %}
+  {% endfor %}
+  {% for change in access_changes %}
+    {% for user in change.added %}
+      <li>
+        {% set user_text = h.linked_user(user) if h.check_access("user_show", { "id": user }) else user %}
+        {{ _('Access to resource "{resource}" granted to {user}.').format(resource=change.resource_name, user=user_text) }}
+      </li>
+    {% endfor %}
+    {% for user in change.removed %}
+      <li>
+        {% set user_text = h.linked_user(user) if h.check_access("user_show", { "id": user }) else user %}
+        {{ _('Access to resource "{resource}" removed from {user}.').format(resource=change.resource_name, user=user_text) }}
+      </li>
+    {% endfor %}
+  {% endfor %}
+</ul>

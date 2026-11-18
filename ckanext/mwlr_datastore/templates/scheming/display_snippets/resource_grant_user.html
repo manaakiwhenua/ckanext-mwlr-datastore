@@ -1,0 +1,6 @@
+{% set user_id = data[field.field_name] %}
+{% if h.check_access('user_show', {'id': user_id}) %}
+  {{ h.linked_user(user_id) }}
+{% else %}
+  {{ user_id }}
+{% endif %}
