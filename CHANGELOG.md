@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.4.0...v2.4.1) (2026-11-24)
+
+
+### Fixes
+
+* MWDS-560 ship the restricted resources email template in the package ([#67](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/67)) ([c402a1e](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/c402a1e666b32ee8491a3d33d6d46ce61cc36ef3))
+
 ## [2.4.0](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.3.2...v2.4.0) (2026-11-18)
 
 
