@@ -31,7 +31,7 @@ Permission labels are also **dataset-level only**: CKAN stores them on the datas
 
 - **Permission labels:** `dataset_approval` implements `IPermissionLabels`; nothing else does. 
 - **Chained actions:** `dataset_approval` chains `package_create`, `package_update`, `package_show` (a pass-through), `resource_create` and `resource_update`.
-- **Templates, between our plugins:** `package/read_base.html`, `package/search.html`, `page.html` and `scheming/package/snippets/resource_form.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders. `bsi_restricted_resources` overrides only a few resource items, which neither of the others touches.
+- **Templates, between our plugins:** `package/read_base.html`, `package/search.html`, `page.html` and `scheming/package/snippets/resource_form.html` are overridden by both `mwlr_datastore` and `dataset_approval`, each on different blocks, so their order does not change what renders. `bsi_restricted_resources` overrides only a few resource items. `bsi_restricted_resources` overrides `resources_list.html`, so needs to be listed in the plugin list before mwlr_datastore.
 - **Templates, `mwlr_datastore` with core `tracking`:** both override `package/search.html` and `page.html`, on different blocks.
 - **Templates, with core `tracking`:** CKAN's own `tracking` plugin (2.11 onwards) and `dataset_approval` both replace the same block in two templates, and neither calls `super()`:
     - `package/search.html`, block `form`: whichever is listed first supplies the search form. With `tracking` listed first, the sysadmin-only sort options `dataset_approval` adds (In progress, Rejected, Review pending) do not appear.
