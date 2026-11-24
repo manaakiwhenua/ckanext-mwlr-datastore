@@ -1,0 +1,8 @@
+# Config options this plugin reads from the .env file (MWDS-536). Declared so CKAN knows them and
+# stops warning "Option ... is not declared" on each read.
+
+# Bsi_restricted_resources plugin currently has no configuration options. 
+# As config options are added, structure this file like the other plugins' config_declaration.yml files.
+
+version: 1
+groups: []

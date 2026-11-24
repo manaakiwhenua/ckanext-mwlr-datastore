@@ -94,7 +94,7 @@ jobs:
         # directory, `ckanext` imports from the source tree and the check
         # inspects the very files it is meant to be verifying were installed.
         #
-        # Reads config_declaration.yml for each plugin to ensure all required configuration options are included in the package
+        # Checks config_declaration.yml exists for each plugin. Add config options to the respective config_declaration.yml files to ensure all required configuration options are included in the package
         run: |
           python -m venv /tmp/v && . /tmp/v/bin/activate
           pip install dist/*.tar.gz
@@ -103,7 +103,7 @@ jobs:
           os.chdir("/tmp")
           src = pathlib.Path(os.environ["SRC"])
           missing = []
-          for plugin in ("mwlr_datastore", "datasetapproval"):
+          for plugin in ("mwlr_datastore", "datasetapproval","bsi_restricted_resources"):
               pkg = r.files(f"ckanext.{plugin}")
               base = src / "ckanext" / plugin
               # Without it the config_declarations decorator stops CKAN
