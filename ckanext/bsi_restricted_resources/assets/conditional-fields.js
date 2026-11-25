@@ -7,7 +7,12 @@ ckan.module('conditional-field', function ($) {
       this.update();
     },
     update: function () {
-      this.el.toggle(this.source.val() === this.options.value);
+      const visible = this.source.val() === this.options.value;
+      this.el.toggle(visible);
+      if (visible) {
+        // Select2 cannot measure the field while its parent is hidden.
+        this.el.find('.select2-container').css('width', '100%');
+      }
     }
   };
 });
