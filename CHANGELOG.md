@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.2](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.4.1...v2.4.2) (2026-11-26)
+
+
+### Fixes
+
+* MWDS-542 set width of select2 container after toggling ([#69](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/69)) ([547fc92](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/547fc9248e1ccbf1c0d1af97b090ad73b3ba4432))
+* MWDS-562 add maintainer email address for restricted resource access ([#71](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/issues/71)) ([472e424](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/commit/472e424e584c04edac6833ec6521504dcaedeba9))
+
 ## [2.4.1](https://github.com/manaakiwhenua/ckanext-mwlr-datastore/compare/v2.4.0...v2.4.1) (2026-11-24)
 
 
