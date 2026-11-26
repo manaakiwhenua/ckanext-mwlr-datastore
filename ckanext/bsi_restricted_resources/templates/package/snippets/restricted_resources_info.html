@@ -3,7 +3,6 @@
 {% if g.userobj %}
 {% set username = (g.userobj.display_name or g.userobj.name) | safe %}
 {% endif %}
-{% autoescape false %}
 {% set email_body %}{% include 'emails/restricted_resource_access_request.txt' %}{% endset %}
 <div class="restricted-resources-info card">
   <h4>{{ _('🔒 Restricted resources') }}</h4>
@@ -12,9 +11,10 @@
     {% if not g.userobj %}
     <a href="{{ h.url_for('user.login') }}">{{ _('Log in') }}</a> {{ _('or') }}
     {% endif %}
+    {% autoescape false %}
     <a
       href="mailto:{{ (pkg.maintainer_email if pkg.maintainer_email else h.mwlr_data_management_email()) | e }}?subject={{ 'DataStore Resource Access Request' | urlencode }}&amp;body={{ email_body | urlencode }}&amp;cc={{ h.mwlr_data_management_email() | e }}">{{
       _('Request access to restricted resources') }}</a>
+    {% endautoescape %}
   </p>
 </div>
-{% endautoescape %}
